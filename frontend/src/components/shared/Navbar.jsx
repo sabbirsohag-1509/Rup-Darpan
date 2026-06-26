@@ -114,7 +114,7 @@ const Navbar = () => {
 
       {/* Right Side */}
       <div className="navbar-end">
-        <NavLink to="/login" className="btn btn-primary">
+        <NavLink to="/login" className="btn btn-primary text-secondary">
           Login
         </NavLink>
       </div>
