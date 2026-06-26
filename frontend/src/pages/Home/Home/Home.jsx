@@ -1,7 +1,9 @@
+import Hero from "../Hero/Hero";
+
 const Home = () => {
   return (
     <div>
-      <h2>This is Home</h2>
+      <Hero></Hero>
     </div>
   );
 };
