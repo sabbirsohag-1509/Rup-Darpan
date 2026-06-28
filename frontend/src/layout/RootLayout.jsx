@@ -4,8 +4,8 @@ import Footer from "../components/shared/Footer";
 
 const RootLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-primary/15 shadow-sm">
+    <div className="min-h-screen flex flex-col bg-base-100 text-base-content">
+      <header className="sticky top-0 z-50 bg-base-100/90 backdrop-blur-md border-b border-primary/20">
         <Navbar />
       </header>
 

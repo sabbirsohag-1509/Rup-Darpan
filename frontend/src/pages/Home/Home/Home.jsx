@@ -3,7 +3,12 @@ import Hero from "../Hero/Hero";
 const Home = () => {
   return (
     <div>
-      <Hero></Hero>
+      <section> 
+        <Hero></Hero>
+      </section>
+      <section> 
+        
+      </section>
     </div>
   );
 };
