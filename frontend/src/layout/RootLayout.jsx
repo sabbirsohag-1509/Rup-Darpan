@@ -9,7 +9,7 @@ const RootLayout = () => {
         <Navbar />
       </header>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 lg:px-10 py-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 lg:px-10 pb-10">
         <Outlet />
       </main>
 
