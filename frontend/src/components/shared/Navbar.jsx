@@ -8,6 +8,7 @@ import {
   Mail,
   Menu,
   Package,
+  PlusSquare,
   Star,
   X,
 } from "lucide-react";
@@ -21,6 +22,7 @@ const NAV_LINKS = [
   { to: "/about", label: "About", icon: Info },
   { to: "/reviews", label: "Reviews", icon: Star },
   { to: "/contact", label: "Contact", icon: Mail },
+  { to: "/add-photo", label: "Add Photos", icon: PlusSquare },
 ];
 
 const navLinkClass = ({ isActive }) =>
