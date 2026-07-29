@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 import {
   UploadCloud,
   Tag as TagIcon,
@@ -77,35 +78,43 @@ const AddPhoto = () => {
     setValue("tags", tags, { shouldValidate: true });
   }, [tags, register, setValue]);
 
-  // Handle image file selection & mock Cloudinary upload
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+// Cloudinary Upload & Handle image file selection
+const handleFileChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    // Show local preview immediately
-    const localUrl = URL.createObjectURL(file);
-    setPreviewImage(localUrl);
+  // Local preview
+  const localUrl = URL.createObjectURL(file);
+  setPreviewImage(localUrl);
 
-    // Simulate Cloudinary upload
-    setIsUploading(true);
-    setUploadProgress(0);
-    
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsUploading(false);
-          // Generate a mock Cloudinary URL
-          const randomId = Math.random().toString(36).substring(7);
-          const cloudinaryUrl = `https://res.cloudinary.com/rup-darpan/image/upload/v1688143200/uploads/${randomId}_${file.name.replace(/\s+/g, "_")}`;
-          setValue("image", cloudinaryUrl, { shouldValidate: true });
-          setPreviewImage(cloudinaryUrl); // Update preview to use the Cloudinary URL
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 150);
-  };
+  setIsUploading(true);
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "rup_darpon");
+
+    const res = await axios.post(
+      "https://api.cloudinary.com/v1_1/dgshzmhyk/image/upload",
+      formData
+    );
+
+    const imageUrl = res.data.secure_url;
+
+    // React Hook Form image URL set
+    setValue("image", imageUrl, {
+      shouldValidate: true,
+    });
+
+    // Preview-তেও Cloudinary URL দেখানো
+    setPreviewImage(imageUrl);
+  } catch (error) {
+    console.error(error);
+    alert("Image upload failed!");
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   // Handle URL change
   const handleUrlChange = (e) => {
@@ -138,10 +147,10 @@ const AddPhoto = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const onSubmit = (data) => {
-    // Construct the full object requested by the user
-    const fullPhotoObject = {
-      _id: `photo_${Math.random().toString(36).substring(2, 11)}`, // Mock ObjectId representation
+  // Add Photo submission handler
+ const onSubmit = async (data) => {
+  try {
+    const photoData = {
       title: data.title,
       image: data.image,
       category: data.category,
@@ -153,19 +162,24 @@ const AddPhoto = () => {
       likes: 0,
       views: 0,
       isPublished: data.isPublished,
-      uploadedBy: data.uploadedBy,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      uploadedBy: "admin",
+      createdAt: new Date(),
     };
 
-    // Save to local storage for demo persistence
-    const existingPhotos = JSON.parse(localStorage.getItem("rup_darpan_photos") || "[]");
-    localStorage.setItem("rup_darpan_photos", JSON.stringify([...existingPhotos, fullPhotoObject]));
+    const res = await axios.post(
+      "http://localhost:5000/photos",
+      photoData
+    );
 
-    // Open success modal / display output
-    setSubmittedData(fullPhotoObject);
-  };
+    console.log(res.data);
+    alert("Photo Added Successfully!");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to save photo!");
+  }
+};
 
+  //RESET FORM AND PREVIEW
   const handleReset = () => {
     reset();
     setTags(["Bride", "Outdoor", "Sunset"]);
@@ -217,7 +231,7 @@ const AddPhoto = () => {
               )}
             </div>
 
-            {/* Upload Method Selector */}
+            Upload Method Selector
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text font-semibold">Image Attachment</span>

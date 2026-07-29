@@ -29,6 +29,26 @@ async function run() {
     await client.connect();
     //db collection start
 
+    const myDB = client.db("rup-darpon");
+    const photoCollection = myDB.collection("photos");
+
+    //POST
+    app.post("/photos", async (req, res) => {
+      const photo = req.body;
+      const result = await photoCollection.insertOne(photo);
+      res.status(201).json(result);
+    });
+
+    //GET
+    app.get("/photos", async (req, res) => {
+      const result = await photoCollection
+        .find()
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      res.send(result);
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
