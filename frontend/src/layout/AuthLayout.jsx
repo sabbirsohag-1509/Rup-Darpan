@@ -32,15 +32,11 @@ const AuthLayout = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/20" />
           <div className="relative z-10 max-w-md text-white">
             <p className="text-xs uppercase tracking-[0.25em] text-primary/90 mb-3">
-              Rup Darpan Photography
+              Rup Darpon Photography
             </p>
             <h2 className="font-playfair text-4xl leading-tight mb-4">
               Preserve your timeless stories with elegance
             </h2>
-            <p className="text-white/80 leading-relaxed">
-              This is a demo image section. You can replace it later with your
-              own project visual.
-            </p>
           </div>
         </aside>
       </div>
