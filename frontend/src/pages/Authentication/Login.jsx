@@ -1,14 +1,16 @@
 import { NavLink } from "react-router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const { login } = useContext(AuthContext);
 
   const {
     register,
@@ -25,27 +27,14 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const { rememberMe, ...loginData } = data;
+      const { email, password } = data;
 
-      const response = await axios.post(
-        "http://localhost:5000/login",
-        loginData,
-        {
-          withCredentials: true,
-        },
-      );
+      const loggedInUser = await login(email, password);
 
-      if (response.data.user) {
+      if (loggedInUser) {
         toast.success("Login successful! 🎉");
 
-        console.log("Logged in user:", response.data.user);
-
-        // Fetch the current user's information
-        const meResponse = await axios.get("http://localhost:5000/me", {
-          withCredentials: true,
-        });
-
-        console.log("Current user:", meResponse.data.user);
+        console.log("Logged in user:", loggedInUser);
 
         reset();
       }
