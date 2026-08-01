@@ -1,17 +1,45 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 5000;
 
-//middleqware
-app.use(cors());
+// Middleware
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
+// VERIFY JWT TOKEN
+const verifyToken = (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).send({
+      message: "Unauthorized access",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    return res.status(401).send({
+      message: "Invalid or expired token",
+    });
+  }
+};
+////////////////////////
 
 app.get("/", (req, res) => {
   res.send("Hello World! CRUD is working fine");
@@ -55,17 +83,13 @@ async function run() {
       res.send(result);
     });
 
+    ////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
-    // USER COLLECTION related API
-    //POST
+    // USER COLLECTION Authentication related API
+    //POST Register
     app.post("/register", async (req, res) => {
       try {
-        const { name, email, password } = req.body;
+        const { name, email, password, profilePhoto } = req.body;
 
         // Check required fields
         if (!name || !email || !password) {
@@ -90,6 +114,7 @@ async function run() {
           name,
           email,
           password: hashedPassword,
+          profilePhoto: profilePhoto || "",
           role: "user",
           createdAt: new Date(),
         };
@@ -109,7 +134,108 @@ async function run() {
       }
     });
 
-    //
+    //POST Login
+    // LOGIN API
+    app.post("/login", async (req, res) => {
+      try {
+        const { email, password } = req.body;
+
+        // Check required fields
+        if (!email || !password) {
+          return res.status(400).send({
+            message: "Email and password are required",
+          });
+        }
+
+        // Find user by email
+        const user = await userCollection.findOne({ email });
+
+        if (!user) {
+          return res.status(401).send({
+            message: "Invalid email or password",
+          });
+        }
+
+        // Compare password with hashed password
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordCorrect) {
+          return res.status(401).send({
+            message: "Invalid email or password",
+          });
+        }
+
+        // Create JWT token
+        const token = jwt.sign(
+          {
+            userId: user._id.toString(),
+            email: user.email,
+            role: user.role,
+          },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "7d",
+          },
+        );
+
+        // Store JWT in HTTP-only cookie
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: false, // localhost development
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        // Send user information to frontend
+        res.status(200).send({
+          message: "Login successful",
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            profilePhoto: user.profilePhoto,
+            role: user.role,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+
+        res.status(500).send({
+          message: "Internal Server Error",
+        });
+      }
+    });
+    // GET CURRENT USER
+    app.get("/me", verifyToken, async (req, res) => {
+      try {
+        const user = await userCollection.findOne(
+          { _id: new ObjectId(req.user.userId) },
+          {
+            projection: {
+              password: 0,
+            },
+          },
+        );
+
+        if (!user) {
+          return res.status(404).send({
+            message: "User not found",
+          });
+        }
+
+        res.send({
+          user,
+        });
+      } catch (error) {
+        console.log(error);
+
+        res.status(500).send({
+          message: "Internal Server Error",
+        });
+      }
+    });
+
+    //////
 
     await client.db("admin").command({ ping: 1 });
     console.log(
