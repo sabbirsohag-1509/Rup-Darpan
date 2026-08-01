@@ -65,6 +65,7 @@ const Register = () => {
     register,
     handleSubmit,
     watch,
+    reset,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -121,9 +122,34 @@ const Register = () => {
     }
   };
 
+  //on Submit function btn 
+
   const onSubmit = async (data) => {
-    console.log("Register form data:", data);
-  };
+  try {
+    const { confirmPassword, acceptTerms, ...userData } = data;
+
+    const response = await axios.post(
+      "http://localhost:5000/register",
+      userData
+    );
+
+    if (response.data.insertedId) {
+      toast.success("Account created successfully! 🎉");
+
+      reset();
+    }
+  } catch (error) {
+    console.error(error);
+
+    if (error.response?.status === 409) {
+      toast.error("This email is already registered.");
+    } else {
+      toast.error(
+        error.response?.data?.message || "Registration failed. Please try again."
+      );
+    }
+  }
+};
 
   return (
     <div className="w-full">

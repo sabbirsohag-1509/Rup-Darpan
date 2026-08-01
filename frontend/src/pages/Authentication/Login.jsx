@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
@@ -23,9 +24,42 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log("Login payload:", data);
-    toast.success("Login form submitted successfully.");
-    reset();
+    try {
+      const { rememberMe, ...loginData } = data;
+
+      const response = await axios.post(
+        "http://localhost:5000/login",
+        loginData,
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (response.data.user) {
+        toast.success("Login successful! 🎉");
+
+        console.log("Logged in user:", response.data.user);
+
+        // Fetch the current user's information
+        const meResponse = await axios.get("http://localhost:5000/me", {
+          withCredentials: true,
+        });
+
+        console.log("Current user:", meResponse.data.user);
+
+        reset();
+      }
+    } catch (error) {
+      console.error(error);
+
+      if (error.response?.status === 401) {
+        toast.error("Invalid email or password.");
+      } else {
+        toast.error(
+          error.response?.data?.message || "Login failed. Please try again.",
+        );
+      }
+    }
   };
 
   return (
