@@ -85,7 +85,7 @@ async function run() {
 
     ////////////////////////////////////////////////////////////////////////////////////
 
-    // USER COLLECTION Authentication related API
+    // USER Authentication related API
     //POST Register
     app.post("/register", async (req, res) => {
       try {
@@ -236,6 +236,20 @@ async function run() {
     });
 
     //////
+    // Logout API
+    // LOGOUT API
+    app.post("/logout", (req, res) => {
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+      });
+
+      res.send({
+        message: "Logout successful",
+      });
+    });
+    ////
 
     await client.db("admin").command({ ping: 1 });
     console.log(
