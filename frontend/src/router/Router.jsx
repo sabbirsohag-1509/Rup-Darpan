@@ -5,6 +5,8 @@ import AddPhoto from "../pages/AddPhoto/AddPhoto";
 import AuthLayout from "../layout/AuthLayout";
 import Login from "../pages/Authentication/Login";
 import Register from "../pages/Authentication/Register";
+import PrivateRoute from "../pages/Authentication/PrivateRoute";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 export const router = createBrowserRouter([
   {
@@ -13,11 +15,15 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />, 
+        element: <Home />,
       },
       {
         path: "add-photo",
-        element: <AddPhoto />,
+        element: (
+          <PrivateRoute>
+            <AddPhoto />
+          </PrivateRoute>
+        ),
       },
     ],
   },
@@ -33,5 +39,13 @@ export const router = createBrowserRouter([
         element: <Register />,
       },
     ],
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    ),
   },
 ]);

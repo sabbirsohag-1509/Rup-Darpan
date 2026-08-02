@@ -6,6 +6,7 @@ export const AuthContext = createContext(null);
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // login 
   const login = async (email, password) => {
     const response = await axios.post(
       "http://localhost:5000/login",
@@ -22,6 +23,18 @@ const AuthProvider = ({ children }) => {
 
     return response.data.user;
   };
+  // logout
+  const logout = async () => {
+  await axios.post(
+    "http://localhost:5000/logout",
+    {},
+    {
+      withCredentials: true,
+    },
+  );
+
+  setUser(null);
+};
 
   useEffect(() => {
     axios
@@ -44,6 +57,7 @@ const AuthProvider = ({ children }) => {
     setUser,
     loading,
     login,
+    logout,
   };
 
   return (

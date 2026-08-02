@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, LogIn } from "lucide-react";
@@ -9,8 +9,9 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     register,
@@ -32,11 +33,17 @@ const Login = () => {
       const loggedInUser = await login(email, password);
 
       if (loggedInUser) {
-        toast.success("Login successful! 🎉");
+        toast.success(
+          "Login successful! Welcome back, " + loggedInUser.name + "!",
+        );
 
         console.log("Logged in user:", loggedInUser);
 
         reset();
+
+        const destination = location.state?.from?.pathname || "/";
+
+        navigate(destination, { replace: true });
       }
     } catch (error) {
       console.error(error);
