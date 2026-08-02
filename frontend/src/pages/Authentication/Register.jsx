@@ -233,7 +233,7 @@ const Register = () => {
             <p className="text-xs text-base-content/70">
               {profilePhoto
                 ? "Profile photo uploaded successfully."
-                : "No photo uploaded. A default avatar will be used."}
+                : "No photo uploaded Yet. A default avatar will be used."}
             </p>
           </div>
         </fieldset>

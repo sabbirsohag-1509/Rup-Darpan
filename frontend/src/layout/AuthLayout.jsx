@@ -15,9 +15,11 @@ const AuthLayout = () => {
             Back to Home
           </NavLink>
 
-          <div className="mb-8 mt-12 md:mt-10">
-            <Logo />
+          <div className="flex items-center"> 
+            <div className="mb-8 mt-12 md:mt-10">
+            <Logo /> 
           </div>
+            </div>
 
           <Outlet />
         </section>
