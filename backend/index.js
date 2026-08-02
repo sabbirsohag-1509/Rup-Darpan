@@ -39,6 +39,17 @@ const verifyToken = (req, res, next) => {
     });
   }
 };
+
+//Verify Admin
+const verifyAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).send({
+      message: "Admin access required",
+    });
+  }
+
+  next();
+};
 ////////////////////////
 
 app.get("/", (req, res) => {
@@ -67,14 +78,14 @@ async function run() {
 
     // Add photo related API
     //POST
-    app.post("/photos", async (req, res) => {
+    app.post("/photos", verifyAdmin, async (req, res) => {
       const photo = req.body;
       const result = await photoCollection.insertOne(photo);
       res.status(201).json(result);
     });
 
     //GET
-    app.get("/photos", async (req, res) => {
+    app.get("/photos", verifyAdmin, async (req, res) => {
       const result = await photoCollection
         .find()
         .sort({ createdAt: -1 })
