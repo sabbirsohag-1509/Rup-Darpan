@@ -32,7 +32,11 @@ const AuthLayout = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/20" />
           <div className="relative z-10 max-w-md text-white">
             <p className="text-xs uppercase tracking-[0.25em] text-primary/90 mb-3">
-              Rup Darpon Photography
+              <span className="text-[#C4121A] font-bold">RUP</span>
+              <span className="text-base-content font-bold ml-2">
+                DARPON
+              </span>
+             <span className="pl-2"> Photography</span>
             </p>
             <h2 className="font-playfair text-4xl leading-tight mb-4">
               Preserve your timeless stories with elegance
