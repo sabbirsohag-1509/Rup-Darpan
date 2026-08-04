@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
@@ -17,6 +19,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use(passport.initialize());
 // VERIFY JWT TOKEN
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token;
@@ -75,6 +78,54 @@ async function run() {
     const myDB = client.db("rup-darpon");
     const photoCollection = myDB.collection("photos");
     const userCollection = myDB.collection("users");
+
+    // Google Strategy
+
+    passport.use(
+      new GoogleStrategy(
+        {
+          clientID: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          callbackURL: process.env.GOOGLE_CALLBACK_URL,
+        },
+
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            const email = profile.emails?.[0]?.value;
+
+            if (!email) {
+              return done(null, false);
+            }
+
+            let user = await userCollection.findOne({ email });
+
+            if (!user) {
+              const newUser = {
+                name: profile.displayName,
+                email,
+                profilePhoto: profile.photos?.[0]?.value || "",
+                role: "user",
+                authProvider: "google",
+                createdAt: new Date(),
+              };
+
+              const result = await userCollection.insertOne(newUser);
+
+              user = {
+                _id: result.insertedId,
+                ...newUser,
+              };
+            }
+
+            return done(null, user);
+          } catch (error) {
+            console.error("Google authentication error:", error);
+            return done(error, null);
+          }
+        },
+      ),
+    );
+    //
 
     // Add photo related API
     //POST
@@ -261,6 +312,50 @@ async function run() {
       });
     });
     ////
+    // ================= GOOGLE AUTH =================
+
+    app.get(
+      "/auth/google",
+      passport.authenticate("google", {
+        scope: ["profile", "email"],
+      }),
+    );
+
+    app.get(
+      "/auth/google/callback",
+      passport.authenticate("google", {
+        session: false,
+        failureRedirect: "http://localhost:5173/login",
+      }),
+      async (req, res) => {
+        try {
+          const token = jwt.sign(
+            {
+              userId: req.user._id.toString(),
+              email: req.user.email,
+              role: req.user.role,
+            },
+            process.env.JWT_SECRET,
+            {
+              expiresIn: "7d",
+            },
+          );
+
+          res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+          });
+
+          res.redirect("http://localhost:5173/");
+        } catch (error) {
+          console.error("Google callback error:", error);
+
+          res.redirect("http://localhost:5173/login");
+        }
+      },
+    );
 
     await client.db("admin").command({ ping: 1 });
     console.log(
