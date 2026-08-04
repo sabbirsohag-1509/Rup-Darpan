@@ -20,19 +20,20 @@ import { AuthContext } from "../../context/AuthContext";
 
 const userLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/dashboard/reviews", label: "My Reviews", icon: MessageSquareText },
   { to: "/dashboard/bookings", label: "My Bookings", icon: CalendarDays },
-  { to: "/dashboard/reviews", label: "Reviews", icon: MessageSquareText },
   { to: "/dashboard/profile", label: "Profile", icon: User },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 const adminLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/bookings", label: "Bookings", icon: CalendarDays },
+
   { to: "/admin/photos", label: "Photos", icon: Image },
+  { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/packages", label: "Packages", icon: Package },
   { to: "/admin/reviews", label: "Reviews", icon: MessageSquareText },
+  { to: "/admin/bookings", label: "Bookings", icon: CalendarDays },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
@@ -90,7 +91,13 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
 
         <nav className="flex-1 space-y-1 overflow-y-auto">
           {links.map(({ to, label, icon: Icon, end }) => (
-            <NavLink key={to} to={to} end={end} className={navClass} onClick={onClose}>
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={navClass}
+              onClick={onClose}
+            >
               <Icon className="h-4 w-4" />
               <span>{label}</span>
             </NavLink>

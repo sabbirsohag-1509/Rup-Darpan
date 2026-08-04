@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Check, Eye, EyeOff, UploadCloud, User, UserPlus } from "lucide-react";
@@ -82,6 +82,7 @@ const Register = () => {
   const passwordValue = watch("password");
   const profilePhoto = watch("profilePhoto");
   const acceptTerms = watch("acceptTerms");
+  const navigate = useNavigate();
   const passwordChecks = useMemo(
     () => getPasswordChecks(passwordValue),
     [passwordValue],
@@ -122,34 +123,36 @@ const Register = () => {
     }
   };
 
-  //on Submit function btn 
+  //on Submit function btn
 
   const onSubmit = async (data) => {
-  try {
-    const { confirmPassword, acceptTerms, ...userData } = data;
+    try {
+      const { confirmPassword, acceptTerms, ...userData } = data;
 
-    const response = await axios.post(
-      "http://localhost:5000/register",
-      userData
-    );
-
-    if (response.data.insertedId) {
-      toast.success("Account created successfully! 🎉");
-
-      reset();
-    }
-  } catch (error) {
-    console.error(error);
-
-    if (error.response?.status === 409) {
-      toast.error("This email is already registered.");
-    } else {
-      toast.error(
-        error.response?.data?.message || "Registration failed. Please try again."
+      const response = await axios.post(
+        "http://localhost:5000/register",
+        userData,
       );
+
+      if (response.data.insertedId) {
+        toast.success("Account created successfully! 🎉");
+
+        reset();
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error(error);
+
+      if (error.response?.status === 409) {
+        toast.error("This email is already registered.");
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Registration failed. Please try again.",
+        );
+      }
     }
-  }
-};
+  };
 
   return (
     <div className="w-full">
@@ -191,7 +194,8 @@ const Register = () => {
 
         <fieldset className="space-y-2">
           <label className="text-sm font-semibold">
-            Profile Photo <span className="text-base-content/60">(Optional)</span>
+            Profile Photo{" "}
+            <span className="text-base-content/60">(Optional)</span>
           </label>
           <label
             htmlFor="profile-photo-upload"
@@ -274,7 +278,8 @@ const Register = () => {
                 required: "Password is required.",
                 validate: {
                   minLength: (value) =>
-                    value.length >= 8 || "Password must be at least 8 characters.",
+                    value.length >= 8 ||
+                    "Password must be at least 8 characters.",
                   uppercase: (value) =>
                     uppercaseRegex.test(value) ||
                     "Password must include at least one uppercase letter.",
@@ -334,7 +339,9 @@ const Register = () => {
                         isMet ? "bg-success/20" : "bg-base-300"
                       }`}
                     >
-                      {isMet && <Check className="h-3 w-3" aria-hidden="true" />}
+                      {isMet && (
+                        <Check className="h-3 w-3" aria-hidden="true" />
+                      )}
                     </span>
                     {item.label}
                   </li>
@@ -383,7 +390,9 @@ const Register = () => {
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-sm text-error">{errors.confirmPassword.message}</p>
+            <p className="text-sm text-error">
+              {errors.confirmPassword.message}
+            </p>
           )}
         </fieldset>
 
@@ -426,9 +435,12 @@ const Register = () => {
         </button>
 
         <div className="divider text-xs text-base-content/60">OR</div>
-
+          {/* Google Sign in btn  */}
         <button
           type="button"
+          onClick={() => {
+            window.location.href = "http://localhost:5000/auth/google";
+          }}
           className="btn btn-outline w-full border-primary/30 hover:border-primary hover:bg-primary/10"
         >
           <svg
@@ -440,23 +452,23 @@ const Register = () => {
             <path
               fill="#FFC107"
               d="M43.611,20.083H42V20H24v8h11.303C33.651,32.657,29.193,36,24,36c-6.627,0-12-5.373-12-12
-              s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
-              s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+      s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
+      s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
             />
             <path
               fill="#FF3D00"
               d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
-              l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+      l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
             />
             <path
               fill="#4CAF50"
               d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.145,35.091,26.715,36,24,36
-              c-5.173,0-9.621-3.329-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+      c-5.173,0-9.621-3.329-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
             />
             <path
               fill="#1976D2"
               d="M43.611,20.083H42V20H24v8h11.303c-0.793,2.237-2.231,4.166-4.094,5.571
-              c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.194,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
+      c0.001-0.001,0.002-0.002,0.003-0.002l6.19,5.238C36.971,39.194,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
             />
           </svg>
           Continue with Google

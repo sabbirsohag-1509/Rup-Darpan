@@ -1,4 +1,4 @@
-import { CalendarDays, DollarSign, TrendingUp, Users, MessageSquareText } from "lucide-react";
+import { CalendarDays, DollarSign, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router";
 import StatCard from "../../components/dashboard/StatCard";
 import SectionHeader from "../../components/dashboard/SectionHeader";
