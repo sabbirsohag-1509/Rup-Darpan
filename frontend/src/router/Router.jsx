@@ -21,14 +21,6 @@ export const router = createBrowserRouter([
         index: true,
         element: <Home />,
       },
-      {
-        path: "add-photo",
-        element: (
-          <PrivateRoute>
-            <AddPhoto />
-          </PrivateRoute>
-        ),
-      },
     ],
   },
   {
@@ -122,9 +114,32 @@ export const router = createBrowserRouter([
           />
         ),
       },
+      // {
+      //   path: "photos",
+      //   element: <AdminPhotosManagement />,
+      //   children: [
+      //     {
+      //       path: "add-photos",
+      //       element: (
+      //         <PrivateRoute>
+      //           <AddPhoto />
+      //         </PrivateRoute>
+      //       ),
+      //     },
+      //   ],
+      // },
       {
         path: "photos",
-        element: <AdminPhotosManagement />,
+        children: [
+          {
+            index: true,
+            element: <AdminPhotosManagement />,
+          },
+          {
+            path: "add-photos",
+            element: <AddPhoto />,
+          },
+        ],
       },
       {
         path: "packages",

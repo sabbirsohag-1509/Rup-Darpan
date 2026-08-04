@@ -176,7 +176,7 @@ const AdminPhotosManagement = () => {
             Add, Edit, and Delete gallery photos from your dashboard.
           </p>
         </div>
-        <Link to="/add-photo" className="btn btn-primary text-primary-content">
+        <Link to="add-photos" className="btn btn-primary text-primary-content">
           <Plus className="h-4 w-4" />
           Add Photo
         </Link>
@@ -267,12 +267,14 @@ const AdminPhotosManagement = () => {
               </tbody>
             </table>
             {/* // Pagination Controls  */}
-            {(totalPages > 1) && (
+            {totalPages > 1 && (
               <div className="mt-4 flex justify-center gap-2">
                 <button
                   type="button"
                   className="btn btn-sm"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                 >
                   Previous
@@ -283,7 +285,9 @@ const AdminPhotosManagement = () => {
                 <button
                   type="button"
                   className="btn btn-sm"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                 >
                   Next

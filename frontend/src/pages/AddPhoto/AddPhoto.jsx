@@ -9,16 +9,16 @@ import {
   X,
   Heart,
   Eye,
-  Camera,
   User,
   MapPin,
   Sparkles,
   Copy,
   Check,
-  Globe,
   Info,
   CheckCircle2,
+  ArrowLeft,
 } from "lucide-react";
+import { Navigate, useNavigate } from "react-router";
 
 const CATEGORIES = [
   "Wedding",
@@ -42,6 +42,7 @@ const AddPhoto = () => {
   const [copied, setCopied] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -181,6 +182,7 @@ const AddPhoto = () => {
         });
 
         reset();
+        navigate("/admin/photos");
 
         setPreviewImage(null);
       }
@@ -203,6 +205,20 @@ const AddPhoto = () => {
 
   return (
     <div className="py-6 sm:py-10 max-w-7xl mx-auto">
+      <div>
+        {/* back to previous btn  */}
+        <button
+          type="button"
+          onClick={() => navigate("/admin/photos")}
+          className="group inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-all duration-200 hover:border-primary/40 hover:bg-primary/10 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 mb-4"
+        >
+          <ArrowLeft
+            className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
+            aria-hidden="true"
+          />
+          Back to Previous
+        </button>
+      </div>
       {/* Page Header */}
       <div className="mb-8 text-center sm:text-left">
         <h1 className="font-playfair text-3xl sm:text-4xl lg:text-5xl font-semibold text-primary">
@@ -446,7 +462,8 @@ const AddPhoto = () => {
                   <input
                     type="text"
                     className="input input-bordered w-full pl-10 border-primary/20 focus:outline-none focus:border-primary"
-                    {...register("photographer")} placeholder="e.g. Hridoy Shill"
+                    {...register("photographer")}
+                    placeholder="e.g. Hridoy Shill"
                   />
                 </div>
               </div>
@@ -462,7 +479,8 @@ const AddPhoto = () => {
                   <input
                     type="text"
                     className="input input-bordered w-full pl-10 border-primary/20 focus:outline-none focus:border-primary "
-                    {...register("location")} placeholder="e.g. Dinajpur, Bangladesh"
+                    {...register("location")}
+                    placeholder="e.g. Dinajpur, Bangladesh"
                   />
                 </div>
               </div>
