@@ -171,7 +171,9 @@ const AddPhoto = () => {
         createdAt: new Date(),
       };
 
-      const res = await axios.post("http://localhost:5000/photos", photoData);
+      const res = await axios.post("http://localhost:5000/photos", photoData, {
+        withCredentials: true,
+      });
 
       if (res.data.insertedId) {
         toast.success("Photo added successfully!", {

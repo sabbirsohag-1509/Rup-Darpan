@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Vite glob import to dynamically load local images from the assets folder.
-// If the user places their own 10-12 images here, they will be loaded automatically.
-const localImagesGlob = import.meta.glob(
+const fallbackImages = [
+  "https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=800&auto=format&fit=crop",
+];
+
+// Vite glob import to lazily load local images from the assets folder.
+// This avoids blocking the initial hero render with all images at once.
+const localImageLoaders = import.meta.glob(
   "../../../assets/hero/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}",
-  { eager: true },
+  { eager: false, import: "default" },
 );
 
-const localImages = Object.values(localImagesGlob).map(
-  (module) => module.default || module,
-);
 // Get the current month and determine the season
 const currentMonth = new Date().getMonth() + 1; // 1-12
 
@@ -18,17 +22,41 @@ const season =
   [11, 12, 1, 2].includes(currentMonth) ? "winter" : "summer";
 
 const Hero = () => {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState(fallbackImages);
 
   useEffect(() => {
-    const combined = [...localImages];
-    if (combined.length < 7) {
-      const needed = 7 - combined.length;
-      for (let i = 0; i < needed; i++) {
-        combined.push(fallbackImages[i % fallbackImages.length]);
+    let isCancelled = false;
+
+    const loadLocalImages = async () => {
+      try {
+        const importedImages = await Promise.all(
+          Object.values(localImageLoaders).map((loadImage) => loadImage()),
+        );
+
+        if (isCancelled) return;
+
+        const combined = [...importedImages];
+        if (combined.length < 7) {
+          const needed = 7 - combined.length;
+          for (let i = 0; i < needed; i++) {
+            combined.push(fallbackImages[i % fallbackImages.length]);
+          }
+        }
+
+        setImages(combined);
+      } catch (error) {
+        console.error("Failed to load hero images:", error);
+        if (!isCancelled) {
+          setImages(fallbackImages);
+        }
       }
-    }
-    setImages(combined);
+    };
+
+    loadLocalImages();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   const totalImages = images.length;
@@ -241,8 +269,13 @@ const Hero = () => {
                 <img
                   src={image}
                   alt={`Wedding moment ${index + 1}`}
+                  width={800}
+                  height={1200}
                   className="w-full h-full object-cover pointer-events-none"
                   loading={Math.abs(distance) <= 1 ? "eager" : "lazy"}
+                  decoding="async"
+                  fetchPriority={Math.abs(distance) <= 1 ? "high" : "low"}
+                  sizes="(max-width: 640px) 110px, (max-width: 1024px) 150px, 200px"
                 />
               </motion.div>
             );

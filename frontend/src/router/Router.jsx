@@ -10,6 +10,7 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 import DashboardLayout from "../layout/DashboardLayout";
 import DashboardPlaceholderPage from "../pages/Dashboard/DashboardPlaceholderPage";
 import AdminRouter from "./AdminRouter/AdminRouter";
+import AdminPhotosManagement from "../pages/Dashboard/AdminPhotosManagement";
 
 export const router = createBrowserRouter([
   {
@@ -123,12 +124,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "photos",
-        element: (
-          <DashboardPlaceholderPage
-            title="Photos Management"
-            description="Portfolio and gallery asset controls are prepared here."
-          />
-        ),
+        element: <AdminPhotosManagement />,
       },
       {
         path: "packages",

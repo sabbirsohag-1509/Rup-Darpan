@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Bell, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 
 const DashboardHeader = ({ title, description, onMenuClick }) => {
@@ -25,13 +25,6 @@ const DashboardHeader = ({ title, description, onMenuClick }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="btn btn-ghost btn-square rounded-xl border border-primary/10 hover:border-primary/30 hover:bg-primary/10"
-            aria-label="Notifications"
-          >
-            <Bell className="h-5 w-5 text-primary" />
-          </button>
 
           <div className="hidden items-center gap-3 rounded-2xl border border-primary/10 bg-base-100 px-3 py-2 shadow-sm sm:flex">
             <div className="avatar">

@@ -20,15 +20,15 @@ import ThemeToggle from "./ThemeToggle";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
-const NAV_LINKS = [
-  { to: "/", label: "Home", end: true, icon: Home },
-  { to: "/gallery", label: "Gallery", icon: Images },
-  { to: "/packages", label: "Packages", icon: Package },
-  { to: "/about", label: "About", icon: Info },
-  { to: "/reviews", label: "Reviews", icon: Star },
-  { to: "/contact", label: "Contact", icon: Mail },
-  { to: "/add-photo", label: "Add Photos", icon: PlusSquare },
-];
+const getNavLinks = () => {
+  return [
+    { to: "/", label: "Home", end: true, icon: Home },
+    { to: "/gallery", label: "Gallery", icon: Images },
+    { to: "/packages", label: "Packages", icon: Package },
+    { to: "/about", label: "About", icon: Info },
+    { to: "/contact", label: "Contact", icon: Mail },
+  ];
+};
 
 const navLinkClass = ({ isActive }) =>
   [
@@ -54,9 +54,10 @@ const Navbar = () => {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
   const closeMenu = () => setMenuOpen(false);
+  const navLinks = getNavLinks();
 
   const renderLinks = (className, onNavigate, iconSize = "h-4 w-4") =>
-    NAV_LINKS.map(({ to, label, end, icon: Icon }) => (
+    navLinks.map(({ to, label, end, icon: Icon }) => (
       <li key={to}>
         <NavLink to={to} end={end} className={className} onClick={onNavigate}>
           <Icon className={iconSize} aria-hidden="true" />
