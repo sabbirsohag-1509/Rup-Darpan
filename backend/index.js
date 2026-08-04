@@ -129,18 +129,59 @@ async function run() {
 
     // Add photo related API
     //POST
-    app.post("/photos", verifyAdmin, async (req, res) => {
+    app.post("/photos", verifyToken, verifyAdmin, async (req, res) => {
       const photo = req.body;
       const result = await photoCollection.insertOne(photo);
       res.status(201).json(result);
     });
 
     //GET
-    app.get("/photos", verifyAdmin, async (req, res) => {
+    app.get("/photos", verifyToken, verifyAdmin, async (req, res) => {
       const result = await photoCollection
         .find()
         .sort({ createdAt: -1 })
         .toArray();
+
+      res.send(result);
+    });
+
+    // PUT update photo
+    app.put("/photos/:id", verifyToken, verifyAdmin, async (req, res) => {
+      const { id } = req.params;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ message: "Invalid photo id" });
+      }
+
+      const photoData = req.body;
+      const updatePayload = {
+        ...photoData,
+        updatedAt: new Date(),
+      };
+
+      const result = await photoCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatePayload },
+      );
+
+      if (result.matchedCount === 0) {
+        return res.status(404).send({ message: "Photo not found" });
+      }
+
+      res.send(result);
+    });
+
+    // DELETE photo
+    app.delete("/photos/:id", verifyToken, verifyAdmin, async (req, res) => {
+      const { id } = req.params;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ message: "Invalid photo id" });
+      }
+
+      const result = await photoCollection.deleteOne({ _id: new ObjectId(id) });
+
+      if (result.deletedCount === 0) {
+        return res.status(404).send({ message: "Photo not found" });
+      }
 
       res.send(result);
     });
