@@ -80,7 +80,6 @@ async function run() {
     const userCollection = myDB.collection("users");
 
     // Google Strategy
-
     passport.use(
       new GoogleStrategy(
         {
@@ -127,7 +126,7 @@ async function run() {
     );
     //
 
-    // Add photo related API
+    // Photo related API
     //POST
     app.post("/photos", verifyToken, verifyAdmin, async (req, res) => {
       const photo = req.body;
@@ -135,17 +134,37 @@ async function run() {
       res.status(201).json(result);
     });
 
-    //GET
+    //GET with pagination support: ?page=1&limit=5
     app.get("/photos", verifyToken, verifyAdmin, async (req, res) => {
-      const result = await photoCollection
-        .find()
-        .sort({ createdAt: -1 })
-        .toArray();
+      try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
 
-      res.send(result);
+        const skip = (page - 1) * limit;
+
+        const total = await photoCollection.countDocuments();
+
+        const photos = await photoCollection
+          .find()
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .toArray();
+
+        res.send({
+          photos,
+          total,
+          page,
+          totalPages: Math.ceil(total / limit),
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({
+          message: "Failed to fetch photos",
+        });
+      }
     });
-
-    // PUT update photo
+    // Put update photo
     app.put("/photos/:id", verifyToken, verifyAdmin, async (req, res) => {
       const { id } = req.params;
       if (!ObjectId.isValid(id)) {
@@ -186,7 +205,7 @@ async function run() {
       res.send(result);
     });
 
-    ////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////////////////////////////////////
 
     // USER Authentication related API
     //POST Register
@@ -340,7 +359,6 @@ async function run() {
 
     //////
     // Logout API
-    // LOGOUT API
     app.post("/logout", (req, res) => {
       res.clearCookie("token", {
         httpOnly: true,
@@ -397,6 +415,8 @@ async function run() {
         }
       },
     );
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
     await client.db("admin").command({ ping: 1 });
     console.log(
