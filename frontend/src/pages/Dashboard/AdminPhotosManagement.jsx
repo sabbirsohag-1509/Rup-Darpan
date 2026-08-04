@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const API_URL = "http://localhost:5000/photos";
@@ -12,6 +12,9 @@ const AdminPhotosManagement = () => {
   const [deletingId, setDeletingId] = useState("");
   const [editingPhoto, setEditingPhoto] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [formData, setFormData] = useState({
     title: "",
     image: "",
@@ -24,14 +27,24 @@ const AdminPhotosManagement = () => {
     isPublished: true,
   });
 
-  const fetchPhotos = async () => {
-    const response = await axios.get(API_URL, { withCredentials: true });
-    setPhotos(response.data);
+  const fetchPhotos = async (page = 1) => {
+    const response = await axios.get(API_URL, {
+      params: {
+        page,
+      },
+      withCredentials: true,
+    });
+
+    console.log("Photos API response:", response.data);
+
+    setPhotos(response.data.photos || []);
+    setTotalPages(response.data.totalPages || 1);
   };
 
   useEffect(() => {
     setLoading(true);
-    fetchPhotos()
+
+    fetchPhotos(currentPage)
       .catch((error) => {
         console.error(error);
         toast.error("Failed to load photos.");
@@ -39,10 +52,12 @@ const AdminPhotosManagement = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [currentPage]);
 
   const handleDelete = async (photoId) => {
-    const confirmed = window.confirm("Are you sure you want to delete this photo?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this photo?",
+    );
     if (!confirmed) {
       return;
     }
@@ -50,7 +65,11 @@ const AdminPhotosManagement = () => {
     setDeletingId(photoId);
     try {
       await axios.delete(`${API_URL}/${photoId}`, { withCredentials: true });
-      setPhotos((prevPhotos) => prevPhotos.filter((photo) => photo._id !== photoId));
+      await fetchPhotos(currentPage);
+
+      setPhotos((prevPhotos) =>
+        prevPhotos.filter((photo) => photo._id !== photoId),
+      );
       toast.success("Photo deleted successfully.");
     } catch (error) {
       console.error(error);
@@ -88,6 +107,29 @@ const AdminPhotosManagement = () => {
     [formData.tags],
   );
 
+  const filteredPhotos = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return photos;
+    }
+
+    return photos.filter((photo) => {
+      const tagText = Array.isArray(photo.tags)
+        ? photo.tags.join(" ")
+        : photo.tags || "";
+      return [
+        photo.title,
+        photo.category,
+        photo.photographer,
+        photo.location,
+        photo.description,
+        tagText,
+      ]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(normalizedQuery));
+    });
+  }, [photos, searchQuery]);
+
   const handleUpdate = async (event) => {
     event.preventDefault();
     if (!editingPhoto) {
@@ -112,7 +154,7 @@ const AdminPhotosManagement = () => {
         { withCredentials: true },
       );
 
-      await fetchPhotos();
+      await fetchPhotos(currentPage);
       toast.success("Photo updated successfully.");
       closeEditModal();
     } catch (error) {
@@ -127,9 +169,11 @@ const AdminPhotosManagement = () => {
     <div className="space-y-6">
       <section className="flex flex-col gap-3 rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-playfair text-2xl font-semibold">Photos Management</h2>
+          <h2 className="font-playfair text-2xl font-semibold">
+            Photos Management
+          </h2>
           <p className="mt-1 text-sm text-base-content/70">
-            Add, edit, and delete gallery photos from your dashboard.
+            Add, Edit, and Delete gallery photos from your dashboard.
           </p>
         </div>
         <Link to="/add-photo" className="btn btn-primary text-primary-content">
@@ -139,6 +183,21 @@ const AdminPhotosManagement = () => {
       </section>
 
       <section className="rounded-2xl border border-primary/10 bg-base-100 p-4 shadow-sm sm:p-6">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <label className="input input-bordered flex w-full max-w-md items-center gap-2">
+            <Search className="h-4 w-4 text-base-content/60" />
+            <input
+              type="text"
+              className="grow"
+              placeholder="Search photos by title, category, photographer..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
+          </label>
+          <p className="text-sm text-base-content/70">
+            {filteredPhotos.length} photo(s) found
+          </p>
+        </div>
         {loading ? (
           <div className="flex justify-center py-8">
             <span className="loading loading-spinner loading-md text-primary" />
@@ -146,6 +205,10 @@ const AdminPhotosManagement = () => {
         ) : photos.length === 0 ? (
           <p className="py-6 text-center text-sm text-base-content/70">
             No photos found. Add your first photo.
+          </p>
+        ) : filteredPhotos.length === 0 ? (
+          <p className="py-6 text-center text-sm text-base-content/70">
+            No photos matched your search.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -160,7 +223,7 @@ const AdminPhotosManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {photos.map((photo) => (
+                {filteredPhotos.map((photo) => (
                   <tr key={photo._id}>
                     <td>
                       <div className="avatar">
@@ -172,7 +235,9 @@ const AdminPhotosManagement = () => {
                     <td className="font-medium">{photo.title}</td>
                     <td>{photo.category || "N/A"}</td>
                     <td>
-                      <span className={`badge ${photo.isPublished ? "badge-success" : "badge-warning"}`}>
+                      <span
+                        className={`badge ${photo.isPublished ? "badge-success" : "badge-warning"}`}
+                      >
                         {photo.isPublished ? "Published" : "Draft"}
                       </span>
                     </td>
@@ -201,6 +266,30 @@ const AdminPhotosManagement = () => {
                 ))}
               </tbody>
             </table>
+            {/* // Pagination Controls  */}
+            {(totalPages > 1) && (
+              <div className="mt-4 flex justify-center gap-2">
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span className="btn btn-sm btn-disabled">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -217,7 +306,12 @@ const AdminPhotosManagement = () => {
                   required
                   className="input input-bordered w-full"
                   value={formData.title}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      title: event.target.value,
+                    }))
+                  }
                 />
               </label>
 
@@ -228,7 +322,12 @@ const AdminPhotosManagement = () => {
                   required
                   className="input input-bordered w-full"
                   value={formData.image}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, image: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      image: event.target.value,
+                    }))
+                  }
                 />
               </label>
 
@@ -239,28 +338,47 @@ const AdminPhotosManagement = () => {
                     type="text"
                     className="input input-bordered w-full"
                     value={formData.category}
-                    onChange={(event) => setFormData((prev) => ({ ...prev, category: event.target.value }))}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        category: event.target.value,
+                      }))
+                    }
                   />
                 </label>
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 font-medium">Tags (comma separated)</span>
+                  <span className="label-text mb-1 font-medium">
+                    Tags (comma separated)
+                  </span>
                   <input
                     type="text"
                     className="input input-bordered w-full"
                     value={formData.tags}
-                    onChange={(event) => setFormData((prev) => ({ ...prev, tags: event.target.value }))}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        tags: event.target.value,
+                      }))
+                    }
                   />
                 </label>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 font-medium">Photographer</span>
+                  <span className="label-text mb-1 font-medium">
+                    Photographer
+                  </span>
                   <input
                     type="text"
                     className="input input-bordered w-full"
                     value={formData.photographer}
-                    onChange={(event) => setFormData((prev) => ({ ...prev, photographer: event.target.value }))}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        photographer: event.target.value,
+                      }))
+                    }
                   />
                 </label>
                 <label className="form-control w-full">
@@ -269,7 +387,12 @@ const AdminPhotosManagement = () => {
                     type="text"
                     className="input input-bordered w-full"
                     value={formData.location}
-                    onChange={(event) => setFormData((prev) => ({ ...prev, location: event.target.value }))}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        location: event.target.value,
+                      }))
+                    }
                   />
                 </label>
               </div>
@@ -279,7 +402,12 @@ const AdminPhotosManagement = () => {
                 <textarea
                   className="textarea textarea-bordered h-24 w-full"
                   value={formData.description}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: event.target.value,
+                    }))
+                  }
                 />
               </label>
 
@@ -289,7 +417,12 @@ const AdminPhotosManagement = () => {
                     type="checkbox"
                     className="toggle toggle-primary"
                     checked={formData.featured}
-                    onChange={(event) => setFormData((prev) => ({ ...prev, featured: event.target.checked }))}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        featured: event.target.checked,
+                      }))
+                    }
                   />
                   <span className="label-text">Featured</span>
                 </label>
@@ -298,7 +431,12 @@ const AdminPhotosManagement = () => {
                     type="checkbox"
                     className="toggle toggle-success"
                     checked={formData.isPublished}
-                    onChange={(event) => setFormData((prev) => ({ ...prev, isPublished: event.target.checked }))}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        isPublished: event.target.checked,
+                      }))
+                    }
                   />
                   <span className="label-text">Published</span>
                 </label>
@@ -308,13 +446,21 @@ const AdminPhotosManagement = () => {
                 <button type="button" className="btn" onClick={closeEditModal}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary text-primary-content" disabled={saving}>
+                <button
+                  type="submit"
+                  className="btn btn-primary text-primary-content"
+                  disabled={saving}
+                >
                   {saving ? "Saving..." : "Update Photo"}
                 </button>
               </div>
             </form>
           </div>
-          <button type="button" className="modal-backdrop" onClick={closeEditModal}>
+          <button
+            type="button"
+            className="modal-backdrop"
+            onClick={closeEditModal}
+          >
             Close
           </button>
         </dialog>
