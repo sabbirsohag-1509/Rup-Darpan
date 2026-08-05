@@ -47,7 +47,7 @@ const verifyToken = (req, res, next) => {
 const verifyAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== "admin") {
     return res.status(403).send({
-      message: "Admin access required",
+      message: "Admin Access required",
     });
   }
 
@@ -78,6 +78,7 @@ async function run() {
     const myDB = client.db("rup-darpon");
     const photoCollection = myDB.collection("photos");
     const userCollection = myDB.collection("users");
+    const packagesCollection = myDB.collection("packages");
 
     // Google Strategy
     passport.use(
@@ -460,6 +461,138 @@ async function run() {
       }
 
       res.send(result);
+    });
+    ////////////////////////  PACKAGE RELATED API ////////////////////////////////////////////
+    //POST
+    app.post("/packages", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const packageData = req.body;
+
+        const newPackage = {
+          ...packageData,
+          price: Number(packageData.price),
+          photoCount: Number(packageData.photoCount),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const result = await packagesCollection.insertOne(newPackage);
+
+        res.status(201).send(result);
+      } catch (error) {
+        console.error("Failed to create package:", error);
+
+        res.status(500).send({
+          message: "Failed to create package",
+        });
+      }
+    });
+    //GET
+    app.get("/packages", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const packages = await packagesCollection
+          .find()
+          .sort({ createdAt: -1 })
+          .toArray();
+
+        res.send(packages);
+      } catch (error) {
+        console.error("Failed to fetch packages:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch packages",
+        });
+      }
+    });
+    // PUT update package
+    app.put("/packages/:id", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        // Check valid MongoDB ObjectId
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid package ID",
+          });
+        }
+
+        const packageData = req.body;
+
+        const updatePackage = {
+          name: packageData.name?.trim() || "",
+          price: Number(packageData.price),
+          duration: packageData.duration?.trim() || "",
+          photoCount: Number(packageData.photoCount),
+          description: packageData.description?.trim() || "",
+          coverImage: packageData.coverImage?.trim() || "",
+          features: Array.isArray(packageData.features)
+            ? packageData.features
+            : [],
+          featured: Boolean(packageData.featured),
+          active: Boolean(packageData.active),
+          updatedAt: new Date(),
+        };
+
+        const result = await packagesCollection.updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: updatePackage,
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            message: "Package not found",
+          });
+        }
+
+        res.send({
+          message: "Package updated successfully",
+          result,
+        });
+      } catch (error) {
+        console.error("Failed to update package:", error);
+
+        res.status(500).send({
+          message: "Failed to update package",
+        });
+      }
+    });
+    // DELETE package
+    app.delete("/packages/:id", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        // Check valid MongoDB ObjectId
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid package ID",
+          });
+        }
+
+        const result = await packagesCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).send({
+            message: "Package not found",
+          });
+        }
+
+        res.send({
+          message: "Package deleted successfully",
+          result,
+        });
+      } catch (error) {
+        console.error("Failed to delete package:", error);
+
+        res.status(500).send({
+          message: "Failed to delete package",
+        });
+      }
     });
 
     //////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////////////////////
