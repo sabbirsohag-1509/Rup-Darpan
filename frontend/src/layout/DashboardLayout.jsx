@@ -74,6 +74,7 @@ const DashboardLayout = () => {
         description={headerMeta.description}
         onMenuClick={() => setSidebarOpen((prev) => !prev)}
       />
+      {/* layout  */}
 
       <div className="mx-auto flex w-full max-w-[1600px] gap-4 px-3 py-4 sm:px-4 lg:px-6">
         <DashboardSidebar
