@@ -15,6 +15,10 @@ import AdminUsersManagement from "../pages/Dashboard/AdminUsersManagement";
 import AdminPackageManagement from "../pages/Dashboard/AdminPackageManagement";
 import AddPackage from "../pages/AddPackage/AddPackage";
 import ErrorPage from "../components/ErrorPage/ErrorPage";
+import Gallery from "../components/Gallery/Gallery";
+import About from "../components/About/About";
+import Contact from "../components/Contact/Contact";
+import Packages from "../components/Packages/Packages";
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +28,23 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+
+      {
+        path: "/gallery",
+        element: <Gallery />,
+      },
+      {
+        path: "/about",
+        element: <About />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />,
+      },
+      {
+        path: "/packages",
+        element: <Packages></Packages>,
       },
     ],
   },
@@ -100,7 +121,6 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      
       {
         path: "bookings",
         element: (
@@ -125,24 +145,24 @@ export const router = createBrowserRouter([
       },
       {
         path: "users",
-        children: [ 
-          { 
+        children: [
+          {
             index: true,
-            element: <AdminUsersManagement></AdminUsersManagement>
+            element: <AdminUsersManagement></AdminUsersManagement>,
           },
         ],
       },
-      { 
+      {
         path: "packages",
         children: [
           {
             index: true,
-            element: <AdminPackageManagement></AdminPackageManagement>
+            element: <AdminPackageManagement></AdminPackageManagement>,
           },
           {
             path: "add-package",
-            element: <AddPackage></AddPackage>
-          }
+            element: <AddPackage></AddPackage>,
+          },
         ],
       },
       {
@@ -167,6 +187,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <ErrorPage></ErrorPage>
-  }
+    element: <ErrorPage></ErrorPage>,
+  },
 ]);
