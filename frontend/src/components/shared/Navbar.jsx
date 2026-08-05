@@ -89,22 +89,25 @@ const Navbar = () => {
               <Menu className="h-6 w-6" aria-hidden="true" />
             )}
           </button>
-
+              {/* Mobile Menu  */}
           <ul
             tabIndex={0}
             className="menu menu-sm dropdown-content mt-3 z-[60] w-56 rounded-box border border-primary/10 bg-base-100 p-2 shadow-lg"
           >
             {renderLinks(mobileLinkClass, closeMenu, "h-4 w-4")}
-            <li className="mt-1 border-t border-primary/10 pt-1 lg:hidden">
-              <NavLink
-                to="/login"
-                className="btn btn-primary btn-sm w-full text-primary-content gap-2"
-                onClick={closeMenu}
-              >
-                <LogIn className="h-4 w-4" aria-hidden="true" />
-                Login
-              </NavLink>
-            </li>
+
+            {!loading && !user && (
+              <li className="mt-1 border-t border-primary/10 pt-2">
+                <NavLink
+                  to="/login"
+                  className="btn btn-primary btn-sm w-full gap-2 text-primary-content"
+                  onClick={closeMenu}
+                >
+                  <LogIn className="h-4 w-4" aria-hidden="true" />
+                  Login
+                </NavLink>
+              </li>
+            )}
           </ul>
         </div>
 

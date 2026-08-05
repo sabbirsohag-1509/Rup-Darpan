@@ -66,7 +66,7 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
       />
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col border-r border-primary/10 bg-base-100 p-4 shadow-xl transition-transform duration-300 lg:static lg:z-auto lg:h-[calc(100vh-120px)] lg:translate-x-0 lg:rounded-2xl lg:border lg:border-primary/10 lg:shadow-sm ${
+        className={`fixed left-0 top-0 z-50 flex h-screen min-h-0 w-[280px] flex-col border-r border-primary/10 bg-base-100 p-4 shadow-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-full lg:translate-x-0 lg:rounded-none lg:border-y-0 lg:border-l-0 lg:shadow-none ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -89,7 +89,7 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
           Dashboard
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto">
           {links.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
@@ -104,14 +104,16 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
           ))}
         </nav>
 
-        <button
-          type="button"
-          onClick={() => setLogoutModalOpen(true)}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-content"
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </button>
+        <div className="mt-auto shrink-0 pt-4">
+          <button
+            type="button"
+            onClick={() => setLogoutModalOpen(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-content"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </button>
+        </div>
       </aside>
 
       {logoutModalOpen && (

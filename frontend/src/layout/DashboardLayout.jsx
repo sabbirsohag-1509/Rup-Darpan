@@ -68,21 +68,22 @@ const DashboardLayout = () => {
   );
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-base-200/40 text-base-content">
-      <DashboardHeader
+    <div className="flex h-screen flex-col overflow-hidden bg-base-200/40 text-base-content">
+      <div className="shrink-0"> 
+        <DashboardHeader
         title={headerMeta.title}
         description={headerMeta.description}
         onMenuClick={() => setSidebarOpen((prev) => !prev)}
       />
-      {/* layout  */}
+      </div>
 
-      <div className="mx-auto flex w-full max-w-[1600px] gap-4 px-3 py-4 sm:px-4 lg:px-6">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <DashboardSidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
 
-        <main className="min-w-0 flex-1 rounded-2xl border border-primary/10 bg-base-100 p-4 shadow-sm sm:p-6 lg:p-8">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-4 lg:p-6">
           <Outlet />
         </main>
       </div>
