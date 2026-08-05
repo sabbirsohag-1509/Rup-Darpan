@@ -124,16 +124,274 @@ async function run() {
         },
       ),
     );
-    //
+    ////
+    //////////////////////// USER's RELATED API ////////////////////////////////////////////
+    // GET ALL USERS - ADMIN ONLY
+    app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
 
-    // Photo related API
+        const limit = Math.min(
+          Math.max(parseInt(req.query.limit, 10) || 10, 1),
+          50,
+        );
+
+        const search = req.query.search?.trim() || "";
+
+        const skip = (page - 1) * limit;
+
+        const query = search
+          ? {
+              $or: [
+                {
+                  name: {
+                    $regex: search,
+                    $options: "i",
+                  },
+                },
+                {
+                  email: {
+                    $regex: search,
+                    $options: "i",
+                  },
+                },
+              ],
+            }
+          : {};
+
+        const [totalCount, users] = await Promise.all([
+          userCollection.countDocuments(query),
+
+          userCollection
+            .find(query)
+            .project({ password: 0 })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .toArray(),
+        ]);
+
+        const totalPages = Math.ceil(totalCount / limit);
+
+        res.send({
+          users,
+          total: totalCount,
+          page,
+          totalPages,
+        });
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+
+        res.status(500).send({
+          message: "Internal Server Error",
+        });
+      }
+    });
+    //Change user role - ADMIN ONLY PATCH
+    app.patch("/users/:id/role", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { role } = req.body;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid user ID.",
+          });
+        }
+
+        if (!["user", "admin"].includes(role)) {
+          return res.status(400).send({
+            message: "Invalid role.",
+          });
+        }
+
+        // Prevent admin from changing their own role
+        if (req.user?.email) {
+          const targetUser = await userCollection.findOne({
+            _id: new ObjectId(id),
+          });
+
+          if (!targetUser) {
+            return res.status(404).send({
+              message: "User not found.",
+            });
+          }
+
+          if (targetUser.email === req.user.email) {
+            return res.status(403).send({
+              message: "You cannot change your own role.",
+            });
+          }
+        }
+
+        const result = await userCollection.updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: {
+              role,
+            },
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
+        res.send({
+          message: "User role updated successfully.",
+        });
+      } catch (error) {
+        console.error("Failed to change user role:", error);
+
+        res.status(500).send({
+          message: "Internal Server Error",
+        });
+      }
+    });
+    //Edit user profile - PATCH Admin only
+    app.patch("/users/:id", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const { name, profilePhoto, role } = req.body;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid user ID.",
+          });
+        }
+
+        if (!name || !name.trim()) {
+          return res.status(400).send({
+            message: "Name is required.",
+          });
+        }
+
+        if (role && !["user", "admin"].includes(role)) {
+          return res.status(400).send({
+            message: "Invalid role.",
+          });
+        }
+
+        const targetUser = await userCollection.findOne({
+          _id: new ObjectId(id),
+        });
+
+        if (!targetUser) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
+        // Prevent admin from changing their own role
+        if (
+          targetUser.email === req.user?.email &&
+          role &&
+          role !== targetUser.role
+        ) {
+          return res.status(403).send({
+            message: "You cannot change your own role.",
+          });
+        }
+
+        const updateData = {
+          name: name.trim(),
+          profilePhoto: profilePhoto?.trim() || "",
+        };
+
+        // Only update role if provided
+        if (role) {
+          updateData.role = role;
+        }
+
+        const result = await userCollection.updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: updateData,
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
+        res.send({
+          message: "User updated successfully.",
+        });
+      } catch (error) {
+        console.error("Failed to update user:", error);
+
+        res.status(500).send({
+          message: "Internal Server Error",
+        });
+      }
+    });
+    //Delete user - DELETE Admin only
+    app.delete("/users/:id", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid user ID.",
+          });
+        }
+
+        const targetUser = await userCollection.findOne({
+          _id: new ObjectId(id),
+        });
+
+        if (!targetUser) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
+        // Prevent admin from deleting themselves
+        if (targetUser.email === req.user?.email) {
+          return res.status(403).send({
+            message: "You cannot delete your own account.",
+          });
+        }
+
+        const result = await userCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
+        res.send({
+          message: "User deleted successfully.",
+        });
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+
+        res.status(500).send({
+          message: "Internal Server Error",
+        });
+      }
+    });
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////// PHOTO RELATED API ////////////////////////////////////////////
     //POST
     app.post("/photos", verifyToken, verifyAdmin, async (req, res) => {
       const photo = req.body;
       const result = await photoCollection.insertOne(photo);
       res.status(201).json(result);
     });
-
     //GET with pagination support: ?page=1&limit=5
     app.get("/photos", verifyToken, verifyAdmin, async (req, res) => {
       try {
@@ -188,7 +446,6 @@ async function run() {
 
       res.send(result);
     });
-
     // DELETE photo
     app.delete("/photos/:id", verifyToken, verifyAdmin, async (req, res) => {
       const { id } = req.params;
@@ -205,9 +462,7 @@ async function run() {
       res.send(result);
     });
 
-    //////////////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////////////////////////////////////
-
-    // USER Authentication related API
+    //////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////////////////////
     //POST Register
     app.post("/register", async (req, res) => {
       try {
@@ -356,8 +611,6 @@ async function run() {
         });
       }
     });
-
-    //////
     // Logout API
     app.post("/logout", (req, res) => {
       res.clearCookie("token", {
@@ -372,14 +625,12 @@ async function run() {
     });
     ////
     // ================= GOOGLE AUTH =================
-
     app.get(
       "/auth/google",
       passport.authenticate("google", {
         scope: ["profile", "email"],
       }),
     );
-
     app.get(
       "/auth/google/callback",
       passport.authenticate("google", {
