@@ -12,6 +12,7 @@ import DashboardPlaceholderPage from "../pages/Dashboard/DashboardPlaceholderPag
 import AdminRouter from "./AdminRouter/AdminRouter";
 import AdminPhotosManagement from "../pages/Dashboard/AdminPhotosManagement";
 import AdminUsersManagement from "../pages/Dashboard/AdminUsersManagement";
+import AdminPackageManagement from "../pages/Dashboard/AdminPackageManagement";
 
 export const router = createBrowserRouter([
   {
@@ -107,20 +108,6 @@ export const router = createBrowserRouter([
           />
         ),
       },
-      // {
-      //   path: "photos",
-      //   element: <AdminPhotosManagement />,
-      //   children: [
-      //     {
-      //       path: "add-photos",
-      //       element: (
-      //         <PrivateRoute>
-      //           <AddPhoto />
-      //         </PrivateRoute>
-      //       ),
-      //     },
-      //   ],
-      // },
       {
         path: "photos",
         children: [
@@ -143,23 +130,14 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
+      { 
         path: "packages",
-        element: (
-          <DashboardPlaceholderPage
-            title="Packages Management"
-            description="Package administration interface is ready for API wiring."
-          />
-        ),
-      },
-      {
-        path: "reviews",
-        element: (
-          <DashboardPlaceholderPage
-            title="Reviews Moderation"
-            description="Customer feedback moderation tools can be connected here."
-          />
-        ),
+        children: [
+          {
+            index: true,
+            element: <AdminPackageManagement></AdminPackageManagement>
+          },
+        ],
       },
       {
         path: "payments",
