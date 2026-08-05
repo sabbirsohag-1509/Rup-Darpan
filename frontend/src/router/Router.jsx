@@ -13,6 +13,8 @@ import AdminRouter from "./AdminRouter/AdminRouter";
 import AdminPhotosManagement from "../pages/Dashboard/AdminPhotosManagement";
 import AdminUsersManagement from "../pages/Dashboard/AdminUsersManagement";
 import AdminPackageManagement from "../pages/Dashboard/AdminPackageManagement";
+import AddPackage from "../pages/AddPackage/AddPackage";
+import ErrorPage from "../components/ErrorPage/ErrorPage";
 
 export const router = createBrowserRouter([
   {
@@ -137,6 +139,10 @@ export const router = createBrowserRouter([
             index: true,
             element: <AdminPackageManagement></AdminPackageManagement>
           },
+          {
+            path: "add-package",
+            element: <AddPackage></AddPackage>
+          }
         ],
       },
       {
@@ -159,4 +165,8 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "*",
+    element: <ErrorPage></ErrorPage>
+  }
 ]);
