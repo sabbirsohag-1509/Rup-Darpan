@@ -11,6 +11,7 @@ import DashboardLayout from "../layout/DashboardLayout";
 import DashboardPlaceholderPage from "../pages/Dashboard/DashboardPlaceholderPage";
 import AdminRouter from "./AdminRouter/AdminRouter";
 import AdminPhotosManagement from "../pages/Dashboard/AdminPhotosManagement";
+import AdminUsersManagement from "../pages/Dashboard/AdminUsersManagement";
 
 export const router = createBrowserRouter([
   {
@@ -96,15 +97,7 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      {
-        path: "users",
-        element: (
-          <DashboardPlaceholderPage
-            title="Users Management"
-            description="Admin users management page is ready for API integration."
-          />
-        ),
-      },
+      
       {
         path: "bookings",
         element: (
@@ -138,6 +131,15 @@ export const router = createBrowserRouter([
           {
             path: "add-photos",
             element: <AddPhoto />,
+          },
+        ],
+      },
+      {
+        path: "users",
+        children: [ 
+          { 
+            index: true,
+            element: <AdminUsersManagement></AdminUsersManagement>
           },
         ],
       },
