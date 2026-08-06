@@ -20,6 +20,9 @@ import About from "../components/About/About";
 import Contact from "../components/Contact/Contact";
 import Packages from "../components/Packages/Packages";
 import PackagesDetails from "../components/Packages/PackagesDetails";
+import Booking from "../components/Booking/Booking";
+import MyBookings from "../components/Booking/MyBookings/MyBookings";
+import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +54,10 @@ export const router = createBrowserRouter([
         path: "/packages/:id",
         element: <PackagesDetails></PackagesDetails>,
       },
+      {
+        path: "/booking",
+        element: <Booking></Booking>,
+      },
     ],
   },
   {
@@ -66,6 +73,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  //User Dashboard Routes
   {
     path: "/dashboard",
     element: (
@@ -80,12 +88,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "bookings",
-        element: (
-          <DashboardPlaceholderPage
-            title="My Bookings"
-            description="Your booking management section is ready for API integration."
-          />
-        ),
+        children: [ 
+          { 
+            index: true,
+            element: <MyBookings />
+          }
+        ]
       },
       {
         path: "reviews",
@@ -116,6 +124,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  //Admin Dashboard Routes
   {
     path: "/admin",
     element: (
@@ -128,12 +137,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "bookings",
-        element: (
-          <DashboardPlaceholderPage
-            title="Bookings Management"
-            description="Admin booking operations UI is prepared for backend data."
-          />
-        ),
+        children: [
+          {
+            index: true,
+            element:<AdminBookingManagement></AdminBookingManagement>
+          },
+        ]
       },
       {
         path: "photos",

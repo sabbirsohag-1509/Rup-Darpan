@@ -10,9 +10,7 @@ import {
   Mail,
   Menu,
   Package,
-  PlusSquare,
   Settings,
-  Star,
   X,
 } from "lucide-react";
 import Logo from "./Logo";

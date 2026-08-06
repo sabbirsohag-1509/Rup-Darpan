@@ -447,14 +447,23 @@ const PackagesDetails = () => {
         <div className="mx-auto max-w-3xl text-center">
           <Camera className="mx-auto h-9 w-9 text-primary" />
 
-          <h2 className="mt-4 font-playfair text-3xl font-semibold sm:text-4xl">
-            Ready to Capture Your Moments?
-          </h2>
+          <div className="text-center">
+            <h2 className="mt-4 font-playfair text-3xl font-semibold sm:text-4xl">
+              Ready to Capture Your Moments?{" "}
+              <span className="mt-1 block text-xl font-normal text-base-content/80 sm:text-2xl">
+                (আপনার বিশেষ মুহূর্তগুলো ধরে রাখতে প্রস্তুত?)
+              </span>
+            </h2>
 
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-base-content/60 sm:text-base">
-            Choose this package and let Rup Darpan preserve your special moments
-            with beautiful photography and cinematic storytelling.
-          </p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-base-content/60 sm:text-base">
+              Choose this package and let RupDarpon preserve your special
+              moments with beautiful photography and cinematic storytelling.
+            </p>
+            <p className="mx-auto mt-1 max-w-xl text-xs leading-5 text-base-content/50 sm:text-sm">
+              আজই বুক করুন এই প্যাকেজটি! আপনার সেরা স্মৃতিগুলোকে চমৎকার ছবি ও
+              সিনেমাটিক ভিডিওতে ফ্রেমবন্দি করতে রূপদর্পণ আছে আপনার পাশে।
+            </p>
+          </div>
 
           <Link
             to={`/booking?package=${pkg._id}`}

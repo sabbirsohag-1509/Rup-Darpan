@@ -20,8 +20,8 @@ import { AuthContext } from "../../context/AuthContext";
 
 const userLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/dashboard/reviews", label: "My Reviews", icon: MessageSquareText },
   { to: "/dashboard/bookings", label: "My Bookings", icon: CalendarDays },
+  { to: "/dashboard/reviews", label: "My Reviews", icon: MessageSquareText },
   { to: "/dashboard/profile", label: "Profile", icon: User },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
