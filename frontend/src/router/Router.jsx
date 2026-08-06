@@ -19,6 +19,7 @@ import Gallery from "../components/Gallery/Gallery";
 import About from "../components/About/About";
 import Contact from "../components/Contact/Contact";
 import Packages from "../components/Packages/Packages";
+import PackagesDetails from "../components/Packages/PackagesDetails";
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
       {
         path: "/packages",
         element: <Packages></Packages>,
+      },
+      {
+        path: "/packages/:id",
+        element: <PackagesDetails></PackagesDetails>,
       },
     ],
   },
