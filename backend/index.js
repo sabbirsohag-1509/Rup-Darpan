@@ -488,7 +488,7 @@ async function run() {
       }
     });
     //GET
-    app.get("/packages", verifyToken, verifyAdmin, async (req, res) => {
+    app.get("/packages", async (req, res) => {
       try {
         const packages = await packagesCollection
           .find()
@@ -504,6 +504,28 @@ async function run() {
         });
       }
     });
+    // GET package by ID/ Details
+    app.get("/packages/:id", async (req, res) => {
+      try {
+        const packageId = req.params.id;
+        const query = { _id: new ObjectId(packageId) };
+        const result = await packagesCollection.findOne(query);
+
+        if (!result) {
+          return res.status(404).send({
+            message: "Package not found",
+          });
+        }
+        res.send(result);
+      } catch (error) {
+        console.error("Failed to fetch package:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch package",
+        });
+      }
+    });
+
     // PUT update package
     app.put("/packages/:id", verifyToken, verifyAdmin, async (req, res) => {
       try {
