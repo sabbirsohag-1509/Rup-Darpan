@@ -526,7 +526,7 @@ async function run() {
       }
     });
 
-    // PUT update package
+    // PUT update packages
     app.put("/packages/:id", verifyToken, verifyAdmin, async (req, res) => {
       try {
         const { id } = req.params;
