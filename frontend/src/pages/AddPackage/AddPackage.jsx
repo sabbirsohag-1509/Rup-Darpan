@@ -550,9 +550,9 @@ const AddPackage = () => {
                   },
 
                   maxLength: {
-                    value: 2000,
+                    value: 10000,
                     message:
-                      "Description cannot exceed 2000 characters",
+                      "Description cannot exceed 10000 characters",
                   },
                 })}
               />

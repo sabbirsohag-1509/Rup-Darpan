@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router";
@@ -50,9 +49,7 @@ const Packages = () => {
   });
 
   // Only show active packages
-  const activePackages = packages.filter(
-    (pkg) => pkg.active !== false,
-  );
+  const activePackages = packages.filter((pkg) => pkg.active !== false);
 
   // =========================================
   // Loading State
@@ -83,8 +80,8 @@ const Packages = () => {
           </h2>
 
           <p className="mt-2 text-sm text-base-content/60">
-            Something went wrong while loading our photography
-            packages. Please try again later.
+            Something went wrong while loading our photography packages. Please
+            try again later.
           </p>
         </div>
       </section>
@@ -93,14 +90,12 @@ const Packages = () => {
 
   return (
     <main className="min-h-screen bg-base-100">
-
       {/* =========================================
           PACKAGES SECTION
       ========================================= */}
 
       <section className="px-4 pb-20 sm:pb-24">
         <div className="mx-auto max-w-7xl">
-
           {/* No Packages */}
 
           {activePackages.length === 0 ? (
@@ -116,7 +111,6 @@ const Packages = () => {
               </p>
             </div>
           ) : (
-
             /* =========================================
                 RESPONSIVE GRID
 
@@ -126,9 +120,7 @@ const Packages = () => {
             ========================================= */
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-
               {activePackages.map((pkg) => {
-
                 const features = Array.isArray(pkg.features)
                   ? pkg.features
                   : [];
@@ -142,7 +134,6 @@ const Packages = () => {
                         : "border-primary/10"
                     }`}
                   >
-
                     {/* =====================================
                         FEATURED BADGE
                     ===================================== */}
@@ -151,7 +142,6 @@ const Packages = () => {
                       <div className="absolute left-3 top-3 z-10">
                         <span className="badge badge-primary gap-1 px-3 py-3 text-xs font-semibold text-primary-content shadow-lg">
                           <Sparkles className="h-3.5 w-3.5" />
-
                           Featured
                         </span>
                       </div>
@@ -162,7 +152,6 @@ const Packages = () => {
                     ===================================== */}
 
                     <div className="relative aspect-[16/9] overflow-hidden bg-base-300">
-
                       <img
                         src={pkg.coverImage}
                         alt={pkg.name || "Photography package"}
@@ -187,23 +176,18 @@ const Packages = () => {
                     ===================================== */}
 
                     <div className="flex flex-1 flex-col p-4 sm:p-5">
-
                       {/* =====================================
                           PRICE
                       ===================================== */}
 
                       <div className="flex items-end justify-between gap-3 border-b border-base-content/10 pb-4">
-
                         <div>
                           <p className="text-[10px] uppercase tracking-[0.18em] text-base-content/50">
                             Starting From
                           </p>
 
                           <p className="mt-1 text-2xl font-bold text-primary sm:text-3xl">
-                            ৳
-                            {Number(
-                              pkg.price || 0,
-                            ).toLocaleString()}
+                            ৳{Number(pkg.price || 0).toLocaleString()}
                           </p>
                         </div>
 
@@ -215,11 +199,9 @@ const Packages = () => {
                       ===================================== */}
 
                       <div className="grid grid-cols-2 gap-2.5 py-4">
-
                         {/* Duration */}
 
                         <div className="flex items-center gap-2 rounded-xl bg-base-100 p-2.5">
-
                           <Clock3 className="h-4 w-4 shrink-0 text-primary" />
 
                           <div className="min-w-0">
@@ -231,13 +213,11 @@ const Packages = () => {
                               {pkg.duration || "N/A"}
                             </p>
                           </div>
-
                         </div>
 
                         {/* Photos */}
 
                         <div className="flex items-center gap-2 rounded-xl bg-base-100 p-2.5">
-
                           <Images className="h-4 w-4 shrink-0 text-primary" />
 
                           <div className="min-w-0">
@@ -249,9 +229,7 @@ const Packages = () => {
                               {pkg.photoCount || 0}
                             </p>
                           </div>
-
                         </div>
-
                       </div>
 
                       {/* =====================================
@@ -259,11 +237,9 @@ const Packages = () => {
                       ===================================== */}
 
                       <div>
-
                         <p className="text-sm leading-6 text-base-content/65">
                           {getShortDescription(pkg.description)}
                         </p>
-
                       </div>
 
                       {/* =====================================
@@ -272,32 +248,23 @@ const Packages = () => {
 
                       {features.length > 0 && (
                         <div className="mt-4">
-
                           <p className="mb-2.5 text-sm font-semibold">
                             Package Includes
                           </p>
 
                           <ul className="space-y-2">
+                            {features.slice(0, 4).map((feature, index) => (
+                              <li
+                                key={`${pkg._id}-feature-${index}`}
+                                className="flex items-start gap-2 text-sm text-base-content/70"
+                              >
+                                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                                  <Check className="h-3 w-3 text-primary" />
+                                </span>
 
-                            {features
-                              .slice(0, 4)
-                              .map((feature, index) => (
-                                <li
-                                  key={`${pkg._id}-feature-${index}`}
-                                  className="flex items-start gap-2 text-sm text-base-content/70"
-                                >
-
-                                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                                    <Check className="h-3 w-3 text-primary" />
-                                  </span>
-
-                                  <span className="leading-5">
-                                    {feature}
-                                  </span>
-
-                                </li>
-                              ))}
-
+                                <span className="leading-5">{feature}</span>
+                              </li>
+                            ))}
                           </ul>
 
                           {/* More Features */}
@@ -307,7 +274,6 @@ const Packages = () => {
                               + {features.length - 4} more benefits
                             </p>
                           )}
-
                         </div>
                       )}
 
@@ -316,7 +282,6 @@ const Packages = () => {
                       ===================================== */}
 
                       <div className="mt-auto flex gap-2.5 pt-5">
-
                         {/* View Details */}
 
                         <Link
@@ -324,7 +289,6 @@ const Packages = () => {
                           className="btn btn-sm btn-outline flex-1 border-primary/40 hover:border-primary hover:bg-primary hover:text-primary-content"
                         >
                           View Details
-
                           <ArrowRight className="h-3.5 w-3.5" />
                         </Link>
 
@@ -335,21 +299,15 @@ const Packages = () => {
                           className="btn btn-sm btn-primary flex-1 text-primary-content"
                         >
                           <Camera className="h-3.5 w-3.5" />
-
                           Book Now
                         </Link>
-
                       </div>
-
                     </div>
-
                   </article>
                 );
               })}
-
             </div>
           )}
-
         </div>
       </section>
 
@@ -358,32 +316,34 @@ const Packages = () => {
       ========================================= */}
 
       <section className="border-t border-primary/10 bg-base-200 px-4 py-14 sm:py-16">
-
         <div className="mx-auto max-w-3xl text-center">
+          <div className="text-center">
+            <h2 className="font-playfair text-3xl font-semibold sm:text-4xl">
+              Need a Custom Package?{" "}
+              <span className="block text-xl font-normal text-base-content/80 mt-1 sm:text-2xl">
+                (কাস্টম প্যাকেজ প্রয়োজন?)
+              </span>
+            </h2>
 
-          <h2 className="font-playfair text-3xl font-semibold sm:text-4xl">
-            Need a Custom Package?
-          </h2>
-
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-base-content/60 sm:text-base">
-            Looking for something different? Tell us about your
-            event and we'll help you create a photography package
-            that fits your needs.
-          </p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-base-content/60 sm:text-base">
+              Looking for something different? Tell us about your event and
+              we'll help you create a photography package that fits your needs.
+            </p>
+            <p className="mx-auto mt-1 max-w-xl text-xs leading-5 text-base-content/50 sm:text-sm">
+              আপনার কি অন্য কিছু প্রয়োজন? আপনার ইভেন্ট সম্পর্কে জানান, আমরা
+              আপনার বাজেট ও চাহিদা অনুযায়ী প্যাকেজ বানিয়ে দেব।
+            </p>
+          </div>
 
           <Link
             to="/contact"
             className="btn btn-primary mt-6 text-primary-content"
           >
             Contact Rup Darpan
-
             <ArrowRight className="h-4 w-4" />
           </Link>
-
         </div>
-
       </section>
-
     </main>
   );
 };
