@@ -79,6 +79,7 @@ async function run() {
     const photoCollection = myDB.collection("photos");
     const userCollection = myDB.collection("users");
     const packagesCollection = myDB.collection("packages");
+    const bookingCollection = myDB.collection("bookings");
 
     // Google Strategy
     passport.use(
@@ -616,6 +617,182 @@ async function run() {
         });
       }
     });
+    ////////////////////////  BOOKING RELATED API ////////////////////////////////////////////
+    app.post("/bookings", verifyToken, async (req, res) => {
+      try {
+        const bookingData = req.body;
+
+        const newBooking = {
+          ...bookingData,
+
+          userId: req.user.userId,
+
+          status: "pending",
+
+          createdAt: new Date(),
+        };
+
+        const result = await bookingCollection.insertOne(newBooking);
+
+        res.status(201).send(result);
+      } catch (error) {
+        console.error("Failed to create booking:", error);
+
+        res.status(500).send({
+          message: "Failed to create booking",
+        });
+      }
+    });
+    //GET bookings for the logged-in user
+    app.get("/bookings", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.userId;
+        const bookings = await bookingCollection.find({ userId }).toArray();
+        res.send(bookings);
+      } catch (error) {
+        console.error("Failed to fetch bookings:", error);
+        res.status(500).send({
+          message: "Failed to fetch bookings",
+        });
+      }
+    });
+    //GET all bookings for admin
+    app.get("/admin/bookings", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const bookings = await bookingCollection
+          .find({})
+          .sort({ createdAt: -1 })
+          .toArray();
+
+        res.send(bookings);
+      } catch (error) {
+        console.error("Failed to fetch admin bookings:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch admin bookings",
+        });
+      }
+    });
+    // Update booking status - Admin only
+    // Confirm Booking
+    app.patch(
+      "/admin/bookings/:id/confirm",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+
+          if (!ObjectId.isValid(id)) {
+            return res.status(400).send({
+              success: false,
+              message: "Invalid booking ID",
+            });
+          }
+
+          const result = await bookingCollection.updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $set: {
+                status: "confirmed",
+                updatedAt: new Date(),
+              },
+            },
+          );
+
+          if (result.matchedCount === 0) {
+            return res.status(404).send({
+              success: false,
+              message: "Booking not found",
+            });
+          }
+
+          res.send({
+            success: true,
+            message: "Booking confirmed successfully",
+          });
+        } catch (error) {
+          console.error("Failed to confirm booking:", error);
+
+          res.status(500).send({
+            success: false,
+            message: "Failed to confirm booking",
+          });
+        }
+      },
+    );
+    // CANCEL BOOKING
+    app.patch(
+      "/admin/bookings/:id/cancel",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+
+          if (!ObjectId.isValid(id)) {
+            return res.status(400).send({
+              success: false,
+              message: "Invalid booking ID",
+            });
+          }
+
+          const result = await bookingCollection.updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $set: {
+                status: "cancelled",
+                updatedAt: new Date(),
+              },
+            },
+          );
+
+          if (result.matchedCount === 0) {
+            return res.status(404).send({
+              success: false,
+              message: "Booking not found",
+            });
+          }
+
+          res.send({
+            success: true,
+            message: "Booking cancelled successfully",
+          });
+        } catch (error) {
+          console.error("Failed to cancel booking:", error);
+
+          res.status(500).send({
+            success: false,
+            message: "Failed to cancel booking",
+          });
+        }
+      },
+    );
+    //Delete booking - Admin only
+    app.delete(
+      "/admin/bookings/:id",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { id } = req.params;
+
+        const result = await bookingCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).send({
+            message: "Booking not found",
+          });
+        }
+
+        res.send({
+          message: "Booking deleted successfully",
+        });
+      },
+    );
+    //
+    //
 
     //////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////////////////////
     //POST Register
