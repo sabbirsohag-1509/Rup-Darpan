@@ -23,6 +23,7 @@ import PackagesDetails from "../components/Packages/PackagesDetails";
 import Booking from "../components/Booking/Booking";
 import MyBookings from "../components/Booking/MyBookings/MyBookings";
 import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
+import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
 
 export const router = createBrowserRouter([
   {
@@ -176,6 +177,15 @@ export const router = createBrowserRouter([
           {
             path: "add-package",
             element: <AddPackage></AddPackage>,
+          },
+        ],
+      },
+      {
+        path: "reviews",
+        children: [ 
+          {
+            index: true,
+            element: <AdminReviewManagement /> 
           },
         ],
       },
