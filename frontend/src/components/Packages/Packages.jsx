@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useContext, useState } from "react";
 import {
   ArrowRight,
   Camera,
@@ -9,7 +10,13 @@ import {
   Images,
   Sparkles,
   Tag,
+  Lock,
+  X,
+  LogIn,
 } from "lucide-react";
+import { AuthContext } from "../../context/AuthContext";
+
+// Change this path according to your project structure
 
 const API_URL = "http://localhost:5000/packages";
 
@@ -34,6 +41,15 @@ const getShortDescription = (description, wordLimit = 50) => {
 // =========================================
 
 const Packages = () => {
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [selectedPackageId, setSelectedPackageId] = useState(null);
+
+  // =========================================
+  // FETCH PACKAGES
+  // =========================================
+
   const {
     data: packages = [],
     isLoading,
@@ -48,55 +64,134 @@ const Packages = () => {
     },
   });
 
-  // Only show active packages
+  // =========================================
+  // ONLY ACTIVE PACKAGES
+  // =========================================
+
   const activePackages = packages.filter((pkg) => pkg.active !== false);
 
   // =========================================
-  // Loading State
+  // BOOK NOW
+  // =========================================
+
+  const handleBookNow = (packageId) => {
+    // User is not logged in
+    if (!user) {
+      setSelectedPackageId(packageId);
+      setShowLoginModal(true);
+      return;
+    }
+
+    // User is logged in
+    navigate(`/booking?package=${packageId}`);
+  };
+
+  // =========================================
+  // LOGIN TO BOOK
+  // =========================================
+
+  const handleLoginToBook = () => {
+    if (!selectedPackageId) return;
+
+    setShowLoginModal(false);
+
+    navigate("/login", {
+      state: {
+        from: `/booking?package=${selectedPackageId}`,
+      },
+    });
+  };
+
+  // =========================================
+  // CLOSE LOGIN MODAL
+  // =========================================
+
+  const handleCloseLoginModal = () => {
+    setShowLoginModal(false);
+    setSelectedPackageId(null);
+  };
+
+  // =========================================
+  // LOADING STATE
   // =========================================
 
   if (isLoading) {
     return (
-      <section className="min-h-[70vh] bg-base-100 px-4 py-20">
-        <div className="flex min-h-[50vh] items-center justify-center">
-          <span className="loading loading-spinner loading-lg text-primary" />
+      <section className="px-4 pb-20 sm:pb-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {[1, 2, 3].map((item) => (
+              <div
+                key={item}
+                className="overflow-hidden rounded-2xl border border-primary/10 bg-base-200 shadow-sm"
+              >
+                {/* Image Skeleton */}
+
+                <div className="aspect-[16/9] animate-pulse bg-base-300" />
+
+                {/* Content Skeleton */}
+
+                <div className="space-y-4 p-5">
+                  <div className="h-8 w-32 animate-pulse rounded bg-base-300" />
+
+                  <div className="h-4 w-full animate-pulse rounded bg-base-300" />
+
+                  <div className="h-4 w-4/5 animate-pulse rounded bg-base-300" />
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="h-14 animate-pulse rounded-xl bg-base-300" />
+
+                    <div className="h-14 animate-pulse rounded-xl bg-base-300" />
+                  </div>
+
+                  <div className="h-10 w-full animate-pulse rounded bg-base-300" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );
   }
 
   // =========================================
-  // Error State
+  // ERROR STATE
   // =========================================
 
   if (isError) {
     return (
-      <section className="min-h-[70vh] bg-base-100 px-4 py-20">
-        <div className="mx-auto max-w-xl rounded-2xl border border-error/20 bg-base-200 p-8 text-center">
-          <Camera className="mx-auto h-10 w-10 text-error" />
+      <section className="px-4 pb-20 sm:pb-24">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-2xl border border-error/20 bg-base-200 p-10 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-error/10">
+              <Camera className="h-7 w-7 text-error" />
+            </div>
 
-          <h2 className="mt-4 font-playfair text-2xl font-semibold">
-            Unable to Load Packages
-          </h2>
+            <h2 className="mt-4 font-playfair text-2xl font-semibold">
+              Unable to Load Packages
+            </h2>
 
-          <p className="mt-2 text-sm text-base-content/60">
-            Something went wrong while loading our photography packages. Please
-            try again later.
-          </p>
+            <p className="mt-2 text-sm text-base-content/60">
+              Something went wrong while loading our photography packages.
+              Please try again later.
+            </p>
+          </div>
         </div>
       </section>
     );
   }
 
   return (
-    <main className="min-h-screen bg-base-100">
+    <>
       {/* =========================================
           PACKAGES SECTION
       ========================================= */}
 
       <section className="px-4 pb-20 sm:pb-24">
         <div className="mx-auto max-w-7xl">
-          {/* No Packages */}
+          {/* =========================================
+              NO PACKAGES
+          ========================================= */}
 
           {activePackages.length === 0 ? (
             <div className="rounded-2xl border border-primary/10 bg-base-200 p-10 text-center">
@@ -294,13 +389,22 @@ const Packages = () => {
 
                         {/* Book Now */}
 
-                        <Link
-                          to={`/booking?package=${pkg._id}`}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!user) {
+                              setSelectedPackageId(pkg._id);
+                              setShowLoginModal(true);
+                              return;
+                            }
+
+                            navigate(`/booking?package=${pkg._id}`);
+                          }}
                           className="btn btn-sm btn-primary flex-1 text-primary-content"
                         >
                           <Camera className="h-3.5 w-3.5" />
                           Book Now
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   </article>
@@ -319,8 +423,8 @@ const Packages = () => {
         <div className="mx-auto max-w-3xl text-center">
           <div className="text-center">
             <h2 className="font-playfair text-3xl font-semibold sm:text-4xl">
-              Need a Custom Package?{" "}
-              <span className="block text-xl font-normal text-base-content/80 mt-1 sm:text-2xl">
+              Need a Custom Package?
+              <span className="mt-1 block text-xl font-normal text-base-content/80 sm:text-2xl">
                 (কাস্টম প্যাকেজ প্রয়োজন?)
               </span>
             </h2>
@@ -329,6 +433,7 @@ const Packages = () => {
               Looking for something different? Tell us about your event and
               we'll help you create a photography package that fits your needs.
             </p>
+
             <p className="mx-auto mt-1 max-w-xl text-xs leading-5 text-base-content/50 sm:text-sm">
               আপনার কি অন্য কিছু প্রয়োজন? আপনার ইভেন্ট সম্পর্কে জানান, আমরা
               আপনার বাজেট ও চাহিদা অনুযায়ী প্যাকেজ বানিয়ে দেব।
@@ -344,7 +449,87 @@ const Packages = () => {
           </Link>
         </div>
       </section>
-    </main>
+
+      {/* =========================================
+          LOGIN REQUIRED MODAL
+      ========================================= */}
+
+      {showLoginModal && (
+        <div
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+          onClick={() => setShowLoginModal(false)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-2xl border border-primary/20 bg-base-100/90 p-6 shadow-2xl backdrop-blur-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              type="button"
+              onClick={() => setShowLoginModal(false)}
+              className="btn btn-circle btn-ghost btn-sm absolute right-3 top-3"
+              title="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Login Icon */}
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+              <LogIn className="h-7 w-7 text-primary" />
+            </div>
+
+            {/* Content */}
+            <div className="mt-4 text-center">
+              <div>
+                <h3 className="font-playfair text-xl font-semibold">
+                  Login Required{" "}
+                  <span className="text-base font-normal text-base-content/80">
+                    (লগইন করা প্রয়োজন)
+                  </span>
+                </h3>
+
+                <p className="mt-2 text-sm leading-6 text-base-content/60">
+                  To book this photography package, you need to login to your
+                  account first.
+                </p>
+                <p className="mt-1 text-xs text-base-content/50">
+                  এই ফটোগ্রাফি প্যাকেজটি বুক করতে প্রথমে আপনার অ্যাকাউন্টে লগইন
+                  করুন।
+                </p>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => setShowLoginModal(false)}
+                className="btn btn-ghost flex-1"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLoginModal(false);
+
+                  navigate("/login", {
+                    state: {
+                      from: `/booking?package=${selectedPackageId}`,
+                    },
+                  });
+                }}
+                className="btn btn-primary flex-1 text-primary-content"
+              >
+                <LogIn className="h-4 w-4" />
+                Login to Book
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -96,14 +96,23 @@ const MyBookings = () => {
           <div className="mx-auto max-w-xl rounded-2xl border border-error/20 bg-base-200 p-8 text-center">
             <XCircle className="mx-auto h-12 w-12 text-error" />
 
-            <h2 className="mt-4 font-playfair text-2xl font-semibold">
-              Unable to Load Bookings
-            </h2>
+            <div className="text-center">
+              <h2 className="mt-4 font-playfair text-2xl font-semibold">
+                Unable to Load Bookings{" "}
+                <span className="text-lg font-normal text-base-content/80 sm:text-xl">
+                  (বুকিং লোড করা সম্ভব হয়নি)
+                </span>
+              </h2>
 
-            <p className="mt-2 text-sm leading-6 text-base-content/60">
-              Something went wrong while loading your bookings. Please try
-              again.
-            </p>
+              <p className="mt-2 text-sm leading-6 text-base-content/60">
+                Something went wrong while loading your bookings. Please try
+                again.
+              </p>
+              <p className="mt-1 text-xs text-base-content/50">
+                আপনার বুকিংয়ের তথ্য লোড করার সময় কোনো সমস্যা হয়েছে। অনুগ্রহ করে
+                আবার চেষ্টা করুন।
+              </p>
+            </div>
 
             <button
               onClick={() => refetch()}
@@ -206,20 +215,23 @@ const MyBookings = () => {
               </div>
 
               <div className="text-center">
-  <h2 className="mt-5 font-playfair text-2xl font-semibold sm:text-3xl">
-    No Bookings Yet{" "}
-    <span className="mt-1 block text-lg font-normal text-base-content/80 sm:text-xl">
-      (এখনও কোনো বুকিং করা হয়নি)
-    </span>
-  </h2>
+                <h2 className="mt-5 font-playfair text-2xl font-semibold sm:text-3xl">
+                  No Bookings Yet{" "}
+                  <span className="mt-1 block text-lg font-normal text-base-content/80 sm:text-xl">
+                    (এখনও কোনো বুকিং করা হয়নি)
+                  </span>
+                </h2>
 
-  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-base-content/60">
-    You haven't made any photography bookings yet. Choose a package and let us capture your special moments.
-  </p>
-  <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-base-content/50">
-    আপনি এখনও কোনো বুকিং করেননি। রূপদর্পণ (RupDarpon)-এর একটি প্যাকেজ বেছে নিন এবং আপনার বিশেষ মুহূর্তগুলো ফ্রেমবন্দি করার সুযোগ দিন।
-  </p>
-</div>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-base-content/60">
+                  You haven't made any photography bookings yet. Choose a
+                  package and let us capture your special moments.
+                </p>
+                <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-base-content/50">
+                  আপনি এখনও কোনো বুকিং করেননি। রূপদর্পণ (RupDarpon)-এর একটি
+                  প্যাকেজ বেছে নিন এবং আপনার বিশেষ মুহূর্তগুলো ফ্রেমবন্দি করার
+                  সুযোগ দিন।
+                </p>
+              </div>
 
               <a
                 href="/packages"

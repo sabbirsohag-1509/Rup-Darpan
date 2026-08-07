@@ -41,7 +41,7 @@ const Login = () => {
 
         reset();
 
-        const destination = location.state?.from?.pathname || "/";
+        const destination = location.state?.from || "/";
 
         navigate(destination, { replace: true });
       }
