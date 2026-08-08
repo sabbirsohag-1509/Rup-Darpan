@@ -21,7 +21,6 @@ import Contact from "../components/Contact/Contact";
 import Packages from "../components/Packages/Packages";
 import PackagesDetails from "../components/Packages/PackagesDetails";
 import Booking from "../components/Booking/Booking";
-//My bookings
 import MyBookings from "../components/Booking/MyBookings/MyBookings";
 import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
 import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
