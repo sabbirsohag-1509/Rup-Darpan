@@ -80,6 +80,7 @@ async function run() {
     const userCollection = myDB.collection("users");
     const packagesCollection = myDB.collection("packages");
     const bookingCollection = myDB.collection("bookings");
+    const reviewCollection = myDB.collection("reviews");
 
     // Google Strategy
     passport.use(
@@ -792,7 +793,187 @@ async function run() {
       },
     );
     //
-    //
+    //////////////////////////  REVIEW RELATED API ////////////////////////////////////////////
+    //POST review
+    app.post("/reviews", verifyToken, async (req, res) => {
+      try {
+        const { packageId, packageName, rating, comment } = req.body;
+
+        // Logged-in user
+        const userId = req.user.userId;
+
+        // User collection to get user details
+        const user = await userCollection.findOne({
+          _id: new ObjectId(userId),
+        });
+
+        if (!user) {
+          return res.status(404).send({
+            message: "User not found",
+          });
+        }
+
+        const newReview = {
+          packageId,
+          packageName,
+
+          userId,
+          userName: user.name,
+          userPhoto: user.profilePhoto || user.photo || "",
+
+          rating: Number(rating),
+          comment,
+
+          createdAt: new Date(),
+          status: "pending",
+        };
+
+        const result = await reviewCollection.insertOne(newReview);
+
+        res.status(201).send({
+          success: true,
+          message: "Review submitted successfully",
+          review: {
+            _id: result.insertedId,
+            ...newReview,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to create review:", error);
+
+        res.status(500).send({
+          message: "Failed to create review",
+        });
+      }
+    });
+    // GET reviews for a specific package
+    app.get("/reviews/package/:packageId", async (req, res) => {
+      try {
+        const { packageId } = req.params;
+
+        const reviews = await reviewCollection
+          .find({
+            packageId,
+            status: "approved",
+          })
+          .sort({ createdAt: -1 })
+          .toArray();
+
+        res.status(200).send(reviews);
+      } catch (error) {
+        console.error("Failed to fetch package reviews:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch package reviews",
+        });
+      }
+    });
+    // GET all reviews - Admin only
+    app.get("/admin/reviews", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const reviews = await reviewCollection
+          .find({})
+          .sort({ createdAt: -1 })
+          .toArray();
+
+        res.status(200).send(reviews);
+      } catch (error) {
+        console.error("Failed to fetch admin reviews:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch reviews",
+        });
+      }
+    });
+    //Apporeve review - Admin only
+    app.patch("/admin/reviews/:id/approve", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const result = await reviewCollection.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              status: "approved",
+              approvedAt: new Date(),
+            },
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            message: "Review not found",
+          });
+        }
+
+        res.status(200).send({
+          message: "Review approved successfully",
+        });
+      } catch (error) {
+        console.error("Failed to approve review:", error);
+
+        res.status(500).send({
+          message: "Failed to approve review",
+        });
+      }
+    });
+    //Reject review - Admin only
+    app.patch("/admin/reviews/:id/reject", verifyToken,verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const result = await reviewCollection.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              status: "rejected",
+              rejectedAt: new Date(),
+            },
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            message: "Review not found",
+          });
+        }
+
+        res.status(200).send({
+          message: "Review rejected successfully",
+        });
+      } catch (error) {
+        console.error("Failed to reject review:", error);
+
+        res.status(500).send({
+          message: "Failed to reject review",
+        });
+      }
+    });
+    //Delete Review - Admin only
+    app.delete("/admin/reviews/:id", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const result = await reviewCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).send({
+            message: "Review not found",
+          });
+        }
+
+        res.status(200).send({
+          message: "Review deleted successfully",
+        });
+      } catch (error) {
+        console.error("Failed to delete review:", error);
+
+        res.status(500).send({
+          message: "Failed to delete review",
+        });
+      }
+    });
 
     //////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////////////////////
     //POST Register
