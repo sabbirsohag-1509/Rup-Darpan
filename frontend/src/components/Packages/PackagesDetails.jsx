@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 import { AuthContext } from "../../context/AuthContext";
+import ReviewSection from "../Review/ReviewSection";
 
 const PackagesDetails = () => {
   const { id } = useParams();
@@ -514,6 +515,10 @@ const PackagesDetails = () => {
               </div>
             </div>
           </aside>
+        </div>
+        {/* Review Section  */}
+        <div>
+          <ReviewSection packageId={id} packageName={pkg.name } />
         </div>
       </section>
 
