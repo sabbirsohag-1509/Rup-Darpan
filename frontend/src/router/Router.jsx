@@ -24,6 +24,7 @@ import Booking from "../components/Booking/Booking";
 import MyBookings from "../components/Booking/MyBookings/MyBookings";
 import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
 import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
+import MyReview from "../components/Review/MyReview";
 
 export const router = createBrowserRouter([
   {
@@ -98,12 +99,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "reviews",
-        element: (
-          <DashboardPlaceholderPage
-            title="Reviews"
-            description="Your review management section is prepared for real data."
-          />
-        ),
+        children: [
+          {
+            index: true,
+            element: <MyReview></MyReview>
+          },
+        ],
       },
       {
         path: "profile",
