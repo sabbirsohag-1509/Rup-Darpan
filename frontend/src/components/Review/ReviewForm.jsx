@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { MessageSquareText, Send, Star } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { AuthContext } from './../../context/AuthContext';
+import { AuthContext } from "./../../context/AuthContext";
 
 const ReviewForm = ({ packageName, packageId }) => {
   const { user } = useContext(AuthContext);
@@ -96,49 +96,57 @@ const ReviewForm = ({ packageName, packageId }) => {
         {/* =========================================
             PACKAGE
         ========================================== */}
-              {/* =========================================
+        {/* =========================================
     REVIEWER PROFILE
 ========================================== */}
 
-<div className="rounded-2xl border border-primary/10 bg-base-100 p-4">
-  <div className="flex items-center gap-3">
-    {/* Profile Image */}
+        <div className="rounded-2xl border border-primary/10 bg-base-100 p-4">
+          {/* Login as user info  */}
+          <div className="flex items-center gap-3">
+            {/* Profile Image */}
 
-    <div className="avatar">
-      <div className="h-12 w-12 overflow-hidden rounded-full ring-2 ring-primary/10 ring-offset-2 ring-offset-base-100">
-        {user?.profilePhoto ? (
-          <img
-            src={user.profilePhoto}
-            alt={user?.name || "User"}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-primary/10 text-lg font-semibold text-primary">
-            {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            <div className="avatar">
+              <div className="h-12 w-12 overflow-hidden rounded-full ring-2 ring-primary/10 ring-offset-2 ring-offset-base-100">
+                {user?.profilePhoto ? (
+                  <img src={user.profilePhoto} alt={user?.name || "User"} />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-primary/10 text-lg font-semibold text-primary">
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* User Info */}
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">
+                {user?.name || "User"}
+              </p>
+
+              <p className="truncate text-xs text-base-content/50">
+                {user?.email || "No email available"}
+              </p>
+            </div>
+
+            {/* Logged In Status */}
+
+            <div
+              className={`hidden shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium sm:flex ${
+                user ? "bg-success/10 text-success" : "bg-error/10 text-error"
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  user ? "bg-success" : "bg-error"
+                }`}
+              />
+
+              {user ? "Logged in" : "Not logged in"}
+            </div>
           </div>
-        )}
-      </div>
-    </div>
-
-    {/* User Info */}
-
-    <div className="min-w-0 flex-1">
-      <p className="truncate text-sm font-semibold">
-        {user?.name || "User"}
-      </p>
-
-      <p className="truncate text-xs text-base-content/50">
-        {user?.email || "No email available"}
-      </p>
-    </div>
-
-    {/* Logged In Status */}
-
-    <div className="hidden shrink-0 items-center gap-1.5 rounded-full bg-success/10 px-3 py-1.5 text-xs font-medium text-success sm:flex">
-      <span className="h-1.5 w-1.5 rounded-full bg-success" />
-      Logged in
-    </div>
-  </div>
-</div>
+          
+        </div>
 
         <div className="rounded-2xl border border-primary/10 bg-base-100 p-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-base-content/45">
@@ -245,8 +253,8 @@ const ReviewForm = ({ packageName, packageId }) => {
                   message: "Review must be at least 10 characters.",
                 },
                 maxLength: {
-                  value: 500,
-                  message: "Review cannot exceed 500 characters.",
+                  value: 1500,
+                  message: "Review cannot exceed 1500 characters.",
                 },
               })}
             />
@@ -262,7 +270,7 @@ const ReviewForm = ({ packageName, packageId }) => {
             </p>
 
             <span className="text-xs text-base-content/35">
-              10–500 characters
+              10–1500 characters
             </span>
           </div>
         </div>
