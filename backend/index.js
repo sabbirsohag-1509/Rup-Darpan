@@ -886,80 +886,195 @@ async function run() {
       }
     });
     //Apporeve review - Admin only
-    app.patch("/admin/reviews/:id/approve", verifyToken, verifyAdmin, async (req, res) => {
-      try {
-        const { id } = req.params;
+    app.patch(
+      "/admin/reviews/:id/approve",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        try {
+          const { id } = req.params;
 
-        const result = await reviewCollection.updateOne(
-          { _id: new ObjectId(id) },
-          {
-            $set: {
-              status: "approved",
-              approvedAt: new Date(),
+          const result = await reviewCollection.updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $set: {
+                status: "approved",
+                approvedAt: new Date(),
+              },
             },
-          },
-        );
+          );
 
-        if (result.matchedCount === 0) {
-          return res.status(404).send({
-            message: "Review not found",
+          if (result.matchedCount === 0) {
+            return res.status(404).send({
+              message: "Review not found",
+            });
+          }
+
+          res.status(200).send({
+            message: "Review approved successfully",
+          });
+        } catch (error) {
+          console.error("Failed to approve review:", error);
+
+          res.status(500).send({
+            message: "Failed to approve review",
           });
         }
-
-        res.status(200).send({
-          message: "Review approved successfully",
-        });
-      } catch (error) {
-        console.error("Failed to approve review:", error);
-
-        res.status(500).send({
-          message: "Failed to approve review",
-        });
-      }
-    });
+      },
+    );
     //Reject review - Admin only
-    app.patch("/admin/reviews/:id/reject", verifyToken,verifyAdmin, async (req, res) => {
+    app.patch(
+      "/admin/reviews/:id/reject",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+
+          const result = await reviewCollection.updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $set: {
+                status: "rejected",
+                rejectedAt: new Date(),
+              },
+            },
+          );
+
+          if (result.matchedCount === 0) {
+            return res.status(404).send({
+              message: "Review not found",
+            });
+          }
+
+          res.status(200).send({
+            message: "Review rejected successfully",
+          });
+        } catch (error) {
+          console.error("Failed to reject review:", error);
+
+          res.status(500).send({
+            message: "Failed to reject review",
+          });
+        }
+      },
+    );
+    //Delete Review - Admin only
+    app.delete(
+      "/admin/reviews/:id",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+          const result = await reviewCollection.deleteOne({
+            _id: new ObjectId(id),
+          });
+
+          if (result.deletedCount === 0) {
+            return res.status(404).send({
+              message: "Review not found",
+            });
+          }
+
+          res.status(200).send({
+            message: "Review deleted successfully",
+          });
+        } catch (error) {
+          console.error("Failed to delete review:", error);
+
+          res.status(500).send({
+            message: "Failed to delete review",
+          });
+        }
+      },
+    );
+    //My Reviews - GET reviews for the logged-in user
+    app.get("/reviews/my", verifyToken, async (req, res) => {
       try {
-        const { id } = req.params;
+        const reviews = await reviewCollection
+          .find({
+            userId: req.user.userId,
+          })
+          .sort({ createdAt: -1 })
+          .toArray();
+
+        res.status(200).send(reviews);
+      } catch (error) {
+        console.error("Failed to fetch my reviews:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch your reviews",
+        });
+      }
+    });
+    //Update my review - PATCH
+    app.patch("/reviews/:id", verifyToken, async (req, res) => {
+      try {
+        const reviewId = req.params.id;
+        const { rating, comment } = req.body;
+
+        const review = await reviewCollection.findOne({
+          _id: new ObjectId(reviewId),
+          userId: req.user.userId,
+        });
+
+        if (!review) {
+          return res.status(404).send({
+            message: "Review not found or you are not authorized to edit it",
+          });
+        }
+
+        const updateDoc = {
+          $set: {
+            rating: Number(rating),
+            comment: comment.trim(),
+
+            // Edited review আবার admin approval-এর জন্য Pending
+            status: "pending",
+
+            updatedAt: new Date(),
+          },
+        };
 
         const result = await reviewCollection.updateOne(
-          { _id: new ObjectId(id) },
           {
-            $set: {
-              status: "rejected",
-              rejectedAt: new Date(),
-            },
+            _id: new ObjectId(reviewId),
+            userId: req.user.userId,
           },
+          updateDoc,
         );
 
-        if (result.matchedCount === 0) {
-          return res.status(404).send({
-            message: "Review not found",
+        if (result.modifiedCount === 0) {
+          return res.status(400).send({
+            message: "Review was not updated",
           });
         }
 
         res.status(200).send({
-          message: "Review rejected successfully",
+          message: "Review updated successfully",
         });
       } catch (error) {
-        console.error("Failed to reject review:", error);
+        console.error("Failed to update review:", error);
 
         res.status(500).send({
-          message: "Failed to reject review",
+          message: "Failed to update review",
         });
       }
     });
-    //Delete Review - Admin only
-    app.delete("/admin/reviews/:id", verifyToken, verifyAdmin, async (req, res) => {
+    //DELETE my review - DELETE
+    app.delete("/reviews/:id", verifyToken, async (req, res) => {
       try {
-        const { id } = req.params;
+        const reviewId = req.params.id;
+
         const result = await reviewCollection.deleteOne({
-          _id: new ObjectId(id),
+          _id: new ObjectId(reviewId),
+          userId: req.user.userId,
         });
 
         if (result.deletedCount === 0) {
           return res.status(404).send({
-            message: "Review not found",
+            message: "Review not found or you are not authorized to delete it",
           });
         }
 
