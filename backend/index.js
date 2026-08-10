@@ -190,6 +190,103 @@ async function run() {
         });
       }
     });
+
+    //My Profile - GET
+    app.get("/users/me", verifyToken, async (req, res) => {
+      try {
+        const user = await userCollection.findOne(
+          { email: req.user.email },
+          {
+            projection: {
+              password: 0,
+            },
+          },
+        );
+
+        if (!user) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
+        res.send(user);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch profile.",
+        });
+      }
+    });
+    //Update my profile - PATCH
+
+    // Update my profile
+    app.patch("/users/me", verifyToken, async (req, res) => {
+      try {
+        const { name, phone, address, bio, profilePhoto } = req.body;
+
+        // Check authenticated user
+        if (!req.user?.email) {
+          return res.status(401).send({
+            message: "User email not found in token.",
+          });
+        }
+
+        // Name validation
+        if (!name || !name.trim()) {
+          return res.status(400).send({
+            message: "Name is required.",
+          });
+        }
+
+        const updateData = {
+          name: name.trim(),
+          phone: phone?.trim() || "",
+          address: address?.trim() || "",
+          bio: bio?.trim() || "",
+          profilePhoto: profilePhoto?.trim() || "",
+          updatedAt: new Date(),
+        };
+
+        const result = await userCollection.updateOne(
+          {
+            email: req.user.email,
+          },
+          {
+            $set: updateData,
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
+        // Get updated user
+        const updatedUser = await userCollection.findOne(
+          {
+            email: req.user.email,
+          },
+          {
+            projection: {
+              password: 0,
+            },
+          },
+        );
+
+        res.send({
+          message: "Profile updated successfully.",
+          user: updatedUser,
+        });
+      } catch (error) {
+        console.error("Failed to update profile:", error);
+
+        res.status(500).send({
+          message: "Failed to update profile.",
+        });
+      }
+    });
     //Change user role - ADMIN ONLY PATCH
     app.patch("/users/:id/role", verifyToken, verifyAdmin, async (req, res) => {
       try {
@@ -383,93 +480,6 @@ async function run() {
 
         res.status(500).send({
           message: "Internal Server Error",
-        });
-      }
-    });
-    //My Profile - GET
-    app.get("/users/me", verifyToken, async (req, res) => {
-      try {
-        const user = await userCollection.findOne(
-          { email: req.user.email },
-          {
-            projection: {
-              password: 0,
-            },
-          },
-        );
-
-        if (!user) {
-          return res.status(404).send({
-            message: "User not found.",
-          });
-        }
-
-        res.send(user);
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-
-        res.status(500).send({
-          message: "Failed to fetch profile.",
-        });
-      }
-    });
-    //Update my profile - PATCH
-
-    app.patch("/users/me", verifyToken, async (req, res) => {
-      try {
-        const { name, phone, address, bio } = req.body;
-
-        // Name validation
-        if (!name || !name.trim()) {
-          return res.status(400).send({
-            message: "Name is required.",
-          });
-        }
-
-        const updateData = {
-          name: name.trim(),
-          phone: phone?.trim() || "",
-          address: address?.trim() || "",
-          bio: bio?.trim() || "",
-          updatedAt: new Date(),
-        };
-
-        const result = await userCollection.updateOne(
-          {
-            _id: new ObjectId(req.user.userId),
-          },
-          {
-            $set: updateData,
-          },
-        );
-
-        if (result.matchedCount === 0) {
-          return res.status(404).send({
-            message: "User not found.",
-          });
-        }
-
-        // Get updated user
-        const updatedUser = await userCollection.findOne(
-          {
-            _id: new ObjectId(req.user.userId),
-          },
-          {
-            projection: {
-              password: 0,
-            },
-          },
-        );
-
-        res.send({
-          message: "Profile updated successfully.",
-          user: updatedUser,
-        });
-      } catch (error) {
-        console.error("Failed to update profile:", error);
-
-        res.status(500).send({
-          message: "Failed to update profile.",
         });
       }
     });
