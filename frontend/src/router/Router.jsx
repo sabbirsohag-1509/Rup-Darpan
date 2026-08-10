@@ -25,6 +25,7 @@ import MyBookings from "../components/Booking/MyBookings/MyBookings";
 import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
 import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
 import MyReview from "../components/Review/MyReview";
+import UserProfile from "../pages/Dashboard/MyProfile/UserProfile";
 
 export const router = createBrowserRouter([
   {
@@ -58,7 +59,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/booking",
-        element: <PrivateRoute><Booking></Booking></PrivateRoute>,
+        element: (
+          <PrivateRoute>
+            <Booking></Booking>
+          </PrivateRoute>
+        ),
       },
     ],
   },
@@ -90,30 +95,30 @@ export const router = createBrowserRouter([
       },
       {
         path: "bookings",
-        children: [ 
-          { 
+        children: [
+          {
             index: true,
-            element: <MyBookings />
-          }
-        ]
+            element: <MyBookings />,
+          },
+        ],
       },
       {
         path: "reviews",
         children: [
           {
             index: true,
-            element: <MyReview></MyReview>
+            element: <MyReview></MyReview>,
           },
         ],
       },
       {
         path: "profile",
-        element: (
-          <DashboardPlaceholderPage
-            title="Profile"
-            description="Profile management UI is ready to connect with your backend."
-          />
-        ),
+        children: [
+          {
+            index: true,
+            element: <UserProfile></UserProfile>,
+          },
+        ],
       },
       {
         path: "settings",
@@ -142,9 +147,9 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element:<AdminBookingManagement></AdminBookingManagement>
+            element: <AdminBookingManagement></AdminBookingManagement>,
           },
-        ]
+        ],
       },
       {
         path: "photos",
@@ -183,10 +188,10 @@ export const router = createBrowserRouter([
       },
       {
         path: "reviews",
-        children: [ 
+        children: [
           {
             index: true,
-            element: <AdminReviewManagement /> 
+            element: <AdminReviewManagement />,
           },
         ],
       },
