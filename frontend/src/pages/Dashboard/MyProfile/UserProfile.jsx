@@ -5,7 +5,6 @@ import {
   BarChart3,
   CalendarDays,
   Camera,
-  Check,
   Mail,
   MapPin,
   Phone,
@@ -108,7 +107,7 @@ const UserProfile = () => {
   const handleOpenEdit = () => {
     setFormData({
       name: user?.name || "",
-      phone: user?.phone || "",
+      phone: user?.phone?.replace(/^\+88/, "") || "",
       address: user?.address || "",
       bio: user?.bio || "",
       profilePhoto: user?.profilePhoto || "",
@@ -154,10 +153,7 @@ const UserProfile = () => {
 
       cloudinaryFormData.append("file", file);
 
-      cloudinaryFormData.append(
-        "upload_preset",
-        "rup_darpon",
-      );
+      cloudinaryFormData.append("upload_preset", "rup_darpon");
 
       const response = await axios.post(
         "https://api.cloudinary.com/v1_1/dgshzmhyk/image/upload",
@@ -187,13 +183,9 @@ const UserProfile = () => {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedData) => {
-      const response = await axios.patch(
-        `${API_URL}/users/me`,
-        updatedData,
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await axios.patch(`${API_URL}/users/me`, updatedData, {
+        withCredentials: true,
+      });
 
       return response.data;
     },
@@ -210,16 +202,13 @@ const UserProfile = () => {
     },
 
     onError: (error) => {
-  console.error("Profile update failed:", error);
+      console.error("Profile update failed:", error);
 
-  console.log("STATUS:", error.response?.status);
-  console.log("DATA:", error.response?.data);
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
 
-  toast.error(
-    error.response?.data?.message ||
-      "Failed to update profile."
-  );
-},
+      toast.error(error.response?.data?.message || "Failed to update profile.");
+    },
   });
 
   // =========================================
@@ -508,9 +497,7 @@ const UserProfile = () => {
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-xs text-base-content/45">
-                    Full Name
-                  </p>
+                  <p className="text-xs text-base-content/45">Full Name</p>
 
                   <p className="mt-1 truncate text-sm font-semibold">
                     {user?.name || "Not provided"}
@@ -528,9 +515,7 @@ const UserProfile = () => {
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-xs text-base-content/45">
-                    Email Address
-                  </p>
+                  <p className="text-xs text-base-content/45">Email Address</p>
 
                   <p className="mt-1 truncate text-sm font-semibold">
                     {user?.email || "Not provided"}
@@ -548,9 +533,7 @@ const UserProfile = () => {
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-xs text-base-content/45">
-                    Phone Number
-                  </p>
+                  <p className="text-xs text-base-content/45">Phone Number</p>
 
                   <p className="mt-1 truncate text-sm font-semibold">
                     {user?.phone || "Not provided"}
@@ -568,9 +551,7 @@ const UserProfile = () => {
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-xs text-base-content/45">
-                    Address
-                  </p>
+                  <p className="text-xs text-base-content/45">Address</p>
 
                   <p className="mt-1 truncate text-sm font-semibold">
                     {user?.address || "Not provided"}
@@ -603,9 +584,7 @@ const UserProfile = () => {
               </div>
 
               <div>
-                <p className="text-xs text-base-content/45">
-                  Account Created
-                </p>
+                <p className="text-xs text-base-content/45">Account Created</p>
 
                 <p className="mt-1 text-sm font-semibold">
                   {user?.createdAt
@@ -623,8 +602,8 @@ const UserProfile = () => {
 
         {(bookingsError || reviewsError) && (
           <div className="rounded-2xl border border-warning/20 bg-warning/10 p-4 text-sm text-warning-content">
-            Some profile statistics could not be loaded. Your main
-            profile is still available.
+            Some profile statistics could not be loaded. Your main profile is
+            still available.
           </div>
         )}
       </div>
@@ -660,10 +639,7 @@ const UserProfile = () => {
 
             {/* Modal Body */}
 
-            <form
-              onSubmit={handleSaveProfile}
-              className="space-y-5 p-5 sm:p-7"
-            >
+            <form onSubmit={handleSaveProfile} className="space-y-5 p-5 sm:p-7">
               {/* Profile Photo */}
 
               <div>
@@ -683,8 +659,7 @@ const UserProfile = () => {
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-primary/10 text-3xl font-bold text-primary">
-                        {formData.name?.charAt(0)?.toUpperCase() ||
-                          "U"}
+                        {formData.name?.charAt(0)?.toUpperCase() || "U"}
                       </div>
                     )}
                   </div>
@@ -767,11 +742,12 @@ const UserProfile = () => {
                 </label>
 
                 <input
-                  type="number"
+                  type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+8801XXXXXXXXX"
+                  maxLength={11}
+                  placeholder="017XXX-XXXXX"
                   className="input input-bordered w-full focus:border-primary"
                 />
               </div>
@@ -796,9 +772,7 @@ const UserProfile = () => {
               {/* Bio */}
 
               <div>
-                <label className="mb-2 block text-sm font-semibold">
-                  Bio
-                </label>
+                <label className="mb-2 block text-sm font-semibold">Bio</label>
 
                 <textarea
                   name="bio"
@@ -829,10 +803,7 @@ const UserProfile = () => {
 
                 <button
                   type="submit"
-                  disabled={
-                    updateProfileMutation.isPending ||
-                    isUploadingPhoto
-                  }
+                  disabled={updateProfileMutation.isPending || isUploadingPhoto}
                   className="btn btn-primary rounded-full px-7"
                 >
                   {updateProfileMutation.isPending ? (
