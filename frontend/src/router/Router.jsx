@@ -26,6 +26,7 @@ import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
 import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
 import MyReview from "../components/Review/MyReview";
 import UserProfile from "../pages/Dashboard/MyProfile/UserProfile";
+import AdminProfile from "../pages/Dashboard/MyProfile/AdminProfile";
 
 export const router = createBrowserRouter([
   {
@@ -203,6 +204,15 @@ export const router = createBrowserRouter([
             description="Payment operations and settlements panel is ready."
           />
         ),
+      },
+      {
+        path: "admin-profile",
+        children: [ 
+          { 
+            index: true,
+            element: <AdminProfile></AdminProfile>
+          },
+        ],
       },
       {
         path: "settings",

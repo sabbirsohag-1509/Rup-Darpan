@@ -35,6 +35,7 @@ const adminLinks = [
   { to: "/admin/bookings", label: "Bookings", icon: CalendarDays },
   { to: "/admin/reviews", label: "Reviews", icon: MessageSquareText },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
+  {to: "/admin/admin-profile", label: "Profile", icon: User },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

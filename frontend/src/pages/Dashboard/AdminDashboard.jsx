@@ -80,7 +80,7 @@ const BarPlaceholder = ({ title, description, bars }) => (
         </div>
       ))}
     </div>
-  </section>
+  </section> 
 );
 
 const AdminDashboard = () => {
