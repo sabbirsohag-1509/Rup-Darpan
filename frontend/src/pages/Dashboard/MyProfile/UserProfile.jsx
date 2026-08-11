@@ -14,6 +14,8 @@ import {
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import ChangePassword from "./Security/ChangePassword";
+import LoginActivity from "./Security/LoginActivity";
 
 const API_URL = "http://localhost:5000";
 
@@ -823,6 +825,10 @@ const UserProfile = () => {
           </div>
         </div>
       )}
+      <div> 
+        <ChangePassword></ChangePassword>
+        <LoginActivity></LoginActivity>
+      </div>
     </>
   );
 };

@@ -21,8 +21,6 @@ import SectionHeader from "../../components/dashboard/SectionHeader";
 import BookingStatusBadge from "../../components/dashboard/BookingStatusBadge";
 import EmptyState from "../../components/dashboard/EmptyState";
 import QuickActionCard from "../../components/dashboard/QuickActionCard";
-import ChangePassword from "./MyProfile/Security/ChangePassword";
-import LoginActivity from "./MyProfile/Security/LoginActivity";
 
 // ======================================================
 // AXIOS
@@ -850,11 +848,6 @@ const UserDashboard = () => {
           <p className="mt-1 text-xs text-base-content/50">
             Manage your password and review recent account activity.
           </p>
-        </div>
-
-        <div className="space-y-4">
-          <ChangePassword />
-          <LoginActivity />
         </div>
       </section>
     </div>
