@@ -1029,7 +1029,7 @@ const AdminProfile = () => {
           <div className="mb-5">
             <h3 className="font-playfair text-xl font-semibold">Security</h3>
 
-            <p className="mt-1 text-xs text-base-content/50">
+            <p className="mt-1 text-xs text-base-content/50"> 
               Manage your password and review recent account activity.
             </p>
           </div>

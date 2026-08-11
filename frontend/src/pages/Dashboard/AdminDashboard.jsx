@@ -22,7 +22,7 @@ const stats = [
     value: "৳12,84,000",
     description: "Monthly revenue trend remains healthy",
     icon: DollarSign,
-  },
+  }, 
   {
     label: "Pending Bookings",
     value: "29",

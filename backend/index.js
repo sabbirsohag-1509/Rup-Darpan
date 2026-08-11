@@ -18,7 +18,8 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+
+app.use(express.json()); 
 app.use(cookieParser());
 app.use(passport.initialize());
 // VERIFY JWT TOKEN
