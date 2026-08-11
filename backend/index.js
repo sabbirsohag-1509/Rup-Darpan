@@ -7,6 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const UAParser = require("ua-parser-js");
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 5000;
@@ -55,7 +56,7 @@ const verifyAdmin = (req, res, next) => {
 
   next();
 };
-//Device Info after login acitivity
+//Device Info after login activity
 const getDeviceInfo = (req) => {
   const parser = new UAParser(req.headers["user-agent"]);
   const result = parser.getResult();
@@ -76,6 +77,14 @@ const getDeviceInfo = (req) => {
     deviceType,
   };
 };
+//Forgot Password Email Transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 ////////////////////////
 
 app.get("/", (req, res) => {
@@ -1210,7 +1219,7 @@ async function run() {
       }
     });
 
-    //////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////////////////////
+    ////////////FULL AUTHENTICATION EMAIL, PASSWORD AND GOOGLE CLOUD LOGIN REGISTRATION//////////
     //POST Register
     app.post("/register", async (req, res) => {
       try {
@@ -1258,8 +1267,6 @@ async function run() {
         });
       }
     });
-
-    //POST Login
     // LOGIN API
     app.post("/login", async (req, res) => {
       try {
@@ -1403,6 +1410,170 @@ async function run() {
 
         res.status(500).send({
           message: "Internal Server Error",
+        });
+      }
+    });
+    //Forgot Password API
+    app.post("/users/forgot-password", async (req, res) => {
+      try {
+        const { email } = req.body;
+
+        if (!email) {
+          return res.status(400).send({
+            message: "Email is required.",
+          });
+        }
+
+        const user = await userCollection.findOne({ email });
+
+        // Security: don't reveal whether email exists
+        if (!user) {
+          return res.status(200).send({
+            message:
+              "If an account exists with this email, a password reset link has been sent.",
+          });
+        }
+
+        // Generate random token
+        const resetToken = crypto.randomBytes(32).toString("hex");
+
+        // Hash token before storing in DB
+        const hashedToken = crypto
+          .createHash("sha256")
+          .update(resetToken)
+          .digest("hex");
+
+        // Token expires in 15 minutes
+        const resetTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
+
+        await userCollection.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              resetPasswordToken: hashedToken,
+              resetPasswordExpires: resetTokenExpires,
+            },
+          },
+        );
+
+        const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+        await transporter.sendMail({
+          from: `"Rup Darpan" <${process.env.EMAIL_USER}>`,
+          to: user.email,
+          subject: "Reset Your Password",
+          html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h2>Password Reset Request</h2>
+
+          <p>Hello ${user.name || "there"},</p>
+
+          <p>
+            We received a request to reset your password.
+          </p>
+
+          <p>
+            Click the button below to create a new password:
+          </p>
+
+          <a
+            href="${resetLink}"
+            style="
+              display:inline-block;
+              padding:12px 20px;
+              background:#570df8;
+              color:white;
+              text-decoration:none;
+              border-radius:8px;
+            "
+          >
+            Reset Password
+          </a>
+
+          <p style="margin-top:20px;">
+            This link will expire in <strong>15 minutes</strong>.
+          </p>
+
+          <p>
+            If you didn't request a password reset, you can safely ignore
+            this email.
+          </p>
+        </div>
+      `,
+        });
+
+        return res.status(200).send({
+          message:
+            "If an account exists with this email, a password reset link has been sent.",
+        });
+      } catch (error) {
+        console.error("Forgot password error:", error);
+
+        return res.status(500).send({
+          message: "Failed to process password reset request.",
+        });
+      }
+    });
+    // Reset Password API
+    app.patch("/users/reset-password/:token", async (req, res) => {
+      try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+
+        if (!token || !newPassword) {
+          return res.status(400).send({
+            message: "Token and new password are required.",
+          });
+        }
+
+        if (newPassword.length < 8) {
+          return res.status(400).send({
+            message: "Password must be at least 8 characters.",
+          });
+        }
+
+        const hashedToken = crypto
+          .createHash("sha256")
+          .update(token)
+          .digest("hex");
+
+        const user = await userCollection.findOne({
+          resetPasswordToken: hashedToken,
+          resetPasswordExpires: {
+            $gt: new Date(),
+          },
+        });
+
+        if (!user) {
+          return res.status(400).send({
+            message: "Reset link is invalid or has expired.",
+          });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await userCollection.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              password: hashedPassword,
+              updatedAt: new Date(),
+            },
+            $unset: {
+              resetPasswordToken: "",
+              resetPasswordExpires: "",
+            },
+          },
+        );
+
+        return res.status(200).send({
+          message: "Password reset successfully.",
+        });
+      } catch (error) {
+        console.error("Reset password error:", error);
+
+        return res.status(500).send({
+          message: "Failed to reset password.",
         });
       }
     });
