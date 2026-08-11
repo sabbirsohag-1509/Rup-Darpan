@@ -21,6 +21,8 @@ import SectionHeader from "../../components/dashboard/SectionHeader";
 import BookingStatusBadge from "../../components/dashboard/BookingStatusBadge";
 import EmptyState from "../../components/dashboard/EmptyState";
 import QuickActionCard from "../../components/dashboard/QuickActionCard";
+import ChangePassword from "./MyProfile/Security/ChangePassword";
+import LoginActivity from "./MyProfile/Security/LoginActivity";
 
 // ======================================================
 // AXIOS
@@ -40,9 +42,9 @@ const fetchCurrentUser = async () => {
   const { data } = await api.get("/me");
 
   // Backend:
-// {
-//   user: {...}
-// }
+  // {
+  //   user: {...}
+  // }
 
   return data?.user ?? null;
 };
@@ -52,10 +54,10 @@ const fetchMyBookings = async () => {
   const { data } = await api.get("/bookings");
 
   // Backend currently returns:
-// [
-//   {...},
-//   {...}
-// ]
+  // [
+  //   {...},
+  //   {...}
+  // ]
 
   // Safe handling if backend later returns { bookings: [] }
   if (Array.isArray(data)) {
@@ -131,11 +133,7 @@ const getBookingPackageName = (booking) => {
 };
 
 const getBookingPayment = (booking) => {
-  return (
-    booking?.paymentStatus ||
-    booking?.payment ||
-    "Unpaid"
-  );
+  return booking?.paymentStatus || booking?.payment || "Unpaid";
 };
 
 const getBookingId = (booking) => {
@@ -208,22 +206,15 @@ const UserDashboard = () => {
   // SAFE ARRAYS
   // ====================================================
 
-  const safeBookings = Array.isArray(bookings)
-    ? bookings
-    : [];
+  const safeBookings = Array.isArray(bookings) ? bookings : [];
 
-  const safeReviews = Array.isArray(reviews)
-    ? reviews
-    : [];
+  const safeReviews = Array.isArray(reviews) ? reviews : [];
 
   // ====================================================
   // LOADING
   // ====================================================
 
-  const isLoading =
-    userLoading ||
-    bookingsLoading ||
-    reviewsLoading;
+  const isLoading = userLoading || bookingsLoading || reviewsLoading;
 
   // ====================================================
   // REFRESH
@@ -242,7 +233,6 @@ const UserDashboard = () => {
   if (isLoading) {
     return (
       <div className="space-y-8">
-
         {/* Header Skeleton */}
         <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
           <div className="flex items-center gap-4">
@@ -284,7 +274,6 @@ const UserDashboard = () => {
           <div className="skeleton h-6 w-48" />
           <div className="mt-5 skeleton h-32 w-full rounded-2xl" />
         </section>
-
       </div>
     );
   }
@@ -297,7 +286,6 @@ const UserDashboard = () => {
     return (
       <div className="flex min-h-[500px] items-center justify-center">
         <div className="w-full max-w-md rounded-2xl border border-error/20 bg-base-100 p-8 text-center shadow-sm">
-
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-error/10 text-error">
             <AlertCircle className="h-7 w-7" />
           </div>
@@ -307,8 +295,8 @@ const UserDashboard = () => {
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-base-content/65">
-            We couldn't load your dashboard information.
-            Please check your connection and try again.
+            We couldn't load your dashboard information. Please check your
+            connection and try again.
           </p>
 
           <button
@@ -319,7 +307,6 @@ const UserDashboard = () => {
             <RefreshCw className="h-4 w-4" />
             Try Again
           </button>
-
         </div>
       </div>
     );
@@ -339,25 +326,17 @@ const UserDashboard = () => {
       const bookingDate = getBookingDate(booking);
 
       if (!bookingDate) {
-        return (
-          status === "pending" ||
-          status === "confirmed"
-        );
+        return status === "pending" || status === "confirmed";
       }
 
       const date = new Date(bookingDate);
 
       if (Number.isNaN(date.getTime())) {
-        return (
-          status === "pending" ||
-          status === "confirmed"
-        );
+        return status === "pending" || status === "confirmed";
       }
 
       return (
-        (status === "pending" ||
-          status === "confirmed") &&
-        date >= new Date()
+        (status === "pending" || status === "confirmed") && date >= new Date()
       );
     })
     .sort((a, b) => {
@@ -368,12 +347,10 @@ const UserDashboard = () => {
     });
 
   const completedBookings = safeBookings.filter(
-    (booking) =>
-      getStatus(booking) === "completed"
+    (booking) => getStatus(booking) === "completed",
   );
 
-  const upcomingBooking =
-    upcomingBookings[0] || null;
+  const upcomingBooking = upcomingBookings[0] || null;
 
   const recentBookings = [...safeBookings]
     .sort((a, b) => {
@@ -401,29 +378,25 @@ const UserDashboard = () => {
     {
       label: "Total Bookings",
       value: totalBookings,
-      description:
-        "Total sessions booked across all packages.",
+      description: "Total sessions booked across all packages.",
       icon: CalendarDays,
     },
     {
       label: "Upcoming Sessions",
       value: upcomingBookings.length,
-      description:
-        "Sessions scheduled for your upcoming dates.",
+      description: "Sessions scheduled for your upcoming dates.",
       icon: Clock3,
     },
     {
       label: "Completed Sessions",
       value: completedBookings.length,
-      description:
-        "Successfully completed photography sessions.",
+      description: "Successfully completed photography sessions.",
       icon: Camera,
     },
     {
       label: "Reviews Given",
       value: safeReviews.length,
-      description:
-        "Reviews you have submitted for your sessions.",
+      description: "Reviews you have submitted for your sessions.",
       icon: MessageSquareText,
     },
   ];
@@ -436,36 +409,31 @@ const UserDashboard = () => {
     {
       to: "/packages",
       title: "Book a Session",
-      description:
-        "Choose your next photography package.",
+      description: "Choose your next photography package.",
       icon: CalendarDays,
     },
     {
       to: "/gallery",
       title: "Browse Gallery",
-      description:
-        "Explore recent visual storytelling work.",
+      description: "Explore recent visual storytelling work.",
       icon: Camera,
     },
     {
       to: "/dashboard/bookings",
       title: "My Bookings",
-      description:
-        "Review all upcoming and past sessions.",
+      description: "Review all upcoming and past sessions.",
       icon: Clock3,
     },
     {
       to: "/dashboard/reviews",
       title: "My Reviews",
-      description:
-        "Manage your submitted feedback.",
+      description: "Manage your submitted feedback.",
       icon: Star,
     },
     {
       to: "/dashboard/profile",
       title: "Edit Profile",
-      description:
-        "Keep your account details up to date.",
+      description: "Keep your account details up to date.",
       icon: MessageSquareText,
     },
   ];
@@ -476,24 +444,18 @@ const UserDashboard = () => {
 
   return (
     <div className="space-y-8">
-
       {/* =================================================
           PROFILE HEADER
       ================================================= */}
 
       <section className="relative overflow-hidden rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
-
         <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/5 blur-3xl" />
 
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-
           <div className="flex items-center gap-4">
-
             {/* Avatar */}
             <div className="avatar">
-
               <div className="h-16 w-16 overflow-hidden rounded-2xl ring-1 ring-primary/30 ring-offset-2 ring-offset-base-100">
-
                 {user?.profilePhoto ? (
                   <img
                     src={user.profilePhoto}
@@ -502,22 +464,15 @@ const UserDashboard = () => {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-primary/10 text-xl font-semibold text-primary">
-                    {user?.name
-                      ?.charAt(0)
-                      ?.toUpperCase() || "U"}
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                 )}
-
               </div>
-
             </div>
 
             {/* User Info */}
             <div>
-
-              <p className="text-sm font-medium text-primary">
-                Welcome back
-              </p>
+              <p className="text-sm font-medium text-primary">Welcome back</p>
 
               <h2 className="font-playfair text-3xl font-semibold">
                 {user?.name || "User"}
@@ -528,12 +483,10 @@ const UserDashboard = () => {
               </p>
 
               <p className="mt-2 max-w-xl text-sm text-base-content/70">
-                Manage your bookings, reviews and photography
-                experience from your dashboard.
+                Manage your bookings, reviews and photography experience from
+                your dashboard.
               </p>
-
             </div>
-
           </div>
 
           <Link
@@ -543,9 +496,7 @@ const UserDashboard = () => {
             Edit Profile
             <ArrowRight className="h-4 w-4" />
           </Link>
-
         </div>
-
       </section>
 
       {/* =================================================
@@ -553,13 +504,9 @@ const UserDashboard = () => {
       ================================================= */}
 
       <section>
-
         <div className="mb-4 flex items-center justify-between">
-
           <div>
-            <h2 className="text-xl font-semibold">
-              Overview
-            </h2>
+            <h2 className="text-xl font-semibold">Overview</h2>
 
             <p className="text-sm text-base-content/60">
               A quick look at your photography activity.
@@ -574,20 +521,13 @@ const UserDashboard = () => {
           >
             <RefreshCw className="h-4 w-4" />
           </button>
-
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-
           {stats.map((stat) => (
-            <StatCard
-              key={stat.label}
-              {...stat}
-            />
+            <StatCard key={stat.label} {...stat} />
           ))}
-
         </div>
-
       </section>
 
       {/* =================================================
@@ -595,84 +535,60 @@ const UserDashboard = () => {
       ================================================= */}
 
       <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
-
         <SectionHeader
           title="Upcoming Booking"
           description="Your nearest scheduled photography session."
         />
 
         {upcomingBooking ? (
-
           <div className="mt-5 rounded-2xl border border-primary/15 bg-base-200/40 p-5">
-
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-
               <div>
-
                 <div className="flex items-center gap-2">
-
                   <span className="h-2 w-2 rounded-full bg-success" />
 
                   <span className="text-xs font-semibold uppercase tracking-wider text-success">
                     Next Session
                   </span>
-
                 </div>
 
                 <h3 className="mt-2 text-xl font-semibold">
-                  {getBookingPackageName(
-                    upcomingBooking
-                  )}
+                  {getBookingPackageName(upcomingBooking)}
                 </h3>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-
                   <p className="flex items-center gap-2 text-sm text-base-content/75">
                     <CalendarDays className="h-4 w-4 text-primary" />
 
-                    {formatDate(
-                      getBookingDate(upcomingBooking)
-                    )}
+                    {formatDate(getBookingDate(upcomingBooking))}
                   </p>
 
                   <p className="flex items-center gap-2 text-sm text-base-content/75">
                     <Clock3 className="h-4 w-4 text-primary" />
 
                     {formatTime(
-                      upcomingBooking?.time ||
-                      upcomingBooking?.bookingTime
+                      upcomingBooking?.time || upcomingBooking?.bookingTime,
                     )}
                   </p>
 
                   <p className="flex items-center gap-2 text-sm text-base-content/75 sm:col-span-2">
                     <MapPin className="h-4 w-4 text-primary" />
 
-                    {upcomingBooking?.location ||
-                      "Location not specified"}
+                    {upcomingBooking?.location || "Location not specified"}
                   </p>
-
                 </div>
-
               </div>
 
               <div className="flex flex-wrap gap-2">
+                <BookingStatusBadge status={upcomingBooking?.status} />
 
                 <BookingStatusBadge
-                  status={upcomingBooking?.status}
+                  status={getBookingPayment(upcomingBooking)}
                 />
-
-                <BookingStatusBadge
-                  status={getBookingPayment(
-                    upcomingBooking
-                  )}
-                />
-
               </div>
-
             </div>
 
             <div className="mt-5">
-
               <Link
                 to="/dashboard/bookings"
                 className="btn btn-primary btn-sm text-primary-content"
@@ -680,15 +596,10 @@ const UserDashboard = () => {
                 View Booking
                 <ArrowRight className="h-4 w-4" />
               </Link>
-
             </div>
-
           </div>
-
         ) : (
-
           <div className="mt-5">
-
             <EmptyState
               icon={CalendarDays}
               title="No upcoming bookings"
@@ -696,11 +607,8 @@ const UserDashboard = () => {
               actionText="Explore Packages"
               actionTo="/packages"
             />
-
           </div>
-
         )}
-
       </section>
 
       {/* =================================================
@@ -708,9 +616,7 @@ const UserDashboard = () => {
       ================================================= */}
 
       <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
-
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-
           <SectionHeader
             title="Recent Bookings"
             description="Your latest booking activity."
@@ -721,124 +627,78 @@ const UserDashboard = () => {
             className="group flex items-center gap-1 text-sm font-semibold text-primary"
           >
             View all
-
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
-
         </div>
 
         {recentBookings.length > 0 ? (
-
           <>
-
             {/* Desktop */}
             <div className="mt-5 hidden overflow-x-auto md:block">
-
               <table className="table">
-
                 <thead>
-
                   <tr className="text-base-content/55">
-
                     <th>Booking</th>
                     <th>Package</th>
                     <th>Date</th>
                     <th>Status</th>
                     <th>Payment</th>
-
                   </tr>
-
                 </thead>
 
                 <tbody>
-
                   {recentBookings.map((booking) => (
-
                     <tr key={booking?._id}>
-
                       <td>
                         <span className="font-semibold">
                           {getBookingId(booking)}
                         </span>
                       </td>
 
-                      <td>
-                        {getBookingPackageName(
-                          booking
-                        )}
-                      </td>
+                      <td>{getBookingPackageName(booking)}</td>
+
+                      <td>{formatDate(getBookingDate(booking))}</td>
 
                       <td>
-                        {formatDate(
-                          getBookingDate(booking)
-                        )}
+                        <BookingStatusBadge status={booking?.status} />
                       </td>
 
                       <td>
                         <BookingStatusBadge
-                          status={booking?.status}
+                          status={getBookingPayment(booking)}
                         />
                       </td>
-
-                      <td>
-                        <BookingStatusBadge
-                          status={getBookingPayment(
-                            booking
-                          )}
-                        />
-                      </td>
-
                     </tr>
-
                   ))}
-
                 </tbody>
-
               </table>
-
             </div>
 
             {/* Mobile */}
             <div className="mt-5 space-y-3 md:hidden">
-
               {recentBookings.map((booking) => (
-
                 <div
                   key={booking?._id}
                   className="rounded-xl border border-primary/10 bg-base-100 p-4"
                 >
-
                   <div className="flex items-center justify-between gap-3">
-
                     <p className="text-sm font-semibold">
                       {getBookingId(booking)}
                     </p>
 
-                    <BookingStatusBadge
-                      status={booking?.status}
-                    />
-
+                    <BookingStatusBadge status={booking?.status} />
                   </div>
 
                   <p className="mt-2 font-medium">
-                    {getBookingPackageName(
-                      booking
-                    )}
+                    {getBookingPackageName(booking)}
                   </p>
 
                   <p className="mt-1 text-xs text-base-content/60">
-                    {formatDate(
-                      getBookingDate(booking)
-                    )}
+                    {formatDate(getBookingDate(booking))}
                   </p>
 
                   <div className="mt-3 flex items-center justify-between">
-
-                    <BookingStatusBadge
-                      status={getBookingPayment(
-                        booking
-                      )}
-                    />
+                    <BookingStatusBadge status={getBookingPayment(booking)} />
 
                     <Link
                       to="/dashboard/bookings"
@@ -846,21 +706,13 @@ const UserDashboard = () => {
                     >
                       View
                     </Link>
-
                   </div>
-
                 </div>
-
               ))}
-
             </div>
-
           </>
-
         ) : (
-
           <div className="mt-5">
-
             <EmptyState
               icon={CalendarDays}
               title="No bookings yet"
@@ -868,11 +720,8 @@ const UserDashboard = () => {
               actionText="Browse Packages"
               actionTo="/packages"
             />
-
           </div>
-
         )}
-
       </section>
 
       {/* =================================================
@@ -880,25 +729,16 @@ const UserDashboard = () => {
       ================================================= */}
 
       <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
-
         <SectionHeader
           title="Quick Actions"
           description="Go directly to the sections you use most."
         />
 
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-
           {quickActions.map((action) => (
-
-            <QuickActionCard
-              key={action.title}
-              {...action}
-            />
-
+            <QuickActionCard key={action.title} {...action} />
           ))}
-
         </div>
-
       </section>
 
       {/* =================================================
@@ -906,9 +746,7 @@ const UserDashboard = () => {
       ================================================= */}
 
       <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
-
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-
           <SectionHeader
             title="Recent Reviews"
             description="Your latest submitted feedback."
@@ -919,130 +757,106 @@ const UserDashboard = () => {
             className="group flex items-center gap-1 text-sm font-semibold text-primary"
           >
             View all
-
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
-
         </div>
 
         {recentReviews.length > 0 ? (
-
           <div className="mt-5 space-y-3">
-
             {recentReviews.map((review) => (
-
               <article
                 key={review?._id}
                 className="rounded-xl border border-primary/10 bg-base-100 p-4 transition hover:border-primary/20 hover:shadow-sm"
               >
-
                 <div className="flex flex-wrap items-center justify-between gap-2">
-
                   <div>
-
                     <h3 className="text-sm font-semibold">
-                      {review?.packageName ||
-                        "Photography Session"}
+                      {review?.packageName || "Photography Session"}
                     </h3>
 
                     <p className="mt-1 text-xs text-base-content/55">
-                      {formatDate(
-                        review?.createdAt
-                      )}
+                      {formatDate(review?.createdAt)}
                     </p>
-
                   </div>
 
                   <div className="flex items-center gap-1 text-warning">
-
                     {Array.from({
                       length: Math.min(
-                        Math.max(
-                          Number(review?.rating) || 0,
-                          0
-                        ),
-                        5
+                        Math.max(Number(review?.rating) || 0, 0),
+                        5,
                       ),
                     }).map((_, index) => (
-
-                      <Star
-                        key={index}
-                        className="h-4 w-4 fill-current"
-                      />
-
+                      <Star key={index} className="h-4 w-4 fill-current" />
                     ))}
-
                   </div>
-
                 </div>
 
                 <p className="mt-3 text-sm leading-6 text-base-content/70">
-                  {review?.comment ||
-                    "No review comment."}
+                  {review?.comment || "No review comment."}
                 </p>
 
                 <div className="mt-3">
-
                   {review?.status === "approved" && (
                     <div className="flex items-center gap-2">
-
                       <CheckCircle2 className="h-4 w-4 text-success" />
 
                       <span className="text-xs font-medium text-success">
                         Approved
                       </span>
-
                     </div>
                   )}
 
                   {review?.status === "pending" && (
                     <div className="flex items-center gap-2">
-
                       <Clock3 className="h-4 w-4 text-warning" />
 
                       <span className="text-xs font-medium text-warning">
                         Pending approval
                       </span>
-
                     </div>
                   )}
 
                   {review?.status === "rejected" && (
                     <div className="flex items-center gap-2">
-
                       <XCircle className="h-4 w-4 text-error" />
 
                       <span className="text-xs font-medium text-error">
                         Rejected
                       </span>
-
                     </div>
                   )}
-
                 </div>
-
               </article>
-
             ))}
-
           </div>
-
         ) : (
-
           <div className="mt-5">
-
             <EmptyState
               icon={MessageSquareText}
               title="No reviews yet"
               description="You have not submitted any reviews yet."
             />
-
           </div>
-
         )}
-
       </section>
+      {/* =================================================
+    SECURITY
+================================================= */}
 
+      <section className="rounded-3xl border border-primary/10 bg-base-100 p-5 shadow-sm sm:p-7">
+        <div className="mb-5">
+          <h3 className="font-playfair text-xl font-semibold">Security</h3>
+
+          <p className="mt-1 text-xs text-base-content/50">
+            Manage your password and review recent account activity.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <ChangePassword />
+          <LoginActivity />
+        </div>
+      </section>
     </div>
   );
 };
