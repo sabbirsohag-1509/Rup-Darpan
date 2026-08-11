@@ -19,7 +19,7 @@ app.use(
   }),
 );
 
-app.use(express.json()); 
+app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 // VERIFY JWT TOKEN
@@ -1518,40 +1518,63 @@ async function run() {
     );
     // ================= CHANGE PASSWORD =================
     app.patch("/users/change-password", verifyToken, async (req, res) => {
+      console.log("change password endpoint hit");
       try {
+        console.log("REQ.USER:", req.user);
+        console.log("USER ID:", req.user?.userId);
+        console.log("USER ID TYPE:", typeof req.user?.userId);
+        console.log("========== CHANGE PASSWORD ==========");
+        console.log("REQ.USER:", req.user);
+        console.log("BODY:", {
+          currentPassword: req.body.currentPassword ? "provided" : "missing",
+          newPassword: req.body.newPassword ? "provided" : "missing",
+        });
+
         const { currentPassword, newPassword } = req.body;
 
         if (!currentPassword || !newPassword) {
+          console.log("❌ Missing password");
           return res.status(400).send({
             message: "Current password and new password are required.",
           });
         }
 
         if (newPassword.length < 8) {
+          console.log("❌ New password too short");
           return res.status(400).send({
             message: "New password must be at least 8 characters.",
           });
         }
 
         if (!req.user?.userId) {
+          console.log("❌ userId missing from token");
+
           return res.status(401).send({
             message: "User authentication information is missing.",
           });
         }
 
-        console.log("Authenticated user:", req.user);
+        if (!ObjectId.isValid(req.user.userId)) {
+          console.log("❌ Invalid ObjectId:", req.user.userId);
+
+          return res.status(400).send({
+            message: "Invalid user ID.",
+          });
+        }
 
         const user = await userCollection.findOne({
           _id: new ObjectId(req.user.userId),
         });
 
-        console.log("Found user:", user?._id);
+        console.log("FOUND USER:", user ? user._id : "NOT FOUND");
 
         if (!user) {
           return res.status(404).send({
             message: "User not found.",
           });
         }
+
+        console.log("HAS PASSWORD:", !!user.password);
 
         if (!user.password) {
           return res.status(400).send({
@@ -1563,6 +1586,8 @@ async function run() {
           currentPassword,
           user.password,
         );
+
+        console.log("CURRENT PASSWORD CORRECT:", isCurrentPasswordCorrect);
 
         if (!isCurrentPasswordCorrect) {
           return res.status(401).send({
@@ -1584,11 +1609,13 @@ async function run() {
           },
         );
 
+        console.log("✅ PASSWORD CHANGED");
+
         return res.status(200).send({
           message: "Password changed successfully.",
         });
       } catch (error) {
-        console.error("Change password error:", error);
+        console.error("❌ Change password error:", error);
 
         return res.status(500).send({
           message: "Failed to change password.",
