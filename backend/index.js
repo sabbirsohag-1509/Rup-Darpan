@@ -6,6 +6,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const UAParser = require("ua-parser-js");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 5000;
@@ -52,6 +53,27 @@ const verifyAdmin = (req, res, next) => {
   }
 
   next();
+};
+//Device Info after login acitivity
+const getDeviceInfo = (req) => {
+  const parser = new UAParser(req.headers["user-agent"]);
+  const result = parser.getResult();
+
+  const browser = result.browser.name || "Unknown Browser";
+  const os = result.os.name || "Unknown OS";
+
+  let deviceType = "Desktop";
+
+  if (result.device.type === "mobile") {
+    deviceType = "Mobile";
+  } else if (result.device.type === "tablet") {
+    deviceType = "Tablet";
+  }
+
+  return {
+    device: `${os} · ${browser}`,
+    deviceType,
+  };
 };
 ////////////////////////
 
@@ -1242,14 +1264,12 @@ async function run() {
       try {
         const { email, password } = req.body;
 
-        // Check required fields
         if (!email || !password) {
           return res.status(400).send({
             message: "Email and password are required",
           });
         }
 
-        // Find user by email
         const user = await userCollection.findOne({ email });
 
         if (!user) {
@@ -1258,7 +1278,6 @@ async function run() {
           });
         }
 
-        // Compare password with hashed password
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
         if (!isPasswordCorrect) {
@@ -1267,7 +1286,79 @@ async function run() {
           });
         }
 
-        // Create JWT token
+        // =========================
+        // LOGIN DEVICE INFORMATION
+        // =========================
+
+        const userAgent = req.headers["user-agent"] || "Unknown";
+
+        // Simple device detection
+        let device = "Desktop";
+
+        if (/mobile/i.test(userAgent)) {
+          device = "Mobile";
+        } else if (/tablet|ipad/i.test(userAgent)) {
+          device = "Tablet";
+        }
+
+        // Browser detection
+        let browser = "Unknown Browser";
+
+        if (/edg/i.test(userAgent)) {
+          browser = "Microsoft Edge";
+        } else if (/chrome/i.test(userAgent)) {
+          browser = "Google Chrome";
+        } else if (/firefox/i.test(userAgent)) {
+          browser = "Mozilla Firefox";
+        } else if (/safari/i.test(userAgent)) {
+          browser = "Safari";
+        }
+
+        // OS detection
+        let os = "Unknown OS";
+
+        if (/windows/i.test(userAgent)) {
+          os = "Windows";
+        } else if (/android/i.test(userAgent)) {
+          os = "Android";
+        } else if (/iphone|ipad|ios/i.test(userAgent)) {
+          os = "iOS";
+        } else if (/macintosh|mac os/i.test(userAgent)) {
+          os = "macOS";
+        } else if (/linux/i.test(userAgent)) {
+          os = "Linux";
+        }
+
+        // Get IP address
+        const ip =
+          req.headers["x-forwarded-for"]?.split(",")[0] ||
+          req.socket.remoteAddress ||
+          "Unknown IP";
+
+        // =========================
+        // SAVE LOGIN ACTIVITY
+        // =========================
+
+        await loginActivityCollection.insertOne({
+          userId: user._id.toString(),
+          email: user.email,
+
+          loginMethod: "email",
+
+          device,
+          browser,
+          os,
+          ip,
+
+          userAgent,
+
+          loginAt: new Date(),
+        });
+
+        // =========================
+        // CREATE JWT
+        // =========================
+
         const token = jwt.sign(
           {
             userId: user._id.toString(),
@@ -1280,17 +1371,24 @@ async function run() {
           },
         );
 
-        // Store JWT in HTTP-only cookie
+        // =========================
+        // COOKIE
+        // =========================
+
         res.cookie("token", token, {
           httpOnly: true,
-          secure: false, // localhost development
+          secure: false,
           sameSite: "lax",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        // Send user information to frontend
+        // =========================
+        // RESPONSE
+        // =========================
+
         res.status(200).send({
           message: "Login successful",
+
           user: {
             id: user._id,
             name: user.name,
@@ -1300,7 +1398,7 @@ async function run() {
           },
         });
       } catch (error) {
-        console.log(error);
+        console.error("Login error:", error);
 
         res.status(500).send({
           message: "Internal Server Error",
@@ -1364,6 +1462,30 @@ async function run() {
       }),
       async (req, res) => {
         try {
+          // Get device information
+          const deviceInfo = getDeviceInfo(req);
+
+          // Get IP address
+          const ip =
+            req.headers["x-forwarded-for"]?.split(",")[0] ||
+            req.socket.remoteAddress;
+
+          // SAVE GOOGLE LOGIN ACTIVITY
+          await loginActivityCollection.insertOne({
+            userId: req.user._id.toString(),
+            email: req.user.email,
+
+            loginMethod: "google",
+
+            loginAt: new Date(),
+
+            device: deviceInfo.device,
+            deviceType: deviceInfo.deviceType,
+
+            ip,
+          });
+
+          // Create JWT
           const token = jwt.sign(
             {
               userId: req.user._id.toString(),
@@ -1376,6 +1498,7 @@ async function run() {
             },
           );
 
+          // Store JWT in cookie
           res.cookie("token", token, {
             httpOnly: true,
             secure: false,
@@ -1383,6 +1506,7 @@ async function run() {
             maxAge: 7 * 24 * 60 * 60 * 1000,
           });
 
+          // Redirect to frontend
           res.redirect("http://localhost:5173/");
         } catch (error) {
           console.error("Google callback error:", error);
@@ -1402,21 +1526,32 @@ async function run() {
           });
         }
 
-        if (newPassword.length < 6) {
+        if (newPassword.length < 8) {
           return res.status(400).send({
-            message: "New password must be at least 6 characters.",
+            message: "New password must be at least 8 characters.",
           });
         }
+
+        if (!req.user?.userId) {
+          return res.status(401).send({
+            message: "User authentication information is missing.",
+          });
+        }
+
+        console.log("Authenticated user:", req.user);
 
         const user = await userCollection.findOne({
           _id: new ObjectId(req.user.userId),
         });
+
+        console.log("Found user:", user?._id);
 
         if (!user) {
           return res.status(404).send({
             message: "User not found.",
           });
         }
+
         if (!user.password) {
           return res.status(400).send({
             message: "Password change is not available for Google accounts.",
@@ -1438,7 +1573,7 @@ async function run() {
 
         await userCollection.updateOne(
           {
-            _id: new ObjectId(req.user.userId),
+            _id: user._id,
           },
           {
             $set: {
@@ -1448,18 +1583,17 @@ async function run() {
           },
         );
 
-        res.send({
+        return res.status(200).send({
           message: "Password changed successfully.",
         });
       } catch (error) {
         console.error("Change password error:", error);
 
-        res.status(500).send({
+        return res.status(500).send({
           message: "Failed to change password.",
         });
       }
     });
-
     // ================== LOGIN ACTIVITY =================
     app.get("/users/login-activity", verifyToken, async (req, res) => {
       try {
