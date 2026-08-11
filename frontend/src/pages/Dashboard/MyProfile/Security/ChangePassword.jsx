@@ -191,6 +191,10 @@ const ChangePassword = () => {
     } catch (error) {
       console.error("Change password error:", error);
 
+      console.log("STATUS:", error.response?.status);
+      console.log("RESPONSE DATA:", error.response?.data);
+      console.log("MESSAGE:", error.response?.data?.message);
+
       const status = error.response?.status;
       const message = error.response?.data?.message;
 
@@ -199,7 +203,7 @@ const ChangePassword = () => {
       } else if (status === 400) {
         toast.error(message || "Please check your password.");
       } else if (status === 404) {
-        toast.error("User account not found.");
+        toast.error(message || "User account not found.");
       } else {
         toast.error(message || "Failed to change password. Please try again.");
       }

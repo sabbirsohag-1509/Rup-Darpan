@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
@@ -8,12 +9,15 @@ import {
   Clock3,
   CheckCircle2,
   AlertCircle,
-  Loader2,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
 
 const LoginActivity = () => {
+  const [showAll, setShowAll] = useState(false);
+
   const {
     data: activities = [],
     isLoading,
@@ -21,9 +25,12 @@ const LoginActivity = () => {
   } = useQuery({
     queryKey: ["login-activity"],
     queryFn: async () => {
-      const response = await axios.get(`${API_URL}/users/login-activity`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${API_URL}/users/login-activity`,
+        {
+          withCredentials: true,
+        },
+      );
 
       return Array.isArray(response.data) ? response.data : [];
     },
@@ -51,6 +58,13 @@ const LoginActivity = () => {
 
     return <Monitor className="h-5 w-5" />;
   };
+
+  // Initially show only 2 activities
+  const visibleActivities = showAll
+    ? activities
+    : activities.slice(0, 2);
+
+  const hasMoreActivities = activities.length > 2;
 
   if (isLoading) {
     return (
@@ -87,7 +101,10 @@ const LoginActivity = () => {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
+      {/* ==================================================
+          HEADER
+      ================================================== */}
+
       <section className="overflow-hidden rounded-3xl border border-primary/10 bg-base-100 shadow-sm">
         <div className="bg-primary/5 p-6 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -116,7 +133,10 @@ const LoginActivity = () => {
         </div>
       </section>
 
-      {/* Activity List */}
+      {/* ==================================================
+          ACTIVITY LIST
+      ================================================== */}
+
       <section className="rounded-3xl border border-primary/10 bg-base-100 p-5 shadow-sm sm:p-7">
         <div className="mb-5">
           <h2 className="font-playfair text-xl font-semibold">
@@ -134,7 +154,7 @@ const LoginActivity = () => {
 
             <h3 className="mt-4 font-semibold">
               No Login Activity{" "}
-              <span className="font-normal text-base-content/80 text-xs sm:text-sm">
+              <span className="text-xs font-normal text-base-content/80 sm:text-sm">
                 (কোনো লগইন অ্যাক্টিভিটি নেই)
               </span>
             </h3>
@@ -142,77 +162,110 @@ const LoginActivity = () => {
             <p className="mt-1 text-sm text-base-content/50">
               Your login activity will appear here after signing in.
             </p>
+
             <p className="mt-0.5 text-xs text-base-content/40">
               সাইন ইন করার পর আপনার লগইন হিস্ট্রি ও অ্যাক্টিভিটি এখানে দেখা
               যাবে।
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {activities.map((activity, index) => (
-              <div
-                key={activity._id || index}
-                className="rounded-2xl border border-base-300 bg-base-200/40 p-4 transition hover:border-primary/20 hover:bg-base-200/70"
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  {/* Left */}
-                  <div className="flex min-w-0 items-start gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      {getDeviceIcon(activity.device)}
-                    </div>
-
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold">
-                          {activity.device || "Unknown Device"}
-                        </h3>
-
-                        <span className="badge badge-success badge-sm gap-1">
-                          <CheckCircle2 className="h-3 w-3" />
-                          Successful
-                        </span>
+          <>
+            <div className="space-y-3">
+              {visibleActivities.map((activity, index) => (
+                <div
+                  key={activity._id || index}
+                  className="rounded-2xl border border-base-300 bg-base-200/40 p-4 transition hover:border-primary/20 hover:bg-base-200/70"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    {/* LEFT */}
+                    <div className="flex min-w-0 items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                        {getDeviceIcon(activity.device)}
                       </div>
 
-                      <div className="mt-2 grid gap-1 text-xs text-base-content/55 sm:grid-cols-2 sm:gap-x-6">
-                        <span className="flex items-center gap-1.5">
-                          <Globe className="h-3.5 w-3.5" />
-                          {activity.ip || "IP unavailable"}
-                        </span>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold">
+                            {activity.device || "Unknown Device"}
+                          </h3>
 
-                        <span className="flex items-center gap-1.5">
-                          <Clock3 className="h-3.5 w-3.5" />
-                          {formatDate(activity.loginAt)}
-                        </span>
+                          <span className="badge badge-success badge-sm gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Successful
+                          </span>
+                        </div>
+
+                        <div className="mt-2 grid gap-1 text-xs text-base-content/55 sm:grid-cols-2 sm:gap-x-6">
+                          {/* IP */}
+                          <span className="flex items-center gap-1.5">
+                            <Globe className="h-3.5 w-3.5" />
+                            {activity.ip || "IP unavailable"}
+                          </span>
+
+                          {/* Date */}
+                          <span className="flex items-center gap-1.5">
+                            <Clock3 className="h-3.5 w-3.5" />
+                            {formatDate(activity.loginAt)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Right */}
-                  <div className="text-left sm:text-right">
-                    <p className="text-xs font-medium text-base-content/40">
-                      Login time
-                    </p>
+                    {/* RIGHT */}
+                    <div className="text-left sm:text-right">
+                      <p className="text-xs font-medium text-base-content/40">
+                        Login time
+                      </p>
 
-                    <p className="mt-1 text-sm font-semibold">
-                      {activity.loginAt
-                        ? new Date(activity.loginAt).toLocaleTimeString(
-                            "en-BD",
-                            {
+                      <p className="mt-1 text-sm font-semibold">
+                        {activity.loginAt
+                          ? new Date(
+                              activity.loginAt,
+                            ).toLocaleTimeString("en-BD", {
                               hour: "2-digit",
                               minute: "2-digit",
-                            },
-                          )
-                        : "Unknown"}
-                    </p>
+                            })
+                          : "Unknown"}
+                      </p>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* ==================================================
+                SHOW MORE / SHOW LESS
+            ================================================== */}
+
+            {hasMoreActivities && (
+              <div className="mt-5 flex justify-center border-t border-base-300 pt-5">
+                <button
+                  type="button"
+                  onClick={() => setShowAll((prev) => !prev)}
+                  className="btn btn-ghost btn-sm rounded-full px-5 text-primary hover:bg-primary/10"
+                >
+                  {showAll ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      Show Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      Show More
+                    </>
+                  )}
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </section>
 
-      {/* Security Notice */}
+      {/* ==================================================
+          SECURITY NOTICE
+      ================================================== */}
+
       <section className="rounded-3xl border border-warning/20 bg-warning/5 p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
@@ -220,7 +273,7 @@ const LoginActivity = () => {
           <div>
             <h3 className="font-semibold">
               Don't recognize a login?{" "}
-              <span className="font-normal text-base-content/80 text-xs sm:text-sm">
+              <span className="text-xs font-normal text-base-content/80 sm:text-sm">
                 (অপরিচিত কোনো লগইন দেখছেন?)
               </span>
             </h3>
@@ -229,6 +282,7 @@ const LoginActivity = () => {
               If you notice an unfamiliar login, change your password
               immediately and review your account security.
             </p>
+
             <p className="mt-0.5 text-xs text-base-content/50">
               অপরিচিত কোনো স্থান বা ডিভাইস থেকে লগইন দেখতে পেলে সাথে সাথে আপনার
               পাসওয়ার্ড পরিবর্তন করুন এবং অ্যাকাউন্ট নিরাপত্তা যাচাই করুন।
