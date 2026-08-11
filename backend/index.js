@@ -81,6 +81,7 @@ async function run() {
     const packagesCollection = myDB.collection("packages");
     const bookingCollection = myDB.collection("bookings");
     const reviewCollection = myDB.collection("reviews");
+    const loginActivityCollection = myDB.collection("loginActivities");
 
     // Google Strategy
     passport.use(
@@ -1390,6 +1391,95 @@ async function run() {
         }
       },
     );
+    // ================= CHANGE PASSWORD =================
+    app.patch("/users/change-password", verifyToken, async (req, res) => {
+      try {
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+          return res.status(400).send({
+            message: "Current password and new password are required.",
+          });
+        }
+
+        if (newPassword.length < 6) {
+          return res.status(400).send({
+            message: "New password must be at least 6 characters.",
+          });
+        }
+
+        const user = await userCollection.findOne({
+          _id: new ObjectId(req.user.userId),
+        });
+
+        if (!user) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+        if (!user.password) {
+          return res.status(400).send({
+            message: "Password change is not available for Google accounts.",
+          });
+        }
+
+        const isCurrentPasswordCorrect = await bcrypt.compare(
+          currentPassword,
+          user.password,
+        );
+
+        if (!isCurrentPasswordCorrect) {
+          return res.status(401).send({
+            message: "Current password is incorrect.",
+          });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await userCollection.updateOne(
+          {
+            _id: new ObjectId(req.user.userId),
+          },
+          {
+            $set: {
+              password: hashedPassword,
+              updatedAt: new Date(),
+            },
+          },
+        );
+
+        res.send({
+          message: "Password changed successfully.",
+        });
+      } catch (error) {
+        console.error("Change password error:", error);
+
+        res.status(500).send({
+          message: "Failed to change password.",
+        });
+      }
+    });
+
+    // ================== LOGIN ACTIVITY =================
+    app.get("/users/login-activity", verifyToken, async (req, res) => {
+      try {
+        const activities = await loginActivityCollection
+          .find({
+            userId: req.user.userId,
+          })
+          .sort({ loginAt: -1 })
+          .limit(20)
+          .toArray();
+
+        res.send(activities);
+      } catch (error) {
+        console.error("Failed to fetch login activity:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch login activity.",
+        });
+      }
+    });
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
