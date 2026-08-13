@@ -114,6 +114,7 @@ async function run() {
     const bookingCollection = myDB.collection("bookings");
     const reviewCollection = myDB.collection("reviews");
     const loginActivityCollection = myDB.collection("loginActivities");
+    const videoCollection = myDB.collection("videos");
 
     // Google Strategy
     passport.use(
@@ -706,6 +707,143 @@ async function run() {
 
       res.send(result);
     });
+    ////////////////////////   VIDEO RELATED API ////////////////////////////////////////////
+    //POST
+    app.post("/videos", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const {
+          title,
+          videoUrl,
+          category,
+          description,
+          featured,
+          isPublished,
+        } = req.body;
+
+        // =========================================
+        // VALIDATION
+        // =========================================
+
+        if (!title?.trim()) {
+          return res.status(400).send({
+            message: "Video title is required.",
+          });
+        }
+
+        if (!videoUrl?.trim()) {
+          return res.status(400).send({
+            message: "Facebook video URL is required.",
+          });
+        }
+
+        // =========================================
+        // FACEBOOK URL VALIDATION
+        // =========================================
+
+        let facebookUrl;
+
+        try {
+          facebookUrl = new URL(videoUrl.trim());
+        } catch {
+          return res.status(400).send({
+            message: "Please provide a valid Facebook video URL.",
+          });
+        }
+
+        const allowedHosts = [
+          "facebook.com",
+          "www.facebook.com",
+          "m.facebook.com",
+          "web.facebook.com",
+        ];
+
+        if (!allowedHosts.includes(facebookUrl.hostname)) {
+          return res.status(400).send({
+            message: "Only Facebook video URLs are allowed.",
+          });
+        }
+
+        // =========================================
+        // GENERATE EMBED URL
+        // =========================================
+
+        const cleanVideoUrl = facebookUrl.toString();
+
+        const embedUrl =
+          `https://www.facebook.com/plugins/video.php?` +
+          `href=${encodeURIComponent(cleanVideoUrl)}` +
+          `&show_text=false` +
+          `&width=500`;
+
+        // =========================================
+        // FEATURED LIMIT
+        // =========================================
+
+        const wantsFeatured = Boolean(featured);
+
+        if (wantsFeatured) {
+          const featuredCount = await videoCollection.countDocuments({
+            featured: true,
+          });
+
+          if (featuredCount >= 8) {
+            return res.status(400).send({
+              message:
+                "Maximum 8 featured videos are allowed. Please remove one featured video first.",
+            });
+          }
+        }
+
+        // =========================================
+        // CREATE VIDEO DOCUMENT
+        // =========================================
+
+        const videoData = {
+          title: title.trim(),
+
+          videoUrl: cleanVideoUrl,
+
+          embedUrl,
+
+          category: category?.trim() || "",
+
+          description: description?.trim() || "",
+
+          featured: wantsFeatured,
+
+          isPublished: Boolean(isPublished),
+
+          createdAt: new Date(),
+
+          updatedAt: new Date(),
+        };
+
+        // =========================================
+        // INSERT
+        // =========================================
+
+        const result = await videoCollection.insertOne(videoData);
+
+        // =========================================
+        // RESPONSE
+        // =========================================
+
+        res.status(201).send({
+          success: true,
+          message: "Video added successfully.",
+          insertedId: result.insertedId,
+          video: videoData,
+        });
+      } catch (error) {
+        console.error("Add video error:", error);
+
+        res.status(500).send({
+          message: "Failed to add video.",
+        });
+      }
+    });
+    //GET
+
     ////////////////////////  PACKAGE RELATED API ////////////////////////////////////////////
     //POST
     app.post("/packages", verifyToken, verifyAdmin, async (req, res) => {
