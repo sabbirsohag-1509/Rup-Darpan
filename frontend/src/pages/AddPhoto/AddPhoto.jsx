@@ -23,11 +23,10 @@ import { Navigate, useNavigate } from "react-router";
 const CATEGORIES = [
   "Wedding",
   "Pre-Wedding",
-  "Portrait",
-  "Event",
-  "Birthday",
-  "Corporate",
   "Outdoor",
+  "Event",
+  "Lifestyle",
+  "Birthday",
   "Sunset",
   "Other",
 ];

@@ -19,8 +19,8 @@ const featuredPhotos = [
   },
   {
     id: 3,
-    title: "Golden Portrait",
-    category: "Portrait",
+    title: "Golden Outdoor Memories",
+    category: "Outdoor",
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85",
   },
@@ -33,8 +33,8 @@ const featuredPhotos = [
   },
   {
     id: 5,
-    title: "Natural Beauty",
-    category: "Portrait",
+    title: "Natural Outdoor Beauty",
+    category: "Outdoor",
     image:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85",
   },
@@ -263,7 +263,7 @@ const FeaturedGallery = () => {
                     "
                   >
                     <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/60 sm:text-xs">
-                      Rup Darpon
+                      <span className="text-red-500 font-bold">Rup</span> Darpon
                     </p>
 
                     <div className="flex items-end justify-between gap-3">
