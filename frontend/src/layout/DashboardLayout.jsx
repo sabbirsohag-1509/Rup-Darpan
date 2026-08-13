@@ -34,7 +34,11 @@ const routeMeta = {
   },
   "/admin/photos": {
     title: "Photos",
-    description: "Manage portfolio and gallery assets.",
+    description: "Manage your Image and gallery assets.",
+  },
+   "/admin/videos": {
+    title: "Videos",
+    description: "Manage your Video and gallery assets.",
   },
   "/admin/packages": {
     title: "Packages",

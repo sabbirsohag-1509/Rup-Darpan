@@ -2,7 +2,6 @@ import { useState } from "react";
 import axios from "axios";
 import {
   ArrowLeft,
-  CheckCircle2,
   Film,
   Loader2,
   Link as LinkIcon,
