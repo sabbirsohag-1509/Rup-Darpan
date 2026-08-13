@@ -1,4 +1,5 @@
 import FeaturedGallery from "../FeaturedGallery/FeaturedGallery";
+import FeaturedGalleryVideos from "../FeaturedGalleryVideos/FeaturedGalleryVideos";
 import Hero from "../Hero/Hero";
 
 const Home = () => {
@@ -11,6 +12,10 @@ const Home = () => {
         <FeaturedGallery></FeaturedGallery>
       </section>
       <section>
+        <FeaturedGalleryVideos></FeaturedGalleryVideos>
+      </section>
+      <section> 
+        
       </section>
     </div>
   );
