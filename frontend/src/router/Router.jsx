@@ -27,6 +27,8 @@ import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
 import MyReview from "../components/Review/MyReview";
 import UserProfile from "../pages/Dashboard/MyProfile/UserProfile";
 import AdminProfile from "../pages/Dashboard/MyProfile/AdminProfile";
+import AdminVideosManagement from "../pages/Dashboard/AdminVideosManagement";
+import AddVideo from "../pages/AddVideo/AddVideo";
 
 export const router = createBrowserRouter([
   {
@@ -166,6 +168,19 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "videos",
+        children: [
+          {
+            index: true,
+            element: <AdminVideosManagement></AdminVideosManagement>,
+          },
+          {
+            path: "add-videos",
+            element: <AddVideo></AddVideo>,
+          },
+        ],
+      },
+      {
         path: "users",
         children: [
           {
@@ -207,10 +222,10 @@ export const router = createBrowserRouter([
       },
       {
         path: "admin-profile",
-        children: [ 
-          { 
+        children: [
+          {
             index: true,
-            element: <AdminProfile></AdminProfile>
+            element: <AdminProfile></AdminProfile>,
           },
         ],
       },

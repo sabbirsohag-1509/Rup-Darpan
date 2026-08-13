@@ -1,75 +1,43 @@
 import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { ArrowUpRight, Camera } from "lucide-react";
 import { Link } from "react-router";
 
-const featuredPhotos = [
-  {
-    id: 1,
-    title: "Timeless Moments",
-    category: "Wedding",
-    image:
-      "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    id: 2,
-    title: "A Beautiful Beginning",
-    category: "Couple",
-    image:
-      "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 3,
-    title: "Golden Outdoor Memories",
-    category: "Outdoor",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 4,
-    title: "Love in Every Frame",
-    category: "Wedding",
-    image:
-      "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    id: 5,
-    title: "Natural Outdoor Beauty",
-    category: "Outdoor",
-    image:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 6,
-    title: "The Celebration",
-    category: "Event",
-    image:
-      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    id: 7,
-    title: "Quiet Moments",
-    category: "Lifestyle",
-    image:
-      "https://images.unsplash.com/photo-1496440737103-cd596325d314?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 8,
-    title: "Forever Together",
-    category: "Couple",
-    image:
-      "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=900&q=85",
-  },
-];
+const API_URL = "http://localhost:5000/featured-photos";
 
 const FeaturedGallery = () => {
   const sectionRef = useRef(null);
+
+  // =========================================================
+  // FETCH FEATURED PHOTOS
+  // =========================================================
+
+  const {
+    data: photos = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["featured-photos"],
+    queryFn: async () => {
+      const response = await axios.get(API_URL);
+
+      return response.data?.photos || response.data || [];
+    },
+  });
+
+  // =========================================================
+  // SCROLL REVEAL ANIMATION
+  // =========================================================
 
   useEffect(() => {
     const section = sectionRef.current;
 
     if (!section) return;
 
-    const revealItems = section.querySelectorAll(".gallery-reveal");
+    const revealItems =
+      section.querySelectorAll(".gallery-reveal");
 
     if (!revealItems.length) return;
 
@@ -78,6 +46,7 @@ const FeaturedGallery = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("gallery-visible");
+
             observer.unobserve(entry.target);
           }
         });
@@ -95,7 +64,71 @@ const FeaturedGallery = () => {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [photos]);
+
+  // =========================================================
+  // LOADING
+  // =========================================================
+
+  if (isLoading) {
+    return (
+      <section className="bg-base-100 py-16 sm:py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
+          <div className="flex min-h-[300px] items-center justify-center">
+            <span className="loading loading-spinner loading-lg text-primary" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // =========================================================
+  // ERROR
+  // =========================================================
+
+  if (isError) {
+    console.error("Featured photos error:", error);
+
+    return (
+      <section className="bg-base-100 py-16 sm:py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
+          <div className="rounded-3xl border border-error/20 bg-error/5 px-6 py-10 text-center">
+            <h3 className="font-playfair text-2xl font-semibold">
+              Unable to load featured gallery
+            </h3>
+
+            <p className="mt-2 text-sm text-base-content/60">
+              Please try again later.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // =========================================================
+  // EMPTY
+  // =========================================================
+
+  if (!photos.length) {
+    return (
+      <section className="bg-base-100 py-16 sm:py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
+          <div className="rounded-3xl border border-primary/10 bg-primary/5 px-6 py-10 text-center">
+            <Camera className="mx-auto h-8 w-8 text-primary" />
+
+            <h3 className="mt-4 font-playfair text-2xl font-semibold">
+              Featured Gallery
+            </h3>
+
+            <p className="mt-2 text-sm text-base-content/60">
+              No featured photos available yet.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -103,11 +136,13 @@ const FeaturedGallery = () => {
       className="relative overflow-hidden bg-base-100 py-16 sm:py-20 lg:py-28"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
-        {/* =========================================
+
+        {/* =====================================================
             HEADER
-        ========================================= */}
+        ===================================================== */}
 
         <div className="mb-10 flex flex-col gap-6 sm:mb-12 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
+
           {/* Header Content */}
 
           <div
@@ -117,40 +152,58 @@ const FeaturedGallery = () => {
             <div className="mb-4 flex items-center gap-2">
               <span className="h-px w-8 bg-primary" />
             </div>
+
             {/* Heading */}
+
             <h2 className="font-playfair text-4xl font-semibold leading-[1.05] text-base-content sm:text-5xl lg:text-6xl">
-              Featured <span className="italic text-primary">Gallery</span>
+              Featured{" "}
+              <span className="italic text-primary">
+                Gallery
+              </span>
             </h2>
 
             {/* Description */}
 
             <p className="mt-5 max-w-xl text-sm leading-7 text-base-content/60 sm:text-base">
-              A collection of moments we loved capturing. Every photograph tells
-              a story, preserves an emotion, and keeps a beautiful memory alive.
+              A collection of moments we loved capturing.
+              Every photograph tells a story, preserves an
+              emotion, and keeps a beautiful memory alive.
+              <br />
+
+              <span className="text-xs text-base-content/50 sm:text-sm">
+                আমাদের ফ্রেমে বন্দি করা প্রিয় কিছু মুহূর্ত;
+                যেখানে প্রতিটি ছবি বলে একটি গল্প এবং অমলিন
+                রাখে সুন্দর স্মৃতিগুলোকে।
+              </span>
             </p>
           </div>
 
           {/* View Full Gallery */}
 
-          <div className="gallery-reveal" style={{ "--delay": "120ms" }}>
+          <div
+            className="gallery-reveal"
+            style={{ "--delay": "120ms" }}
+          >
             <Link
               to="/gallery"
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-primary-content sm:w-fit"
             >
               View Full Gallery
+
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
           </div>
         </div>
 
-        {/* =========================================
+        {/* =====================================================
             GALLERY
-        ========================================= */}
+        ===================================================== */}
 
         <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-          {featuredPhotos.map((photo, index) => (
+
+          {photos.slice(0, 8).map((photo, index) => (
             <div
-              key={photo.id}
+              key={photo._id}
               className={`
                 gallery-reveal
                 group
@@ -161,19 +214,24 @@ const FeaturedGallery = () => {
                 sm:rounded-3xl
 
                 ${
-                  index === 0 ? "sm:row-span-2 lg:col-span-2 lg:row-span-2" : ""
+                  index === 0
+                    ? "sm:row-span-2 lg:col-span-2 lg:row-span-2"
+                    : ""
                 }
 
                 ${index === 3 ? "lg:col-span-2" : ""}
 
                 ${index === 4 ? "lg:col-span-2" : ""}
 
-                ${index === 5 ? "sm:col-span-2 lg:col-span-2" : ""}
+                ${index === 5
+                  ? "sm:col-span-2 lg:col-span-2"
+                  : ""}
               `}
               style={{
                 "--delay": `${index * 90 + 180}ms`,
               }}
             >
+
               {/* Image Container */}
 
               <div
@@ -187,6 +245,7 @@ const FeaturedGallery = () => {
                   }
                 `}
               >
+
                 {/* Image */}
 
                 <img
@@ -212,19 +271,15 @@ const FeaturedGallery = () => {
                   "
                 />
 
-                {/* =========================================
-                    CATEGORY
-                ========================================= */}
+                {/* CATEGORY */}
 
                 <div className="absolute left-3.5 top-3.5 sm:left-5 sm:top-5">
                   <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md sm:text-xs">
-                    {photo.category}
+                    {photo.category || "Photography"}
                   </span>
                 </div>
 
-                {/* =========================================
-                    CAMERA ICON
-                ========================================= */}
+                {/* CAMERA ICON */}
 
                 <div
                   className="
@@ -248,11 +303,10 @@ const FeaturedGallery = () => {
                   <Camera className="h-4 w-4" />
                 </div>
 
-                {/* =========================================
-                    BOTTOM CONTENT
-                ========================================= */}
+                {/* BOTTOM CONTENT */}
 
                 <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+
                   <div
                     className="
                       transition-transform
@@ -263,10 +317,14 @@ const FeaturedGallery = () => {
                     "
                   >
                     <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/60 sm:text-xs">
-                      <span className="text-red-500 font-bold">Rup</span> Darpon
+                      <span className="font-bold text-red-500">
+                        Rup
+                      </span>{" "}
+                      Darpon
                     </p>
 
                     <div className="flex items-end justify-between gap-3">
+
                       {/* Title */}
 
                       <h3 className="font-playfair text-lg font-semibold leading-tight text-white sm:text-2xl">
@@ -302,21 +360,31 @@ const FeaturedGallery = () => {
           ))}
         </div>
 
-        {/* =========================================
+        {/* =====================================================
             BOTTOM CTA
-        ========================================= */}
+        ===================================================== */}
 
         <div
           className="gallery-reveal mt-8 flex flex-col items-center justify-between gap-5 rounded-2xl border border-primary/10 bg-primary/5 px-5 py-6 sm:mt-10 sm:rounded-3xl sm:px-8 sm:py-7 lg:flex-row"
           style={{ "--delay": "300ms" }}
         >
           <div className="text-center lg:text-left">
+
             <h3 className="font-playfair text-xl font-semibold sm:text-2xl">
-              Want to see more?
+              Want to see more?{" "}
+              <span className="text-base font-normal text-base-content/80 sm:text-lg">
+                (আরও দেখতে চান?)
+              </span>
             </h3>
 
             <p className="mt-1 text-sm text-base-content/55">
-              Explore our complete collection of captured moments.
+              Explore our complete collection of captured
+              moments.
+            </p>
+
+            <p className="mt-0.5 text-xs text-base-content/45">
+              আমাদের ক্যামেরায় বন্দি করা সমস্ত সুন্দর মুহূর্তের
+              গ্যালারি ঘুরে দেখুন।
             </p>
           </div>
 
@@ -325,14 +393,15 @@ const FeaturedGallery = () => {
             className="btn btn-primary w-full rounded-full px-6 font-semibold sm:w-auto"
           >
             Explore Gallery
+
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
 
-      {/* =========================================
+      {/* =====================================================
           SCROLL REVEAL CSS
-      ========================================= */}
+      ===================================================== */}
 
       <style>{`
         .gallery-reveal {
@@ -341,7 +410,8 @@ const FeaturedGallery = () => {
 
           transition:
             opacity 700ms ease-out var(--delay, 0ms),
-            transform 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms);
+            transform 700ms cubic-bezier(0.22, 1, 0.36, 1)
+              var(--delay, 0ms);
         }
 
         .gallery-reveal.gallery-visible {
@@ -349,23 +419,16 @@ const FeaturedGallery = () => {
           transform: translateY(0);
         }
 
-        /* =========================================
-           MOBILE
-        ========================================= */
-
         @media (max-width: 639px) {
           .gallery-reveal {
             transform: translateY(24px);
 
             transition:
               opacity 600ms ease-out var(--delay, 0ms),
-              transform 600ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms);
+              transform 600ms cubic-bezier(0.22, 1, 0.36, 1)
+                var(--delay, 0ms);
           }
         }
-
-        /* =========================================
-           REDUCED MOTION
-        ========================================= */
 
         @media (prefers-reduced-motion: reduce) {
           .gallery-reveal {
