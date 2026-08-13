@@ -1,3 +1,4 @@
+import FeaturedGallery from "../FeaturedGallery/FeaturedGallery";
 import Hero from "../Hero/Hero";
 
 const Home = () => {
@@ -7,7 +8,9 @@ const Home = () => {
         <Hero></Hero>
       </section>
       <section> 
-        
+        <FeaturedGallery></FeaturedGallery>
+      </section>
+      <section>
       </section>
     </div>
   );

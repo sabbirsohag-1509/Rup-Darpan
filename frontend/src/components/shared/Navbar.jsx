@@ -10,7 +10,6 @@ import {
   Mail,
   Menu,
   Package,
-  Settings,
   X,
 } from "lucide-react";
 import Logo from "./Logo";
@@ -156,15 +155,6 @@ const Navbar = () => {
                 >
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
-                </NavLink>
-
-                <NavLink
-                  to="/settings"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-base-content/80 transition-colors hover:bg-primary/10 hover:text-primary"
-                >
-                  <Settings className="h-4 w-4" />
-                  Settings
                 </NavLink>
 
                 <div className="my-1 border-t border-primary/10" />
