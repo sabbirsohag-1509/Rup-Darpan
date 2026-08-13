@@ -842,8 +842,225 @@ async function run() {
         });
       }
     });
-    //GET
+    //GET admin videos for management with pagination support: ?page=1&limit=5
+    app.get("/videos", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 6;
 
+        const skip = (page - 1) * limit;
+
+        const totalVideos = await videoCollection.countDocuments();
+
+        // ⭐ ALL pages-এর featured count
+        const featuredCount = await videoCollection.countDocuments({
+          featured: true,
+        });
+
+        const videos = await videoCollection
+          .find()
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .toArray();
+
+        const totalPages = Math.ceil(totalVideos / limit);
+
+        res.send({
+          success: true,
+          videos,
+          totalVideos,
+          totalPages,
+          currentPage: page,
+          featuredCount,
+        });
+      } catch (error) {
+        console.error("Get videos error:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch videos.",
+        });
+      }
+    });
+    //GET for Featured Videos
+    app.get("/featured-videos", async (req, res) => {
+      try {
+        const videos = await videoCollection
+          .find({
+            featured: true,
+            isPublished: true,
+          })
+          .sort({ createdAt: -1 })
+          .limit(8)
+          .toArray();
+
+        res.send({
+          success: true,
+          videos,
+        });
+      } catch (error) {
+        console.error("Get featured videos error:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch featured videos.",
+        });
+      }
+    });
+    //GET all video for Gallery
+    app.get("/all-videos", async (req, res) => {
+      try {
+        const videos = await videoCollection
+          .find({
+            isPublished: true,
+          })
+          .sort({ createdAt: -1 })
+          .toArray();
+
+        res.send({
+          success: true,
+          videos,
+        });
+      } catch (error) {
+        console.error("Get public videos error:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch public videos.",
+        });
+      }
+    });
+    //PUT admin
+    app.put("/videos/:id", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid video id",
+          });
+        }
+
+        const videoId = new ObjectId(id);
+
+        const currentVideo = await videoCollection.findOne({
+          _id: videoId,
+        });
+
+        if (!currentVideo) {
+          return res.status(404).send({
+            message: "Video not found",
+          });
+        }
+
+        const {
+          title,
+          videoUrl,
+          category,
+          description,
+          featured,
+          isPublished,
+        } = req.body;
+
+        const wantsFeatured = Boolean(featured);
+        const isCurrentlyFeatured = Boolean(currentVideo.featured);
+
+        // ============================================
+        // MAX 8 FEATURED CHECK
+        // ============================================
+
+        const tryingToAddFeatured = wantsFeatured && !isCurrentlyFeatured;
+
+        if (tryingToAddFeatured) {
+          const featuredCount = await videoCollection.countDocuments({
+            featured: true,
+          });
+
+          if (featuredCount >= 8) {
+            return res.status(400).send({
+              message:
+                "Maximum 8 featured videos are allowed. Please remove one featured video first.",
+            });
+          }
+        }
+
+        // ============================================
+        // UPDATE DATA
+        // ============================================
+
+        const updatePayload = {
+          title: title?.trim() || "",
+          videoUrl: videoUrl?.trim() || "",
+          category: category?.trim() || "",
+          description: description?.trim() || "",
+
+          featured: wantsFeatured,
+
+          isPublished: Boolean(isPublished),
+
+          updatedAt: new Date(),
+        };
+
+        const result = await videoCollection.updateOne(
+          {
+            _id: videoId,
+          },
+          {
+            $set: updatePayload,
+          },
+        );
+
+        res.send({
+          success: true,
+          message: "Video updated successfully.",
+          result,
+        });
+      } catch (error) {
+        console.error("Update video error:", error);
+
+        res.status(500).send({
+          message: "Failed to update video.",
+        });
+      }
+    });
+    //DELETE admin
+    app.delete("/videos/:id", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid video id",
+          });
+        }
+
+        const videoId = new ObjectId(id);
+
+        const video = await videoCollection.findOne({
+          _id: videoId,
+        });
+
+        if (!video) {
+          return res.status(404).send({
+            message: "Video not found",
+          });
+        }
+
+        const result = await videoCollection.deleteOne({
+          _id: videoId,
+        });
+
+        res.send({
+          success: true,
+          message: "Video deleted successfully.",
+          result,
+        });
+      } catch (error) {
+        console.error("Delete video error:", error);
+
+        res.status(500).send({
+          message: "Failed to delete video.",
+        });
+      }
+    });
     ////////////////////////  PACKAGE RELATED API ////////////////////////////////////////////
     //POST
     app.post("/packages", verifyToken, verifyAdmin, async (req, res) => {
