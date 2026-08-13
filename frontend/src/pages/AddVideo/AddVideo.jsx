@@ -102,7 +102,7 @@ const AddVideo = () => {
 
       toast.success("Video added successfully!");
 
-      navigate("/dashboard/videos");
+      navigate("/admin/videos");
     } catch (error) {
       console.error("Add video error:", error);
 

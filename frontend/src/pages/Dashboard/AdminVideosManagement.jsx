@@ -1,16 +1,21 @@
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router";
 import {
+  AlertTriangle,
   Check,
   Pencil,
+  Play,
   Plus,
   Search,
   Star,
   Trash2,
   X,
-  Play,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -31,6 +36,8 @@ const AdminVideosManagement = () => {
   const [editingVideo, setEditingVideo] = useState(null);
   const [saving, setSaving] = useState(false);
 
+  const [deleteVideo, setDeleteVideo] = useState(null);
+
   const [formData, setFormData] = useState({
     title: "",
     videoUrl: "",
@@ -42,7 +49,7 @@ const AdminVideosManagement = () => {
   });
 
   // =========================================================
-  // FETCH VIDEOS
+  // GET VIDEOS
   // =========================================================
 
   const {
@@ -51,6 +58,7 @@ const AdminVideosManagement = () => {
     isFetching,
   } = useQuery({
     queryKey: ["admin-videos", currentPage],
+
     queryFn: async () => {
       const response = await axios.get(API_URL, {
         params: {
@@ -62,6 +70,8 @@ const AdminVideosManagement = () => {
 
       return response.data;
     },
+
+    placeholderData: (previousData) => previousData,
   });
 
   // =========================================================
@@ -73,8 +83,8 @@ const AdminVideosManagement = () => {
   const totalPages = videoData.totalPages || 1;
 
   // IMPORTANT:
-  // This is GLOBAL count from backend.
-  // It is NOT current page count.
+  // This MUST come from backend and represent
+  // ALL featured videos across ALL pages.
   const featuredCount = videoData.featuredCount || 0;
 
   // =========================================================
@@ -82,9 +92,9 @@ const AdminVideosManagement = () => {
   // =========================================================
 
   const filteredVideos = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const query = searchQuery.trim().toLowerCase();
 
-    if (!normalizedQuery) {
+    if (!query) {
       return videos;
     }
 
@@ -94,29 +104,33 @@ const AdminVideosManagement = () => {
         video.category,
         video.description,
         video.videoUrl,
-        video.embedUrl,
       ]
         .filter(Boolean)
         .some((value) =>
-          String(value)
-            .toLowerCase()
-            .includes(normalizedQuery),
+          String(value).toLowerCase().includes(query),
         );
     });
   }, [videos, searchQuery]);
 
   // =========================================================
-  // DELETE VIDEO
+  // DELETE MUTATION
   // =========================================================
 
   const deleteMutation = useMutation({
     mutationFn: async (videoId) => {
-      return axios.delete(`${API_URL}/${videoId}`, {
-        withCredentials: true,
-      });
+      const response = await axios.delete(
+        `${API_URL}/${videoId}`,
+        {
+          withCredentials: true,
+        },
+      );
+
+      return response.data;
     },
 
     onSuccess: async () => {
+      setDeleteVideo(null);
+
       await queryClient.invalidateQueries({
         queryKey: ["admin-videos"],
       });
@@ -134,16 +148,24 @@ const AdminVideosManagement = () => {
     },
   });
 
-  const handleDelete = (videoId) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this video?",
-    );
+  // =========================================================
+  // DELETE HANDLER
+  // =========================================================
 
-    if (!confirmed) {
+  const handleDelete = (video) => {
+    setDeleteVideo(video);
+  };
+
+  // =========================================================
+  // CONFIRM DELETE
+  // =========================================================
+
+  const confirmDelete = () => {
+    if (!deleteVideo) {
       return;
     }
 
-    deleteMutation.mutate(videoId);
+    deleteMutation.mutate(deleteVideo._id);
   };
 
   // =========================================================
@@ -169,7 +191,9 @@ const AdminVideosManagement = () => {
   // =========================================================
 
   const closeEditModal = () => {
-    if (saving) return;
+    if (saving) {
+      return;
+    }
 
     setEditingVideo(null);
   };
@@ -193,7 +217,7 @@ const AdminVideosManagement = () => {
       wantsFeatured && !wasFeatured;
 
     // =======================================================
-    // GLOBAL MAX 8 CHECK
+    // FRONTEND MAX 8 CHECK
     // =======================================================
 
     if (
@@ -255,77 +279,55 @@ const AdminVideosManagement = () => {
   // FEATURED TOGGLE
   // =========================================================
 
-  const featuredMutation = useMutation({
-    mutationFn: async ({
-      video,
-      featured,
-    }) => {
-      return axios.put(
-        `${API_URL}/${video._id}`,
-        {
-          title: video.title || "",
-
-          videoUrl: video.videoUrl || "",
-
-          embedUrl: video.embedUrl || "",
-
-          category: video.category || "",
-
-          description: video.description || "",
-
-          featured,
-
-          isPublished: Boolean(video.isPublished),
-        },
-        {
-          withCredentials: true,
-        },
-      );
-    },
-
-    onSuccess: async (_, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: ["admin-videos"],
-      });
-
-      if (variables.featured) {
-        toast.success(
-          "Added to Featured Videos.",
-        );
-      } else {
-        toast.success(
-          "Removed from Featured Videos.",
-        );
-      }
-    },
-
-    onError: (error) => {
-      console.error(
-        "Featured video error:",
-        error,
-      );
-
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to update featured video.",
-      );
-    },
-  });
-
-  const handleFeaturedToggle = (video) => {
-    const currentlyFeatured = Boolean(
-      video.featured,
-    );
+  const handleFeaturedToggle = async (video) => {
+    const currentlyFeatured = Boolean(video.featured);
 
     // =======================================================
     // REMOVE FROM FEATURED
     // =======================================================
 
     if (currentlyFeatured) {
-      featuredMutation.mutate({
-        video,
-        featured: false,
-      });
+      try {
+        await axios.put(
+          `${API_URL}/${video._id}`,
+          {
+            title: video.title || "",
+
+            videoUrl: video.videoUrl || "",
+
+            embedUrl: video.embedUrl || "",
+
+            category: video.category || "",
+
+            description: video.description || "",
+
+            featured: false,
+
+            isPublished: Boolean(video.isPublished),
+          },
+          {
+            withCredentials: true,
+          },
+        );
+
+        await queryClient.invalidateQueries({
+          queryKey: ["admin-videos"],
+        });
+
+        toast.success(
+          "Removed from Featured Videos.",
+        );
+      } catch (error) {
+        console.error(
+          "Remove featured video error:",
+          error,
+        );
+
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to remove featured video.",
+        );
+      }
 
       return;
     }
@@ -346,10 +348,47 @@ const AdminVideosManagement = () => {
     // ADD TO FEATURED
     // =======================================================
 
-    featuredMutation.mutate({
-      video,
-      featured: true,
-    });
+    try {
+      await axios.put(
+        `${API_URL}/${video._id}`,
+        {
+          title: video.title || "",
+
+          videoUrl: video.videoUrl || "",
+
+          embedUrl: video.embedUrl || "",
+
+          category: video.category || "",
+
+          description: video.description || "",
+
+          featured: true,
+
+          isPublished: Boolean(video.isPublished),
+        },
+        {
+          withCredentials: true,
+        },
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-videos"],
+      });
+
+      toast.success(
+        "Added to Featured Videos.",
+      );
+    } catch (error) {
+      console.error(
+        "Add featured video error:",
+        error,
+      );
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add featured video.",
+      );
+    }
   };
 
   // =========================================================
@@ -382,10 +421,11 @@ const AdminVideosManagement = () => {
           <Plus className="h-4 w-4" />
           Add Video
         </Link>
+
       </section>
 
       {/* =====================================================
-          FEATURED VIDEO STATUS
+          FEATURED STATUS
       ===================================================== */}
 
       <section
@@ -410,13 +450,12 @@ const AdminVideosManagement = () => {
               </h3>
 
               <p className="text-sm text-base-content/60">
-                Select exactly 8 videos for your landing page.
+                Select up to {MAX_FEATURED_VIDEOS} videos
+                for your landing page.
               </p>
             </div>
 
           </div>
-
-          {/* GLOBAL COUNT */}
 
           <div
             className={`badge badge-lg ${
@@ -430,9 +469,7 @@ const AdminVideosManagement = () => {
 
         </div>
 
-        {/* ===================================================
-            PROGRESS BAR
-        =================================================== */}
+        {/* PROGRESS BAR */}
 
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-base-300">
 
@@ -456,14 +493,13 @@ const AdminVideosManagement = () => {
 
         </div>
 
-        {/* ===================================================
-            STATUS MESSAGE
-        =================================================== */}
+        {/* STATUS MESSAGE */}
 
         {featuredCount === MAX_FEATURED_VIDEOS ? (
           <p className="mt-3 text-sm font-medium text-success">
-            ✓ 8 featured videos selected. You can remove
-            any video and select another one.
+            ✓ Maximum {MAX_FEATURED_VIDEOS} featured
+            videos selected. Remove one before adding
+            another.
           </p>
         ) : (
           <p className="mt-3 text-sm text-base-content/60">
@@ -484,6 +520,8 @@ const AdminVideosManagement = () => {
 
       <section className="rounded-2xl border border-primary/10 bg-base-100 p-4 shadow-sm sm:p-6">
 
+        {/* SEARCH */}
+
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
           <label className="input input-bordered flex w-full max-w-md items-center gap-2">
@@ -497,8 +535,6 @@ const AdminVideosManagement = () => {
               value={searchQuery}
               onChange={(event) => {
                 setSearchQuery(event.target.value);
-
-                // Search change করলে page 1
                 setCurrentPage(1);
               }}
             />
@@ -511,15 +547,16 @@ const AdminVideosManagement = () => {
 
         </div>
 
-        {/* ===================================================
-            LOADING
-        =================================================== */}
+        {/* LOADING */}
 
         {isLoading ? (
+
           <div className="flex justify-center py-10">
             <span className="loading loading-spinner loading-md text-primary" />
           </div>
+
         ) : videos.length === 0 ? (
+
           <div className="py-10 text-center">
 
             <Play className="mx-auto mb-3 h-10 w-10 text-base-content/30" />
@@ -529,10 +566,13 @@ const AdminVideosManagement = () => {
             </p>
 
           </div>
+
         ) : filteredVideos.length === 0 ? (
+
           <p className="py-8 text-center text-sm text-base-content/70">
             No videos matched your search.
           </p>
+
         ) : (
 
           <div className="overflow-x-auto">
@@ -541,21 +581,14 @@ const AdminVideosManagement = () => {
 
               <thead>
                 <tr>
-
                   <th>Video</th>
-
                   <th>Title</th>
-
                   <th>Category</th>
-
                   <th>Featured</th>
-
                   <th>Published</th>
-
                   <th className="text-right">
                     Actions
                   </th>
-
                 </tr>
               </thead>
 
@@ -574,30 +607,35 @@ const AdminVideosManagement = () => {
                   return (
                     <tr key={video._id}>
 
-                      {/* =================================================
-                          VIDEO
-                      ================================================= */}
+                      {/* VIDEO */}
 
                       <td>
 
                         <div className="relative h-16 w-24 overflow-hidden rounded-lg bg-base-200">
 
                           {video.thumbnail ? (
+
                             <img
                               src={video.thumbnail}
                               alt={video.title}
                               className="h-full w-full object-cover"
+                              loading="lazy"
                             />
+
                           ) : (
+
                             <div className="flex h-full w-full items-center justify-center">
                               <Play className="h-6 w-6 text-base-content/40" />
                             </div>
+
                           )}
 
                           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
 
                             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/90">
+
                               <Play className="ml-0.5 h-3.5 w-3.5 fill-black text-black" />
+
                             </div>
 
                           </div>
@@ -606,9 +644,7 @@ const AdminVideosManagement = () => {
 
                       </td>
 
-                      {/* =================================================
-                          TITLE
-                      ================================================= */}
+                      {/* TITLE */}
 
                       <td>
 
@@ -628,9 +664,7 @@ const AdminVideosManagement = () => {
 
                       </td>
 
-                      {/* =================================================
-                          CATEGORY
-                      ================================================= */}
+                      {/* CATEGORY */}
 
                       <td>
 
@@ -640,9 +674,7 @@ const AdminVideosManagement = () => {
 
                       </td>
 
-                      {/* =================================================
-                          FEATURED
-                      ================================================= */}
+                      {/* FEATURED */}
 
                       <td>
 
@@ -651,10 +683,7 @@ const AdminVideosManagement = () => {
                           onClick={() =>
                             handleFeaturedToggle(video)
                           }
-                          disabled={
-                            cannotFeature ||
-                            featuredMutation.isPending
-                          }
+                          disabled={cannotFeature}
                           className={`btn btn-sm gap-1 ${
                             isFeatured
                               ? "btn-primary"
@@ -668,7 +697,7 @@ const AdminVideosManagement = () => {
                             isFeatured
                               ? "Remove from Featured Videos"
                               : cannotFeature
-                                ? "Maximum 8 featured videos already selected"
+                                ? "Maximum 8 featured videos reached"
                                 : "Add to Featured Videos"
                           }
                         >
@@ -689,9 +718,7 @@ const AdminVideosManagement = () => {
 
                       </td>
 
-                      {/* =================================================
-                          PUBLISHED
-                      ================================================= */}
+                      {/* PUBLISHED */}
 
                       <td>
 
@@ -709,9 +736,7 @@ const AdminVideosManagement = () => {
 
                       </td>
 
-                      {/* =================================================
-                          ACTIONS
-                      ================================================= */}
+                      {/* ACTIONS */}
 
                       <td>
 
@@ -732,7 +757,7 @@ const AdminVideosManagement = () => {
                             type="button"
                             className="btn btn-sm btn-error btn-outline"
                             onClick={() =>
-                              handleDelete(video._id)
+                              handleDelete(video)
                             }
                             disabled={
                               deleteMutation.isPending
@@ -740,9 +765,7 @@ const AdminVideosManagement = () => {
                           >
                             <Trash2 className="h-4 w-4" />
 
-                            {deleteMutation.isPending
-                              ? "Deleting..."
-                              : "Delete"}
+                            Delete
                           </button>
 
                         </div>
@@ -762,6 +785,7 @@ const AdminVideosManagement = () => {
             ================================================= */}
 
             {totalPages > 1 && (
+
               <div className="mt-5 flex justify-center gap-2">
 
                 <button
@@ -804,9 +828,11 @@ const AdminVideosManagement = () => {
                 </button>
 
               </div>
+
             )}
 
           </div>
+
         )}
 
       </section>
@@ -816,13 +842,10 @@ const AdminVideosManagement = () => {
       ===================================================== */}
 
       {editingVideo && (
+
         <dialog className="modal modal-open">
 
           <div className="modal-box max-w-2xl">
-
-            {/* =================================================
-                MODAL HEADER
-            ================================================= */}
 
             <div className="flex items-center justify-between">
 
@@ -833,7 +856,7 @@ const AdminVideosManagement = () => {
                 </h3>
 
                 <p className="mt-1 text-sm text-base-content/60">
-                  Update video information and featured status.
+                  Update video information and settings.
                 </p>
 
               </div>
@@ -849,18 +872,12 @@ const AdminVideosManagement = () => {
 
             </div>
 
-            {/* =================================================
-                FORM
-            ================================================= */}
-
             <form
               onSubmit={handleUpdate}
               className="mt-5 space-y-4"
             >
 
-              {/* =================================================
-                  TITLE
-              ================================================= */}
+              {/* TITLE */}
 
               <label className="form-control w-full">
 
@@ -883,9 +900,7 @@ const AdminVideosManagement = () => {
 
               </label>
 
-              {/* =================================================
-                  FACEBOOK VIDEO URL
-              ================================================= */}
+              {/* FACEBOOK URL */}
 
               <label className="form-control w-full">
 
@@ -913,9 +928,7 @@ const AdminVideosManagement = () => {
 
               </label>
 
-              {/* =================================================
-                  EMBED URL
-              ================================================= */}
+              {/* EMBED URL */}
 
               <label className="form-control w-full">
 
@@ -938,14 +951,12 @@ const AdminVideosManagement = () => {
                 />
 
                 <span className="mt-1 text-xs text-base-content/50">
-                  Facebook's embed/player URL used by the website.
+                  Facebook player URL used on the website.
                 </span>
 
               </label>
 
-              {/* =================================================
-                  CATEGORY
-              ================================================= */}
+              {/* CATEGORY */}
 
               <label className="form-control w-full">
 
@@ -961,17 +972,14 @@ const AdminVideosManagement = () => {
                   onChange={(event) =>
                     setFormData((prev) => ({
                       ...prev,
-                      category:
-                        event.target.value,
+                      category: event.target.value,
                     }))
                   }
                 />
 
               </label>
 
-              {/* =================================================
-                  DESCRIPTION
-              ================================================= */}
+              {/* DESCRIPTION */}
 
               <label className="form-control w-full">
 
@@ -993,13 +1001,11 @@ const AdminVideosManagement = () => {
 
               </label>
 
-              {/* =================================================
-                  FEATURED + PUBLISHED
-              ================================================= */}
+              {/* SETTINGS */}
 
               <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
 
-                <div className="flex flex-wrap gap-5">
+                <div className="flex flex-wrap gap-6">
 
                   {/* FEATURED */}
 
@@ -1023,8 +1029,16 @@ const AdminVideosManagement = () => {
                       }
                     />
 
-                    <span className="label-text font-medium">
-                      Featured
+                    <span>
+
+                      <span className="block font-medium">
+                        Featured
+                      </span>
+
+                      <span className="text-xs text-base-content/50">
+                        Show in Featured Videos.
+                      </span>
+
                     </span>
 
                   </label>
@@ -1048,15 +1062,21 @@ const AdminVideosManagement = () => {
                       }
                     />
 
-                    <span className="label-text font-medium">
-                      Published
+                    <span>
+
+                      <span className="block font-medium">
+                        Published
+                      </span>
+
+                      <span className="text-xs text-base-content/50">
+                        Show this video publicly.
+                      </span>
+
                     </span>
 
                   </label>
 
                 </div>
-
-                {/* FEATURED INFO */}
 
                 <p className="mt-3 text-xs text-base-content/55">
 
@@ -1064,16 +1084,14 @@ const AdminVideosManagement = () => {
                     ? "This video will appear in the Featured Videos section."
                     : featuredCount >=
                         MAX_FEATURED_VIDEOS
-                      ? "Maximum 8 featured videos already selected. Remove one first to select this video."
-                      : "You can select this video for the Featured Videos section."}
+                      ? "Maximum featured videos reached. Remove one first."
+                      : "You can select this video as featured."}
 
                 </p>
 
               </div>
 
-              {/* =================================================
-                  ACTIONS
-              ================================================= */}
+              {/* ACTIONS */}
 
               <div className="modal-action">
 
@@ -1111,6 +1129,109 @@ const AdminVideosManagement = () => {
           </button>
 
         </dialog>
+
+      )}
+
+      {/* =====================================================
+          DELETE CONFIRMATION MODAL
+      ===================================================== */}
+
+      {deleteVideo && (
+
+        <dialog className="modal modal-open">
+
+          <div className="modal-box max-w-md">
+
+            <div className="flex items-start gap-4">
+
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-error/10">
+
+                <AlertTriangle className="h-6 w-6 text-error" />
+
+              </div>
+
+              <div>
+
+                <h3 className="text-lg font-semibold">
+                  Delete Video?
+                </h3>
+
+                <p className="mt-1 text-sm text-base-content/60">
+                  Are you sure you want to permanently
+                  delete this video?
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="mt-5 rounded-xl bg-base-200 p-3">
+
+              <p className="truncate text-sm font-medium">
+                {deleteVideo.title}
+              </p>
+
+              <p className="mt-1 text-xs text-base-content/50">
+                This action cannot be undone.
+              </p>
+
+            </div>
+
+            <div className="modal-action">
+
+              <button
+                type="button"
+                className="btn"
+                onClick={() =>
+                  setDeleteVideo(null)
+                }
+                disabled={
+                  deleteMutation.isPending
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-error text-error-content"
+                onClick={confirmDelete}
+                disabled={
+                  deleteMutation.isPending
+                }
+              >
+
+                {deleteMutation.isPending ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Delete Video
+                  </>
+                )}
+
+              </button>
+
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            className="modal-backdrop"
+            onClick={() =>
+              !deleteMutation.isPending &&
+              setDeleteVideo(null)
+            }
+          >
+            Close
+          </button>
+
+        </dialog>
+
       )}
 
     </div>
