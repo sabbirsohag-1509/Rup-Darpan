@@ -524,15 +524,19 @@ async function run() {
       const result = await photoCollection.insertOne(photo);
       res.status(201).json(result);
     });
-    //GET with pagination support: ?page=1&limit=5
+    //GET photo for Admin management with pagination support: ?page=1&limit=5
     app.get("/photos", verifyToken, verifyAdmin, async (req, res) => {
       try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 5;
+        const limit = parseInt(req.query.limit) || 6;
 
         const skip = (page - 1) * limit;
 
         const total = await photoCollection.countDocuments();
+
+        const featuredCount = await photoCollection.countDocuments({
+          featured: true,
+        });
 
         const photos = await photoCollection
           .find()
@@ -546,9 +550,64 @@ async function run() {
           total,
           page,
           totalPages: Math.ceil(total / limit),
+          featuredCount,
         });
       } catch (error) {
-        console.error(error);
+        console.error("Get photos error:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch photos",
+        });
+      }
+    });
+    //GET for Featured Photo
+    app.get("/featured-photos", async (req, res) => {
+      try {
+        const featuredPhotos = await photoCollection
+          .find({ featured: true })
+          .sort({ createdAt: -1 })
+          .limit(8)
+          .toArray();
+
+        res.send(featuredPhotos);
+      } catch (error) {
+        console.error("Featured photos error:", error);
+
+        res.status(500).send({
+          message: "Failed to fetch featured photos",
+        });
+      }
+    });
+    //GET for All Photos for Gallery
+    app.get("/all-photos", async (req, res) => {
+      try {
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
+        const limit = Math.min(
+          Math.max(parseInt(req.query.limit) || 12, 1),
+          50,
+        );
+
+        const skip = (page - 1) * limit;
+
+        const total = await photoCollection.countDocuments();
+
+        const photos = await photoCollection
+          .find()
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .toArray();
+
+        res.status(200).send({
+          photos,
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        });
+      } catch (error) {
+        console.error("Get photos error:", error);
+
         res.status(500).send({
           message: "Failed to fetch photos",
         });
@@ -556,27 +615,81 @@ async function run() {
     });
     // Put update photo
     app.put("/photos/:id", verifyToken, verifyAdmin, async (req, res) => {
-      const { id } = req.params;
-      if (!ObjectId.isValid(id)) {
-        return res.status(400).send({ message: "Invalid photo id" });
+      try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            message: "Invalid photo id",
+          });
+        }
+
+        const photoId = new ObjectId(id);
+        const photoData = req.body;
+
+        const currentPhoto = await photoCollection.findOne({
+          _id: photoId,
+        });
+
+        if (!currentPhoto) {
+          return res.status(404).send({
+            message: "Photo not found",
+          });
+        }
+
+        // ============================================
+        // FEATURED LIMIT CHECK
+        // ============================================
+
+        const isCurrentlyFeatured = Boolean(currentPhoto.featured);
+
+        const wantsToBeFeatured = photoData.featured === true;
+
+        const isTryingToAddFeatured = wantsToBeFeatured && !isCurrentlyFeatured;
+
+        if (isTryingToAddFeatured) {
+          const featuredCount = await photoCollection.countDocuments({
+            featured: true,
+          });
+
+          if (featuredCount >= 8) {
+            return res.status(400).send({
+              message:
+                "Maximum 8 featured photos are allowed. Please remove one featured photo first.",
+            });
+          }
+        }
+
+        // ============================================
+        // UPDATE
+        // ============================================
+
+        const updatePayload = {
+          ...photoData,
+          updatedAt: new Date(),
+        };
+
+        const result = await photoCollection.updateOne(
+          {
+            _id: photoId,
+          },
+          {
+            $set: updatePayload,
+          },
+        );
+
+        res.send({
+          success: true,
+          message: "Photo updated successfully.",
+          result,
+        });
+      } catch (error) {
+        console.error("Update photo error:", error);
+
+        res.status(500).send({
+          message: "Failed to update photo.",
+        });
       }
-
-      const photoData = req.body;
-      const updatePayload = {
-        ...photoData,
-        updatedAt: new Date(),
-      };
-
-      const result = await photoCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updatePayload },
-      );
-
-      if (result.matchedCount === 0) {
-        return res.status(404).send({ message: "Photo not found" });
-      }
-
-      res.send(result);
     });
     // DELETE photo
     app.delete("/photos/:id", verifyToken, verifyAdmin, async (req, res) => {
