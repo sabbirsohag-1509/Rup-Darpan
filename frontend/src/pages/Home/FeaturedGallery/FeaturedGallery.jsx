@@ -158,7 +158,7 @@ const FeaturedGallery = () => {
             <h2 className="font-playfair text-4xl font-semibold leading-[1.05] text-base-content sm:text-5xl lg:text-6xl">
               Featured{" "}
               <span className="italic text-primary">
-                Gallery
+                Photos
               </span>
             </h2>
 
