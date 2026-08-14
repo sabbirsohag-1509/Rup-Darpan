@@ -161,6 +161,7 @@ async function run() {
         },
       ),
     );
+    // =========================================================
     ////
     //////////////////////// USER's RELATED API ////////////////////////////////////////////
     // GET ALL USERS - ADMIN ONLY
@@ -709,20 +710,22 @@ async function run() {
     });
     ////////////////////////   VIDEO RELATED API ////////////////////////////////////////////
     //POST
+
     app.post("/videos", verifyToken, verifyAdmin, async (req, res) => {
       try {
         const {
           title,
           videoUrl,
+          thumbnailUrl,
           category,
           description,
           featured,
           isPublished,
         } = req.body;
 
-        // =========================================
+        // =========================================================
         // VALIDATION
-        // =========================================
+        // =========================================================
 
         if (!title?.trim()) {
           return res.status(400).send({
@@ -736,48 +739,55 @@ async function run() {
           });
         }
 
-        // =========================================
-        // FACEBOOK URL VALIDATION
-        // =========================================
-
-        let facebookUrl;
-
-        try {
-          facebookUrl = new URL(videoUrl.trim());
-        } catch {
+        if (!thumbnailUrl?.trim()) {
           return res.status(400).send({
-            message: "Please provide a valid Facebook video URL.",
+            message: "Video thumbnail is required.",
           });
         }
 
-        const allowedHosts = [
-          "facebook.com",
-          "www.facebook.com",
-          "m.facebook.com",
-          "web.facebook.com",
-        ];
+        // =========================================================
+        // FACEBOOK URL VALIDATION
+        // =========================================================
 
-        if (!allowedHosts.includes(facebookUrl.hostname)) {
+        if (!isFacebookUrl(videoUrl.trim())) {
           return res.status(400).send({
             message: "Only Facebook video URLs are allowed.",
           });
         }
 
-        // =========================================
+        // =========================================================
+        // THUMBNAIL URL VALIDATION
+        // =========================================================
+
+        try {
+          new URL(thumbnailUrl.trim());
+        } catch {
+          return res.status(400).send({
+            message: "Invalid thumbnail URL.",
+          });
+        }
+
+        // =========================================================
+        // RESOLVE FACEBOOK SHARE URL
+        // =========================================================
+
+        const originalVideoUrl = videoUrl.trim();
+
+        const canonicalVideoUrl =
+          await resolveFacebookVideoUrl(originalVideoUrl);
+
+        console.log("Original Facebook URL:", originalVideoUrl);
+        console.log("Canonical Facebook URL:", canonicalVideoUrl);
+
+        // =========================================================
         // GENERATE EMBED URL
-        // =========================================
+        // =========================================================
 
-        const cleanVideoUrl = facebookUrl.toString();
+        const embedUrl = createFacebookEmbedUrl(canonicalVideoUrl);
 
-        const embedUrl =
-          `https://www.facebook.com/plugins/video.php?` +
-          `href=${encodeURIComponent(cleanVideoUrl)}` +
-          `&show_text=false` +
-          `&width=500`;
-
-        // =========================================
+        // =========================================================
         // FEATURED LIMIT
-        // =========================================
+        // =========================================================
 
         const wantsFeatured = Boolean(featured);
 
@@ -794,16 +804,26 @@ async function run() {
           }
         }
 
-        // =========================================
+        // =========================================================
         // CREATE VIDEO DOCUMENT
-        // =========================================
+        // =========================================================
+
+        const now = new Date();
 
         const videoData = {
           title: title.trim(),
 
-          videoUrl: cleanVideoUrl,
+          // Admin-এর দেওয়া original Facebook URL
+          originalVideoUrl,
 
+          // Resolved canonical Facebook URL
+          videoUrl: canonicalVideoUrl,
+
+          // Facebook embed URL
           embedUrl,
+
+          // Cloudinary thumbnail URL
+          thumbnailUrl: thumbnailUrl.trim(),
 
           category: category?.trim() || "",
 
@@ -813,22 +833,22 @@ async function run() {
 
           isPublished: Boolean(isPublished),
 
-          createdAt: new Date(),
+          createdAt: now,
 
-          updatedAt: new Date(),
+          updatedAt: now,
         };
 
-        // =========================================
+        // =========================================================
         // INSERT
-        // =========================================
+        // =========================================================
 
         const result = await videoCollection.insertOne(videoData);
 
-        // =========================================
+        // =========================================================
         // RESPONSE
-        // =========================================
+        // =========================================================
 
-        res.status(201).send({
+        return res.status(201).send({
           success: true,
           message: "Video added successfully.",
           insertedId: result.insertedId,
@@ -837,7 +857,8 @@ async function run() {
       } catch (error) {
         console.error("Add video error:", error);
 
-        res.status(500).send({
+        return res.status(500).send({
+          success: false,
           message: "Failed to add video.",
         });
       }
@@ -933,13 +954,21 @@ async function run() {
       try {
         const { id } = req.params;
 
+        // =====================================================
+        // ID VALIDATION
+        // =====================================================
+
         if (!ObjectId.isValid(id)) {
           return res.status(400).send({
-            message: "Invalid video id",
+            message: "Invalid video id.",
           });
         }
 
         const videoId = new ObjectId(id);
+
+        // =====================================================
+        // FIND CURRENT VIDEO
+        // =====================================================
 
         const currentVideo = await videoCollection.findOne({
           _id: videoId,
@@ -947,9 +976,13 @@ async function run() {
 
         if (!currentVideo) {
           return res.status(404).send({
-            message: "Video not found",
+            message: "Video not found.",
           });
         }
+
+        // =====================================================
+        // REQUEST DATA
+        // =====================================================
 
         const {
           title,
@@ -960,12 +993,56 @@ async function run() {
           isPublished,
         } = req.body;
 
-        const wantsFeatured = Boolean(featured);
-        const isCurrentlyFeatured = Boolean(currentVideo.featured);
+        // =====================================================
+        // BASIC VALIDATION
+        // =====================================================
 
-        // ============================================
-        // MAX 8 FEATURED CHECK
-        // ============================================
+        if (!title?.trim()) {
+          return res.status(400).send({
+            message: "Video title is required.",
+          });
+        }
+
+        if (!videoUrl?.trim()) {
+          return res.status(400).send({
+            message: "Facebook video URL is required.",
+          });
+        }
+
+        // =====================================================
+        // FACEBOOK URL VALIDATION
+        // =====================================================
+
+        if (!isFacebookUrl(videoUrl)) {
+          return res.status(400).send({
+            message: "Only Facebook video URLs are allowed.",
+          });
+        }
+
+        // =====================================================
+        // RESOLVE SHARE URL → CANONICAL URL
+        // =====================================================
+
+        const canonicalVideoUrl = await resolveFacebookVideoUrl(videoUrl);
+
+        console.log("Original Facebook URL:", videoUrl);
+        console.log("Canonical Facebook URL:", canonicalVideoUrl);
+
+        // =====================================================
+        // GENERATE NEW EMBED URL
+        // =====================================================
+
+        const embedUrl = createFacebookEmbedUrl(canonicalVideoUrl);
+
+        console.log("Generated Facebook Embed URL:", embedUrl);
+
+        // =====================================================
+        // FEATURED LIMIT
+        // =====================================================
+
+        const wantsFeatured = Boolean(featured);
+
+        const isCurrentlyFeatured = Boolean(currentVideo.featured);
 
         const tryingToAddFeatured = wantsFeatured && !isCurrentlyFeatured;
 
@@ -982,14 +1059,21 @@ async function run() {
           }
         }
 
-        // ============================================
+        // =====================================================
         // UPDATE DATA
-        // ============================================
+        // =====================================================
 
         const updatePayload = {
-          title: title?.trim() || "",
-          videoUrl: videoUrl?.trim() || "",
+          title: title.trim(),
+
+          // SAVE CANONICAL URL
+          videoUrl: canonicalVideoUrl,
+
+          // SAVE NEW EMBED URL
+          embedUrl,
+
           category: category?.trim() || "",
+
           description: description?.trim() || "",
 
           featured: wantsFeatured,
@@ -998,6 +1082,10 @@ async function run() {
 
           updatedAt: new Date(),
         };
+
+        // =====================================================
+        // UPDATE DATABASE
+        // =====================================================
 
         const result = await videoCollection.updateOne(
           {
@@ -1008,10 +1096,21 @@ async function run() {
           },
         );
 
+        // =====================================================
+        // RESPONSE
+        // =====================================================
+
         res.send({
           success: true,
+
           message: "Video updated successfully.",
+
           result,
+
+          video: {
+            _id: videoId,
+            ...updatePayload,
+          },
         });
       } catch (error) {
         console.error("Update video error:", error);
