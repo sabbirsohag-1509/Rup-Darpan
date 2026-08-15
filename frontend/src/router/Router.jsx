@@ -29,6 +29,8 @@ import UserProfile from "../pages/Dashboard/MyProfile/UserProfile";
 import AdminProfile from "../pages/Dashboard/MyProfile/AdminProfile";
 import AdminVideosManagement from "../pages/Dashboard/AdminVideosManagement";
 import AddVideo from "../pages/AddVideo/AddVideo";
+import GalleryPhotos from "../components/Gallery/GalleryPhotos/GalleryPhotos";
+import GalleryVideos from "../components/Gallery/GalleryVideos/GalleryVideos";
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +45,14 @@ export const router = createBrowserRouter([
       {
         path: "/gallery",
         element: <Gallery />,
+      },
+      {
+        path: "/gallery/photos",
+        element: <GalleryPhotos />,
+      },
+      {
+        path: "/gallery/videos",
+        element: <GalleryVideos />,
       },
       {
         path: "/about",
