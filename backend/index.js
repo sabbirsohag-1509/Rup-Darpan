@@ -1156,6 +1156,85 @@ async function run() {
         });
       }
     });
+    //PATCH admin - Toggle Featured
+    app.patch(
+      "/videos/:id/featured",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+          const { featured } = req.body;
+
+          // ID validation
+          if (!ObjectId.isValid(id)) {
+            return res.status(400).send({
+              message: "Invalid video id.",
+            });
+          }
+
+          // Featured value validation
+          if (typeof featured !== "boolean") {
+            return res.status(400).send({
+              message: "Featured value must be true or false.",
+            });
+          }
+
+          const videoId = new ObjectId(id);
+
+          // Find video
+          const video = await videoCollection.findOne({
+            _id: videoId,
+          });
+
+          if (!video) {
+            return res.status(404).send({
+              message: "Video not found.",
+            });
+          }
+
+          // Adding to featured
+          if (featured === true && !video.featured) {
+            const featuredCount = await videoCollection.countDocuments({
+              featured: true,
+            });
+
+            if (featuredCount >= 8) {
+              return res.status(400).send({
+                message:
+                  "Maximum 8 featured videos are allowed. Please remove one featured video first.",
+              });
+            }
+          }
+
+          // Update featured status only
+          await videoCollection.updateOne(
+            {
+              _id: videoId,
+            },
+            {
+              $set: {
+                featured,
+                updatedAt: new Date(),
+              },
+            },
+          );
+
+          res.send({
+            success: true,
+            message: featured
+              ? "Added to Featured Videos."
+              : "Removed from Featured Videos.",
+          });
+        } catch (error) {
+          console.error("Featured toggle error:", error);
+
+          res.status(500).send({
+            message: "Failed to update featured status.",
+          });
+        }
+      },
+    );
     //DELETE admin
     app.delete("/videos/:id", verifyToken, verifyAdmin, async (req, res) => {
       try {
