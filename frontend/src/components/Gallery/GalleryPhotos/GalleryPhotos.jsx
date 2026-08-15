@@ -113,13 +113,10 @@ const GalleryPhotos = () => {
           ...(Array.isArray(photo.tags) ? photo.tags : []),
         ]
           .filter(Boolean)
-          .some((value) =>
-            String(value).toLowerCase().includes(query),
-          );
+          .some((value) => String(value).toLowerCase().includes(query));
 
       const matchesCategory =
-        selectedCategory === "All" ||
-        photo.category === selectedCategory;
+        selectedCategory === "All" || photo.category === selectedCategory;
 
       return matchesSearch && matchesCategory;
     });
@@ -150,11 +147,7 @@ const GalleryPhotos = () => {
   // =======================================================
 
   const goToPage = (page) => {
-    if (
-      page < 1 ||
-      page > totalPages ||
-      page === currentPage
-    ) {
+    if (page < 1 || page > totalPages || page === currentPage) {
       return;
     }
 
@@ -187,7 +180,6 @@ const GalleryPhotos = () => {
 
         <section className="relative overflow-hidden border-b border-base-200 bg-base-100">
           {/* Decorative Background */}
-
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -right-32 -top-32 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
 
@@ -195,47 +187,44 @@ const GalleryPhotos = () => {
           </div>
 
           <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-8 sm:py-14 lg:px-10 lg:py-16">
-            <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto] lg:gap-12">
-              {/* LEFT CONTENT */}
+            {/* =====================================================
+        LEFT + RIGHT — 50 / 50
+    ===================================================== */}
+
+            <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+              {/* =================================================
+          LEFT SIDE — 50%
+      ================================================= */}
 
               <div className="max-w-3xl">
-                {/* Label */}
-
-                <div className="mb-4 flex items-center gap-2 text-primary">
-                  <Camera className="h-5 w-5" />
-
-                  <span className="text-xs font-semibold uppercase tracking-[0.2em]">
-                    Our Gallery Photos
-                  </span>
-                </div>
-
                 {/* Heading */}
 
                 <h1 className="font-playfair text-3xl font-semibold leading-tight text-base-content sm:text-4xl lg:text-5xl">
                   Stories captured{" "}
-                  <span className="italic text-primary">
-                    through our lens.
-                  </span>
+                  <span className="italic text-primary">through our lens.</span>
                 </h1>
 
                 {/* Description */}
 
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-base-content/60 sm:text-base">
-                  Explore our collection of photographs from
-                  weddings, celebrations, portraits, outdoor
-                  sessions, and beautiful moments.
+                  Explore our collection of photographs from weddings,
+                  celebrations, portraits, outdoor sessions, and beautiful
+                  moments.
                 </p>
 
                 <p className="mt-1 text-xs leading-6 text-base-content/50 sm:text-sm">
-                  আমাদের লেন্সে ধরা পড়া সুন্দর মুহূর্তগুলোর
-                  সম্পূর্ণ সংগ্রহ।
+                  আমাদের লেন্সে ধরা পড়া সুন্দর মুহূর্তগুলোর সম্পূর্ণ সংগ্রহ।
                 </p>
               </div>
 
-              {/* RIGHT NAVIGATION */}
+              {/* =================================================
+          RIGHT SIDE — 50%
+      ================================================= */}
 
-              <div className="w-full lg:w-[280px]">
-                <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4 shadow-sm sm:p-5">
+              <div className="w-full lg:flex lg:justify-end">
+                <div className="w-full rounded-2xl border border-primary/10 bg-primary/5 p-4 shadow-sm sm:p-5 lg:max-w-md">
+                  {/* Card Header */}
+
                   <div className="flex items-start gap-3">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                       <Images className="h-5 w-5" />
@@ -251,8 +240,7 @@ const GalleryPhotos = () => {
                       </h2>
 
                       <p className="mt-1 text-xs leading-5 text-base-content/55">
-                        Browse photographs or watch our memorable
-                        films.
+                        Browse photographs or watch our memorable films.
                       </p>
                     </div>
                   </div>
@@ -260,21 +248,23 @@ const GalleryPhotos = () => {
                   {/* Navigation Buttons */}
 
                   <div className="mt-4 grid grid-cols-2 gap-2">
+                    {/* Photos */}
+
                     <Link
                       to="/gallery/photos"
                       className="group flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-xs font-semibold text-primary-content transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
                     >
                       <Camera className="h-4 w-4" />
-
                       Photos
                     </Link>
+
+                    {/* Videos */}
 
                     <Link
                       to="/gallery/videos"
                       className="group flex items-center justify-center gap-2 rounded-xl border border-primary/15 bg-base-100 px-3 py-2.5 text-xs font-semibold text-base-content transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:text-primary"
                     >
                       <Play className="h-4 w-4" />
-
                       Videos
                     </Link>
                   </div>
@@ -363,8 +353,7 @@ const GalleryPhotos = () => {
 
             <p className="text-sm text-base-content/50">
               {filteredPhotos.length} photo
-              {filteredPhotos.length !== 1 ? "s" : ""} on this
-              page
+              {filteredPhotos.length !== 1 ? "s" : ""} on this page
             </p>
           </div>
 
@@ -435,11 +424,7 @@ export default GalleryPhotos;
 
 const PhotoCard = ({ photo, onClick }) => {
   const imageUrl =
-    photo?.image ||
-    photo?.imageUrl ||
-    photo?.photoUrl ||
-    photo?.url ||
-    "";
+    photo?.image || photo?.imageUrl || photo?.photoUrl || photo?.url || "";
 
   const title = photo?.title || "Untitled Photograph";
 
@@ -515,12 +500,7 @@ const PhotoCard = ({ photo, onClick }) => {
 // PHOTO DETAIL MODAL
 // =========================================================
 
-const PhotoDetailModal = ({
-  photo,
-  photos,
-  onClose,
-  onSelectPhoto,
-}) => {
+const PhotoDetailModal = ({ photo, photos, onClose, onSelectPhoto }) => {
   const [zoom, setZoom] = useState(1);
 
   // -------------------------------------------------------
@@ -528,11 +508,7 @@ const PhotoDetailModal = ({
   // -------------------------------------------------------
 
   const imageUrl =
-    photo?.image ||
-    photo?.imageUrl ||
-    photo?.photoUrl ||
-    photo?.url ||
-    "";
+    photo?.image || photo?.imageUrl || photo?.photoUrl || photo?.url || "";
 
   const title = photo?.title || "Untitled Photograph";
 
@@ -544,15 +520,11 @@ const PhotoDetailModal = ({
   // CURRENT PHOTO INDEX
   // -------------------------------------------------------
 
-  const currentIndex = photos.findIndex(
-    (item) => item._id === photo?._id,
-  );
+  const currentIndex = photos.findIndex((item) => item._id === photo?._id);
 
   const hasPrevious = currentIndex > 0;
 
-  const hasNext =
-    currentIndex !== -1 &&
-    currentIndex < photos.length - 1;
+  const hasNext = currentIndex !== -1 && currentIndex < photos.length - 1;
 
   // -------------------------------------------------------
   // RESET ZOOM WHEN PHOTO CHANGES
@@ -567,15 +539,11 @@ const PhotoDetailModal = ({
   // -------------------------------------------------------
 
   const zoomIn = useCallback(() => {
-    setZoom((previous) =>
-      Math.min(previous + 0.25, 3),
-    );
+    setZoom((previous) => Math.min(previous + 0.25, 3));
   }, []);
 
   const zoomOut = useCallback(() => {
-    setZoom((previous) =>
-      Math.max(previous - 0.25, 0.5),
-    );
+    setZoom((previous) => Math.max(previous - 0.25, 0.5));
   }, []);
 
   const resetZoom = useCallback(() => {
@@ -590,12 +558,7 @@ const PhotoDetailModal = ({
     if (!hasPrevious) return;
 
     onSelectPhoto(photos[currentIndex - 1]);
-  }, [
-    hasPrevious,
-    currentIndex,
-    photos,
-    onSelectPhoto,
-  ]);
+  }, [hasPrevious, currentIndex, photos, onSelectPhoto]);
 
   // -------------------------------------------------------
   // NEXT
@@ -605,12 +568,7 @@ const PhotoDetailModal = ({
     if (!hasNext) return;
 
     onSelectPhoto(photos[currentIndex + 1]);
-  }, [
-    hasNext,
-    currentIndex,
-    photos,
-    onSelectPhoto,
-  ]);
+  }, [hasNext, currentIndex, photos, onSelectPhoto]);
 
   // -------------------------------------------------------
   // KEYBOARD CONTROLS
@@ -643,25 +601,12 @@ const PhotoDetailModal = ({
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    onClose,
-    showPrevious,
-    showNext,
-    zoomIn,
-    zoomOut,
-    resetZoom,
-  ]);
+  }, [onClose, showPrevious, showNext, zoomIn, zoomOut, resetZoom]);
 
   // -------------------------------------------------------
   // MOUSE WHEEL ZOOM
@@ -682,14 +627,11 @@ const PhotoDetailModal = ({
   // -------------------------------------------------------
 
   const formattedDate = photo?.createdAt
-    ? new Date(photo.createdAt).toLocaleDateString(
-        "en-US",
-        {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        },
-      )
+    ? new Date(photo.createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
     : null;
 
   return (
@@ -911,25 +853,17 @@ const PhotoDetailModal = ({
             <div className="rounded-2xl bg-base-200/60 p-4">
               <Heart className="h-4 w-4 text-primary" />
 
-              <p className="mt-2 text-lg font-semibold">
-                {photo?.likes ?? 0}
-              </p>
+              <p className="mt-2 text-lg font-semibold">{photo?.likes ?? 0}</p>
 
-              <p className="text-xs text-base-content/50">
-                Likes
-              </p>
+              <p className="text-xs text-base-content/50">Likes</p>
             </div>
 
             <div className="rounded-2xl bg-base-200/60 p-4">
               <Eye className="h-4 w-4 text-primary" />
 
-              <p className="mt-2 text-lg font-semibold">
-                {photo?.views ?? 0}
-              </p>
+              <p className="mt-2 text-lg font-semibold">{photo?.views ?? 0}</p>
 
-              <p className="text-xs text-base-content/50">
-                Views
-              </p>
+              <p className="text-xs text-base-content/50">Views</p>
             </div>
           </div>
 
@@ -968,7 +902,6 @@ const PhotoDetailModal = ({
               className="btn btn-outline rounded-full disabled:opacity-30"
             >
               <ArrowLeft className="h-4 w-4" />
-
               Previous
             </button>
 
@@ -979,7 +912,6 @@ const PhotoDetailModal = ({
               className="btn btn-primary rounded-full disabled:opacity-30"
             >
               Next
-
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -992,7 +924,6 @@ const PhotoDetailModal = ({
             className="btn btn-ghost mt-2 w-full rounded-full"
           >
             <X className="h-4 w-4" />
-
             Close
           </button>
         </aside>
@@ -1029,20 +960,12 @@ const DetailRow = ({ icon, label, value }) => {
 // PAGINATION
 // =========================================================
 
-const Pagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  isFetching,
-}) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, isFetching }) => {
   const pages = [];
 
   const start = Math.max(1, currentPage - 2);
 
-  const end = Math.min(
-    totalPages,
-    currentPage + 2,
-  );
+  const end = Math.min(totalPages, currentPage + 2);
 
   for (let page = start; page <= end; page++) {
     pages.push(page);
@@ -1054,17 +977,13 @@ const Pagination = ({
 
       <button
         type="button"
-        onClick={() =>
-          onPageChange(currentPage - 1)
-        }
+        onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || isFetching}
         className="btn btn-outline btn-sm rounded-full"
       >
         <ChevronLeft className="h-4 w-4" />
 
-        <span className="hidden sm:inline">
-          Previous
-        </span>
+        <span className="hidden sm:inline">Previous</span>
       </button>
 
       {/* PAGE NUMBERS */}
@@ -1089,17 +1008,11 @@ const Pagination = ({
 
       <button
         type="button"
-        onClick={() =>
-          onPageChange(currentPage + 1)
-        }
-        disabled={
-          currentPage === totalPages || isFetching
-        }
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages || isFetching}
         className="btn btn-outline btn-sm rounded-full"
       >
-        <span className="hidden sm:inline">
-          Next
-        </span>
+        <span className="hidden sm:inline">Next</span>
 
         <ChevronRight className="h-4 w-4" />
       </button>
@@ -1138,20 +1051,18 @@ const GalleryPhotosSkeleton = () => {
 
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-8 lg:px-10">
         <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
-          {Array.from({ length: 9 }).map(
-            (_, index) => (
-              <div
-                key={index}
-                className={`mb-5 break-inside-avoid animate-pulse rounded-3xl bg-base-200 ${
-                  index % 3 === 0
-                    ? "h-[480px]"
-                    : index % 3 === 1
-                      ? "h-[350px]"
-                      : "h-[420px]"
-                }`}
-              />
-            ),
-          )}
+          {Array.from({ length: 9 }).map((_, index) => (
+            <div
+              key={index}
+              className={`mb-5 break-inside-avoid animate-pulse rounded-3xl bg-base-200 ${
+                index % 3 === 0
+                  ? "h-[480px]"
+                  : index % 3 === 1
+                    ? "h-[350px]"
+                    : "h-[420px]"
+              }`}
+            />
+          ))}
         </div>
       </section>
     </main>
@@ -1174,8 +1085,7 @@ const GalleryError = ({ onRetry }) => {
       </h3>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-base-content/60">
-        Something went wrong while loading the gallery.
-        Please try again.
+        Something went wrong while loading the gallery. Please try again.
       </p>
 
       <button
@@ -1205,10 +1115,9 @@ const GalleryEmpty = () => {
       </h3>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-base-content/60">
-        We couldn't find any photos matching your
-        search or selected category. / আপনার অনুসন্ধান
-        বা নির্বাচিত ক্যাটাগরির সাথে মিলে এমন কোনো ছবি
-        আমরা খুঁজে পাইনি।
+        We couldn't find any photos matching your search or selected category. /
+        আপনার অনুসন্ধান বা নির্বাচিত ক্যাটাগরির সাথে মিলে এমন কোনো ছবি আমরা
+        খুঁজে পাইনি।
       </p>
     </div>
   );

@@ -255,105 +255,47 @@ const AdminVideosManagement = () => {
   // FEATURED TOGGLE
   // =========================================================
 
-  const handleFeaturedToggle = async (video) => {
-    const currentlyFeatured = Boolean(video.featured);
+const handleFeaturedToggle = async (video) => {
+  const currentlyFeatured = Boolean(video.featured);
 
-    // =======================================================
-    // REMOVE FROM FEATURED
-    // =======================================================
+  // Adding to featured
+  if (!currentlyFeatured && featuredCount >= MAX_FEATURED_VIDEOS) {
+    toast.error(
+      `You already have ${MAX_FEATURED_VIDEOS} featured videos. Remove one first.`,
+    );
 
-    if (currentlyFeatured) {
-      try {
-        await axios.put(
-          `${API_URL}/${video._id}`,
-          {
-            title: video.title || "",
+    return;
+  }
 
-            videoUrl: video.videoUrl || "",
+  try {
+    await axios.patch(
+      `${API_URL}/${video._id}/featured`,
+      {
+        featured: !currentlyFeatured,
+      },
+      {
+        withCredentials: true,
+      },
+    );
 
-            embedUrl: video.embedUrl || "",
+    await queryClient.invalidateQueries({
+      queryKey: ["admin-videos"],
+    });
 
-            category: video.category || "",
+    toast.success(
+      currentlyFeatured
+        ? "Removed from Featured Videos."
+        : "Added to Featured Videos.",
+    );
+  } catch (error) {
+    console.error("Featured toggle error:", error);
 
-            description: video.description || "",
-
-            featured: false,
-
-            isPublished: Boolean(video.isPublished),
-          },
-          {
-            withCredentials: true,
-          },
-        );
-
-        await queryClient.invalidateQueries({
-          queryKey: ["admin-videos"],
-        });
-
-        toast.success("Removed from Featured Videos.");
-      } catch (error) {
-        console.error("Remove featured video error:", error);
-
-        toast.error(
-          error.response?.data?.message || "Failed to remove featured video.",
-        );
-      }
-
-      return;
-    }
-
-    // =======================================================
-    // MAX 8 CHECK
-    // =======================================================
-
-    if (featuredCount >= MAX_FEATURED_VIDEOS) {
-      toast.error(
-        `You already have ${MAX_FEATURED_VIDEOS} featured videos. Remove one first.`,
-      );
-
-      return;
-    }
-
-    // =======================================================
-    // ADD TO FEATURED
-    // =======================================================
-
-    try {
-      await axios.put(
-        `${API_URL}/${video._id}`,
-        {
-          title: video.title || "",
-
-          videoUrl: video.videoUrl || "",
-
-          embedUrl: video.embedUrl || "",
-
-          category: video.category || "",
-
-          description: video.description || "",
-
-          featured: true,
-
-          isPublished: Boolean(video.isPublished),
-        },
-        {
-          withCredentials: true,
-        },
-      );
-
-      await queryClient.invalidateQueries({
-        queryKey: ["admin-videos"],
-      });
-
-      toast.success("Added to Featured Videos.");
-    } catch (error) {
-      console.error("Add featured video error:", error);
-
-      toast.error(
-        error.response?.data?.message || "Failed to add featured video.",
-      );
-    }
-  };
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to update featured status.",
+    );
+  }
+};
 
   // =========================================================
   // RENDER
