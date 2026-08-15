@@ -163,35 +163,35 @@ async function run() {
     );
     // Function to check if a URL is a valid Facebook video URL
     const isFacebookUrl = (url) => {
-  try {
-    const parsedUrl = new URL(url);
+      try {
+        const parsedUrl = new URL(url);
 
-    const allowedHosts = [
-      "facebook.com",
-      "www.facebook.com",
-      "m.facebook.com",
-      "web.facebook.com",
-    ];
+        const allowedHosts = [
+          "facebook.com",
+          "www.facebook.com",
+          "m.facebook.com",
+          "web.facebook.com",
+        ];
 
-    const hostname = parsedUrl.hostname.toLowerCase();
+        const hostname = parsedUrl.hostname.toLowerCase();
 
-    if (!allowedHosts.includes(hostname)) {
-      return false;
-    }
+        if (!allowedHosts.includes(hostname)) {
+          return false;
+        }
 
-    // Only allow Facebook video/reel/share video URLs
-    const pathname = parsedUrl.pathname.toLowerCase();
+        // Only allow Facebook video/reel/share video URLs
+        const pathname = parsedUrl.pathname.toLowerCase();
 
-    return (
-      pathname.startsWith("/reel/") ||
-      pathname.startsWith("/share/v/") ||
-      pathname.startsWith("/watch") ||
-      pathname.startsWith("/videos/")
-    );
-  } catch {
-    return false;
-  }
-};
+        return (
+          pathname.startsWith("/reel/") ||
+          pathname.startsWith("/share/v/") ||
+          pathname.startsWith("/watch") ||
+          pathname.startsWith("/videos/")
+        );
+      } catch {
+        return false;
+      }
+    };
     // =========================================================
     ////
     //////////////////////// USER's RELATED API ////////////////////////////////////////////
@@ -740,170 +740,165 @@ async function run() {
       res.send(result);
     });
     ////////////////////////   VIDEO RELATED API ////////////////////////////////////////////
-    //POST
-    // ================================================================
-// VIDEO RELATED API
-// ================================================================
+    // POST - Add Video
+    app.post("/videos", verifyToken, verifyAdmin, async (req, res) => {
+      try {
+        const {
+          title,
+          videoUrl,
+          thumbnailUrl,
+          category,
+          description,
+          featured,
+          isPublished,
+        } = req.body;
 
-// POST - Add Video
-app.post("/videos", verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const {
-      title,
-      videoUrl,
-      thumbnailUrl,
-      category,
-      description,
-      featured,
-      isPublished,
-    } = req.body;
+        // =========================================================
+        // VALIDATION
+        // =========================================================
 
-    // =========================================================
-    // VALIDATION
-    // =========================================================
+        if (!title?.trim()) {
+          return res.status(400).send({
+            success: false,
+            message: "Video title is required.",
+          });
+        }
 
-    if (!title?.trim()) {
-      return res.status(400).send({
-        success: false,
-        message: "Video title is required.",
-      });
-    }
+        if (!videoUrl?.trim()) {
+          return res.status(400).send({
+            success: false,
+            message: "Facebook video URL is required.",
+          });
+        }
 
-    if (!videoUrl?.trim()) {
-      return res.status(400).send({
-        success: false,
-        message: "Facebook video URL is required.",
-      });
-    }
+        if (!thumbnailUrl?.trim()) {
+          return res.status(400).send({
+            success: false,
+            message: "Video thumbnail is required.",
+          });
+        }
 
-    if (!thumbnailUrl?.trim()) {
-      return res.status(400).send({
-        success: false,
-        message: "Video thumbnail is required.",
-      });
-    }
+        // =========================================================
+        // CLEAN VALUES
+        // =========================================================
 
-    // =========================================================
-    // CLEAN VALUES
-    // =========================================================
+        const cleanTitle = title.trim();
+        const cleanVideoUrl = videoUrl.trim();
+        const cleanThumbnailUrl = thumbnailUrl.trim();
+        const cleanCategory = category?.trim() || "";
+        const cleanDescription = description?.trim() || "";
 
-    const cleanTitle = title.trim();
-    const cleanVideoUrl = videoUrl.trim();
-    const cleanThumbnailUrl = thumbnailUrl.trim();
-    const cleanCategory = category?.trim() || "";
-    const cleanDescription = description?.trim() || "";
+        // =========================================================
+        // FACEBOOK URL VALIDATION
+        // =========================================================
 
-    // =========================================================
-    // FACEBOOK URL VALIDATION
-    // =========================================================
+        if (!isFacebookUrl(cleanVideoUrl)) {
+          return res.status(400).send({
+            success: false,
+            message: "Only Facebook video URLs are allowed.",
+          });
+        }
 
-    if (!isFacebookUrl(cleanVideoUrl)) {
-      return res.status(400).send({
-        success: false,
-        message: "Only Facebook video URLs are allowed.",
-      });
-    }
+        // =========================================================
+        // THUMBNAIL URL VALIDATION
+        // =========================================================
 
-    // =========================================================
-    // THUMBNAIL URL VALIDATION
-    // =========================================================
+        try {
+          const thumbnail = new URL(cleanThumbnailUrl);
 
-    try {
-      const thumbnail = new URL(cleanThumbnailUrl);
+          if (!["http:", "https:"].includes(thumbnail.protocol)) {
+            return res.status(400).send({
+              success: false,
+              message: "Invalid thumbnail URL.",
+            });
+          }
+        } catch {
+          return res.status(400).send({
+            success: false,
+            message: "Invalid thumbnail URL.",
+          });
+        }
 
-      if (!["http:", "https:"].includes(thumbnail.protocol)) {
-        return res.status(400).send({
+        // =========================================================
+        // FEATURED LIMIT
+        // =========================================================
+
+        const wantsFeatured = Boolean(featured);
+
+        if (wantsFeatured) {
+          const featuredCount = await videoCollection.countDocuments({
+            featured: true,
+          });
+
+          if (featuredCount >= 8) {
+            return res.status(400).send({
+              success: false,
+              message:
+                "Maximum 8 featured videos are allowed. Please remove one featured video first.",
+            });
+          }
+        }
+
+        // =========================================================
+        // CREATE VIDEO DOCUMENT
+        // =========================================================
+
+        const now = new Date();
+
+        const videoData = {
+          title: cleanTitle,
+
+          // Facebook URL exactly as admin provided
+          videoUrl: cleanVideoUrl,
+
+          // Cloudinary thumbnail URL
+          thumbnailUrl: cleanThumbnailUrl,
+
+          category: cleanCategory,
+
+          description: cleanDescription,
+
+          featured: wantsFeatured,
+
+          isPublished: Boolean(isPublished),
+
+          createdAt: now,
+
+          updatedAt: now,
+        };
+
+        // =========================================================
+        // INSERT
+        // =========================================================
+
+        const result = await videoCollection.insertOne(videoData);
+
+        // =========================================================
+        // RESPONSE
+        // =========================================================
+
+        return res.status(201).send({
+          success: true,
+          message: "Video added successfully.",
+
+          insertedId: result.insertedId,
+
+          video: {
+            _id: result.insertedId,
+            ...videoData,
+          },
+        });
+      } catch (error) {
+        console.error("=================================");
+        console.error("Add video error:", error);
+        console.error("=================================");
+
+        return res.status(500).send({
           success: false,
-          message: "Invalid thumbnail URL.",
+          message: error.message || "Failed to add video.",
         });
       }
-    } catch {
-      return res.status(400).send({
-        success: false,
-        message: "Invalid thumbnail URL.",
-      });
-    }
-
-    // =========================================================
-    // FEATURED LIMIT
-    // =========================================================
-
-    const wantsFeatured = Boolean(featured);
-
-    if (wantsFeatured) {
-      const featuredCount = await videoCollection.countDocuments({
-        featured: true,
-      });
-
-      if (featuredCount >= 8) {
-        return res.status(400).send({
-          success: false,
-          message:
-            "Maximum 8 featured videos are allowed. Please remove one featured video first.",
-        });
-      }
-    }
-
-    // =========================================================
-    // CREATE VIDEO DOCUMENT
-    // =========================================================
-
-    const now = new Date();
-
-    const videoData = {
-      title: cleanTitle,
-
-      // Facebook URL exactly as admin provided
-      videoUrl: cleanVideoUrl,
-
-      // Cloudinary thumbnail URL
-      thumbnailUrl: cleanThumbnailUrl,
-
-      category: cleanCategory,
-
-      description: cleanDescription,
-
-      featured: wantsFeatured,
-
-      isPublished: Boolean(isPublished),
-
-      createdAt: now,
-
-      updatedAt: now,
-    };
-
-    // =========================================================
-    // INSERT
-    // =========================================================
-
-    const result = await videoCollection.insertOne(videoData);
-
-    // =========================================================
-    // RESPONSE
-    // =========================================================
-
-    return res.status(201).send({
-      success: true,
-      message: "Video added successfully.",
-
-      insertedId: result.insertedId,
-
-      video: {
-        _id: result.insertedId,
-        ...videoData,
-      },
     });
-  } catch (error) {
-    console.error("=================================");
-    console.error("Add video error:", error);
-    console.error("=================================");
-
-    return res.status(500).send({
-      success: false,
-      message: error.message || "Failed to add video.",
-    });
-  }
-});
     //GET admin videos for management with pagination support: ?page=1&limit=5
     app.get("/videos", verifyToken, verifyAdmin, async (req, res) => {
       try {
