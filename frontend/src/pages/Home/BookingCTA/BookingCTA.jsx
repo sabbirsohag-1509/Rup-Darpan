@@ -10,6 +10,7 @@ const BookingCTA = () => {
   const guarantees = [
     { textEn: "Free Event Consultation", textBn: "বিনামূল্যে পরামর্শ" },
     { textEn: "Customized Budget Packages", textBn: "বাজেট অনুযায়ী প্যাকেজ" },
+    { textEn: "Flexible Booking Options", textBn: "সুবিধাজনক বুকিং বিকল্প" },
     { textEn: "Instant Date Confirmation", textBn: "দ্রুত বুকিং কনফার্মেশন" },
   ];
 
