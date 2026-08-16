@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 import {
-  Sparkles,
   CalendarCheck,
   PhoneCall,
   CheckCircle2,
