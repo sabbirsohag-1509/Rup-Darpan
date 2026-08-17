@@ -15,6 +15,7 @@ import {
   LogIn,
 } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
+import OurPolicy from "../OurPolicy/OurPolicy";
 
 // Change this path according to your project structure
 
@@ -186,7 +187,6 @@ const Packages = () => {
       {/* =========================================
           PACKAGES SECTION
       ========================================= */}
-
       <section className="px-4 pb-20 sm:pb-24">
         <div className="mx-auto max-w-7xl">
           {/* =========================================
@@ -414,11 +414,9 @@ const Packages = () => {
           )}
         </div>
       </section>
-
       {/* =========================================
           BOTTOM CTA
       ========================================= */}
-
       <section className="border-t border-primary/10 bg-base-200 px-4 py-14 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">
           <div className="text-center">
@@ -449,11 +447,11 @@ const Packages = () => {
           </Link>
         </div>
       </section>
-
+      {/* =========================OUR POLICY=============================== */}
+      <OurPolicy></OurPolicy>
       {/* =========================================
           LOGIN REQUIRED MODAL
       ========================================= */}
-
       {showLoginModal && (
         <div
           className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
@@ -528,7 +526,6 @@ const Packages = () => {
             </div>
           </div>
         </div>
-        
       )}
     </>
   );
