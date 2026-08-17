@@ -9,6 +9,8 @@ import {
   Users,
 } from "lucide-react";
 import OurPolicy from "../OurPolicy/OurPolicy";
+import OurTeam from "../../assets/sabbir.jpg";
+import OurStory from "../../assets/sabbir.jpg"
 
 const About = () => {
   return (
@@ -54,7 +56,7 @@ const About = () => {
 
             <div>
               <img
-                src="/about/about-hero.jpg"
+                src={OurTeam}
                 alt="Rup Darpon Team"
                 className="h-[420px] w-full rounded-3xl object-cover shadow-xl"
               />
@@ -116,7 +118,7 @@ const About = () => {
             </div>
 
             <img
-              src="/about/story.jpg"
+              src={OurStory}
               alt="Our Story"
               className="h-[340px] w-full rounded-2xl object-cover"
             />
@@ -230,7 +232,7 @@ const About = () => {
               <Phone className="h-8 w-8 text-primary" />
               <div>
                 <p className="text-xs text-base-content/45">Phone</p>
-                <h3 className="font-semibold">+8801723-473804</h3>
+                <h3 className="font-semibold">+8801824-269459</h3>
               </div>
             </div>
 
