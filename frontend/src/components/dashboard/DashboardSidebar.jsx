@@ -14,6 +14,7 @@ import {
   X,
   CalendarDays,
   Video,
+  Images,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Logo from "../shared/Logo";
@@ -30,8 +31,9 @@ const userLinks = [
 const adminLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
 
-  { to: "/admin/photos", label: "Photos", icon: Image },
-  { to: "/admin/videos", label: "Videos", icon: Video },
+  { to: "/admin/photos", label: "Gallery Photos", icon: Image },
+  { to: "/admin/videos", label: "Gallery Videos", icon: Video },
+   { to: "/admin/hero-images", label: "Hero Images", icon: Images },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/packages", label: "Packages", icon: Package },
   { to: "/admin/bookings", label: "Bookings", icon: CalendarDays },

@@ -361,57 +361,22 @@ const AdminPhotosManagement = () => {
           HEADER
       ===================================================== */}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* ====================================
-                          MAIN GALLERY PHOTOS
-                    ================================= */}
-        <section className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
-          <div>
-            <h2 className="font-playfair text-2xl font-semibold">
-              Gallery Photos
-            </h2>
+      <section className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h2 className="font-playfair text-2xl font-semibold">
+           Gallery Photos Management
+          </h2>
 
-            <p className="mt-1 text-sm text-base-content/70">
-              Add, edit, delete and manage Rup Darpon gallery photos.
-            </p>
-          </div>
+          <p className="mt-1 text-sm text-base-content/70">
+            Add, edit, delete and manage your gallery photos.
+          </p>
+        </div>
 
-          <div>
-            <Link
-              to="add-photos"
-              className="btn btn-primary text-primary-content"
-            >
-              <Plus className="h-4 w-4" />
-              Add Gallery Photo
-            </Link>
-          </div>
-        </section>
-
-        {/* ========================
-      HERO BANNER IMAGES
-  ============================= */}
-        <section className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
-          <div>
-            <h2 className="font-playfair text-2xl font-semibold">
-              Hero Banner Images
-            </h2>
-
-            <p className="mt-1 text-sm text-base-content/70">
-              Add and manage images used in the Rup Darpon homepage hero banner.
-            </p>
-          </div>
-
-          <div>
-            <Link
-              to="add-hero-photos"
-              className="btn btn-primary text-primary-content"
-            >
-              <Plus className="h-4 w-4" />
-              Add Hero Image
-            </Link>
-          </div>
-        </section>
-      </div>
+        <Link to="add-photos" className="btn btn-primary text-primary-content">
+          <Plus className="h-4 w-4" />
+          Add Photo
+        </Link>
+      </section>
 
       {/* =====================================================
           FEATURED GALLERY STATUS

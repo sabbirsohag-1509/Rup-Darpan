@@ -40,6 +40,10 @@ const routeMeta = {
     title: "Videos",
     description: "Manage your Video and gallery assets.",
   },
+   "/admin/hero-images": {
+    title: "Hero Images",
+    description: "Manage your hero image assets.",
+  },
   "/admin/packages": {
     title: "Packages",
     description: "Maintain photography package offerings.",
