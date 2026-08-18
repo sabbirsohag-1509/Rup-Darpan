@@ -115,6 +115,7 @@ async function run() {
     const reviewCollection = myDB.collection("reviews");
     const loginActivityCollection = myDB.collection("loginActivities");
     const videoCollection = myDB.collection("videos");
+    const heroImagesCollection = myDB.collection("heroImages");
 
     // Google Strategy
     passport.use(
@@ -739,7 +740,7 @@ async function run() {
 
       res.send(result);
     });
-    ////////////////////////   VIDEO RELATED API ////////////////////////////////////////////
+    ////////////////////////   VIDEO RELATED API ///////////////////////////////////////
     // POST - Add Video
     app.post("/videos", verifyToken, verifyAdmin, async (req, res) => {
       try {
@@ -1275,6 +1276,162 @@ async function run() {
         });
       }
     });
+    ////////////////////////   HERO IMAGE RELATED API ///////////////////////////////////////
+    // POST
+    app.post("/hero-images", async (req, res) => {
+      try {
+        const { title, image, publicId, altText, displayOrder, isActive } =
+          req.body;
+
+        // Required validation
+        if (!image) {
+          return res.status(400).send({
+            message: "Hero image is required.",
+          });
+        }
+
+        // Maximum 8 hero images
+        const heroImageCount = await heroImagesCollection.countDocuments();
+
+        if (heroImageCount >= 8) {
+          return res.status(400).send({
+            message: "Maximum 8 hero images are allowed.",
+          });
+        }
+
+        const heroImage = {
+          title: title?.trim() || "",
+          image: image.trim(),
+          publicId: publicId?.trim() || "",
+          altText: altText?.trim() || title?.trim() || "Rup Darpon Hero Image",
+          displayOrder: Number(displayOrder) || heroImageCount + 1,
+          isActive: isActive !== false,
+
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const result = await heroImagesCollection.insertOne(heroImage);
+        res.status(201).send({
+          success: true,
+          message: "Hero image added successfully.",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Add hero image error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to add hero image.",
+        });
+      }
+    });
+    //GET
+    app.get("/hero-images", async (req, res) => {
+      try {
+        const heroImages = await heroImagesCollection
+          .find({})
+          .sort({ displayOrder: 1, createdAt: -1 })
+          .toArray();
+
+        res.status(200).send({
+          success: true,
+          message: "Hero images fetched successfully.",
+          data: heroImages,
+        });
+      } catch (error) {
+        console.error("Get hero images error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to fetch hero images.",
+        });
+      }
+    });
+    //PUT
+    app.put("/hero-images/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const { title, image, publicId, altText, displayOrder, isActive } =
+          req.body;
+
+        if (!image) {
+          return res.status(400).send({
+            success: false,
+            message: "Hero image is required.",
+          });
+        }
+
+        const updateData = {
+          title: title?.trim() || "",
+          image: image.trim(),
+          publicId: publicId?.trim() || "",
+          altText: altText?.trim() || title?.trim() || "Rup Darpon Hero Image",
+          displayOrder: Number(displayOrder) || 1,
+          isActive: isActive !== false,
+          updatedAt: new Date(),
+        };
+
+        const result = await heroImagesCollection.updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: updateData,
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            success: false,
+            message: "Hero image not found.",
+          });
+        }
+
+        res.status(200).send({
+          success: true,
+          message: "Hero image updated successfully.",
+        });
+      } catch (error) {
+        console.error("Update hero image error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to update hero image.",
+        });
+      }
+    });
+    //DELETE
+    app.delete("/hero-images/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const result = await heroImagesCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).send({
+            success: false,
+            message: "Hero image not found.",
+          });
+        }
+
+        res.status(200).send({
+          success: true,
+          message: "Hero image deleted successfully.",
+        });
+      } catch (error) {
+        console.error("Delete hero image error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to delete hero image.",
+        });
+      }
+    });
+
     ////////////////////////  PACKAGE RELATED API ////////////////////////////////////////////
     //POST
     app.post("/packages", verifyToken, verifyAdmin, async (req, res) => {
