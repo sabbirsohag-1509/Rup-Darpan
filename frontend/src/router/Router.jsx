@@ -31,6 +31,7 @@ import AdminVideosManagement from "../pages/Dashboard/AdminVideosManagement";
 import AddVideo from "../pages/AddVideo/AddVideo";
 import GalleryPhotos from "../components/Gallery/GalleryPhotos/GalleryPhotos";
 import GalleryVideos from "../components/Gallery/GalleryVideos/GalleryVideos";
+import AddHeroImage from "../pages/AddHeroImage/AddHeroImage";
 
 export const router = createBrowserRouter([
   {
@@ -174,6 +175,9 @@ export const router = createBrowserRouter([
           {
             path: "add-photos",
             element: <AddPhoto />,
+          }, {
+            path: "add-hero-photos",
+            element: <AddHeroImage></AddHeroImage>
           },
         ],
       },

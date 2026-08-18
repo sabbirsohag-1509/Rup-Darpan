@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router";
-import {
-  Check,
-  Pencil,
-  Plus,
-  Search,
-  Star,
-  Trash2,
-  X,
-} from "lucide-react";
+import { Check, Pencil, Plus, Search, Star, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 const API_URL = "http://localhost:5000/photos";
@@ -34,7 +26,6 @@ const AdminPhotosManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // ✅ IMPORTANT:
   // This count comes from BACKEND.
   // It represents ALL featured photos across ALL pages.
   const [featuredCount, setFeaturedCount] = useState(0);
@@ -87,10 +78,7 @@ const AdminPhotosManagement = () => {
       .catch((error) => {
         console.error("Fetch photos error:", error);
 
-        toast.error(
-          error.response?.data?.message ||
-            "Failed to load photos.",
-        );
+        toast.error(error.response?.data?.message || "Failed to load photos.");
       })
       .finally(() => {
         setLoading(false);
@@ -123,10 +111,7 @@ const AdminPhotosManagement = () => {
     } catch (error) {
       console.error("Delete photo error:", error);
 
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to delete photo.",
-      );
+      toast.error(error.response?.data?.message || "Failed to delete photo.");
     } finally {
       setDeletingId("");
     }
@@ -146,9 +131,7 @@ const AdminPhotosManagement = () => {
       description: photo.description || "",
       photographer: photo.photographer || "",
       location: photo.location || "",
-      tags: Array.isArray(photo.tags)
-        ? photo.tags.join(", ")
-        : "",
+      tags: Array.isArray(photo.tags) ? photo.tags.join(", ") : "",
       featured: Boolean(photo.featured),
       isPublished: Boolean(photo.isPublished),
     });
@@ -200,11 +183,7 @@ const AdminPhotosManagement = () => {
         tagText,
       ]
         .filter(Boolean)
-        .some((value) =>
-          String(value)
-            .toLowerCase()
-            .includes(normalizedQuery),
-        );
+        .some((value) => String(value).toLowerCase().includes(normalizedQuery));
     });
   }, [photos, searchQuery]);
 
@@ -226,13 +205,9 @@ const AdminPhotosManagement = () => {
     // GLOBAL MAX 8 CHECK
     // -------------------------------------------------------
 
-    const tryingToAddFeatured =
-      wantsFeatured && !wasFeatured;
+    const tryingToAddFeatured = wantsFeatured && !wasFeatured;
 
-    if (
-      tryingToAddFeatured &&
-      featuredCount >= MAX_FEATURED_PHOTOS
-    ) {
+    if (tryingToAddFeatured && featuredCount >= MAX_FEATURED_PHOTOS) {
       toast.error(
         `You already have ${MAX_FEATURED_PHOTOS} featured photos. Remove one first.`,
       );
@@ -272,10 +247,7 @@ const AdminPhotosManagement = () => {
     } catch (error) {
       console.error("Update photo error:", error);
 
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to update photo.",
-      );
+      toast.error(error.response?.data?.message || "Failed to update photo.");
     } finally {
       setSaving(false);
     }
@@ -304,9 +276,7 @@ const AdminPhotosManagement = () => {
             photographer: photo.photographer || "",
             location: photo.location || "",
 
-            tags: Array.isArray(photo.tags)
-              ? photo.tags
-              : [],
+            tags: Array.isArray(photo.tags) ? photo.tags : [],
 
             featured: false,
 
@@ -319,18 +289,12 @@ const AdminPhotosManagement = () => {
 
         await fetchPhotos(currentPage);
 
-        toast.success(
-          "Removed from Featured Gallery.",
-        );
+        toast.success("Removed from Featured Gallery.");
       } catch (error) {
-        console.error(
-          "Remove featured error:",
-          error,
-        );
+        console.error("Remove featured error:", error);
 
         toast.error(
-          error.response?.data?.message ||
-            "Failed to remove featured photo.",
+          error.response?.data?.message || "Failed to remove featured photo.",
         );
       }
 
@@ -364,9 +328,7 @@ const AdminPhotosManagement = () => {
           photographer: photo.photographer || "",
           location: photo.location || "",
 
-          tags: Array.isArray(photo.tags)
-            ? photo.tags
-            : [],
+          tags: Array.isArray(photo.tags) ? photo.tags : [],
 
           featured: true,
 
@@ -379,18 +341,12 @@ const AdminPhotosManagement = () => {
 
       await fetchPhotos(currentPage);
 
-      toast.success(
-        "Added to Featured Gallery.",
-      );
+      toast.success("Added to Featured Gallery.");
     } catch (error) {
-      console.error(
-        "Add featured error:",
-        error,
-      );
+      console.error("Add featured error:", error);
 
       toast.error(
-        error.response?.data?.message ||
-          "Failed to add featured photo.",
+        error.response?.data?.message || "Failed to add featured photo.",
       );
     }
   };
@@ -401,31 +357,61 @@ const AdminPhotosManagement = () => {
 
   return (
     <div className="space-y-6">
-
       {/* =====================================================
           HEADER
       ===================================================== */}
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* ====================================
+                          MAIN GALLERY PHOTOS
+                    ================================= */}
+        <section className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
+          <div>
+            <h2 className="font-playfair text-2xl font-semibold">
+              Gallery Photos
+            </h2>
 
-        <div>
-          <h2 className="font-playfair text-2xl font-semibold">
-            Photos Management
-          </h2>
+            <p className="mt-1 text-sm text-base-content/70">
+              Add, edit, delete and manage Rup Darpon gallery photos.
+            </p>
+          </div>
 
-          <p className="mt-1 text-sm text-base-content/70">
-            Add, edit, delete and manage your gallery photos.
-          </p>
-        </div>
+          <div>
+            <Link
+              to="add-photos"
+              className="btn btn-primary text-primary-content"
+            >
+              <Plus className="h-4 w-4" />
+              Add Gallery Photo
+            </Link>
+          </div>
+        </section>
 
-        <Link
-          to="add-photos"
-          className="btn btn-primary text-primary-content"
-        >
-          <Plus className="h-4 w-4" />
-          Add Photo
-        </Link>
-      </section>
+        {/* ========================
+      HERO BANNER IMAGES
+  ============================= */}
+        <section className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
+          <div>
+            <h2 className="font-playfair text-2xl font-semibold">
+              Hero Banner Images
+            </h2>
+
+            <p className="mt-1 text-sm text-base-content/70">
+              Add and manage images used in the Rup Darpon homepage hero banner.
+            </p>
+          </div>
+
+          <div>
+            <Link
+              to="add-hero-photos"
+              className="btn btn-primary text-primary-content"
+            >
+              <Plus className="h-4 w-4" />
+              Add Hero Image
+            </Link>
+          </div>
+        </section>
+      </div>
 
       {/* =====================================================
           FEATURED GALLERY STATUS
@@ -439,23 +425,18 @@ const AdminPhotosManagement = () => {
         }`}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
           <div className="flex items-center gap-3">
-
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
               <Star className="h-5 w-5 text-primary" />
             </div>
 
             <div>
-              <h3 className="font-semibold">
-                Featured Gallery
-              </h3>
+              <h3 className="font-semibold">Featured Gallery</h3>
 
               <p className="text-sm text-base-content/60">
                 Select exactly 8 photos for your landing page.
               </p>
             </div>
-
           </div>
 
           {/* GLOBAL COUNT */}
@@ -468,7 +449,6 @@ const AdminPhotosManagement = () => {
           >
             {featuredCount} / {MAX_FEATURED_PHOTOS} Selected
           </div>
-
         </div>
 
         {/* =================================================
@@ -476,7 +456,6 @@ const AdminPhotosManagement = () => {
         ================================================= */}
 
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-base-300">
-
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               featuredCount === MAX_FEATURED_PHOTOS
@@ -484,16 +463,12 @@ const AdminPhotosManagement = () => {
                 : "bg-primary"
             }`}
             style={{
-              width: `${
-                Math.min(
-                  (featuredCount / MAX_FEATURED_PHOTOS) *
-                    100,
-                  100,
-                )
-              }%`,
+              width: `${Math.min(
+                (featuredCount / MAX_FEATURED_PHOTOS) * 100,
+                100,
+              )}%`,
             }}
           />
-
         </div>
 
         {/* =================================================
@@ -502,17 +477,14 @@ const AdminPhotosManagement = () => {
 
         {featuredCount === MAX_FEATURED_PHOTOS ? (
           <p className="mt-3 text-sm font-medium text-success">
-            ✓ 8 featured photos selected. You can remove
-            any photo and select another one.
+            ✓ 8 featured photos selected. You can remove any photo and select
+            another one.
           </p>
         ) : (
           <p className="mt-3 text-sm text-base-content/60">
-            {MAX_FEATURED_PHOTOS - featuredCount} more
-            photo
-            {MAX_FEATURED_PHOTOS - featuredCount !== 1
-              ? "s"
-              : ""}{" "}
-            can be selected.
+            {MAX_FEATURED_PHOTOS - featuredCount} more photo
+            {MAX_FEATURED_PHOTOS - featuredCount !== 1 ? "s" : ""} can be
+            selected.
           </p>
         )}
       </section>
@@ -522,9 +494,7 @@ const AdminPhotosManagement = () => {
       ===================================================== */}
 
       <section className="rounded-2xl border border-primary/10 bg-base-100 p-4 shadow-sm sm:p-6">
-
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
           <label className="input input-bordered flex w-full max-w-md items-center gap-2">
             <Search className="h-4 w-4 text-base-content/60" />
 
@@ -533,16 +503,13 @@ const AdminPhotosManagement = () => {
               className="grow"
               placeholder="Search title, category, photographer..."
               value={searchQuery}
-              onChange={(event) =>
-                setSearchQuery(event.target.value)
-              }
+              onChange={(event) => setSearchQuery(event.target.value)}
             />
           </label>
 
           <p className="text-sm text-base-content/70">
             {filteredPhotos.length} photo(s) found
           </p>
-
         </div>
 
         {/* ===================================================
@@ -562,11 +529,8 @@ const AdminPhotosManagement = () => {
             No photos matched your search.
           </p>
         ) : (
-
           <div className="overflow-x-auto">
-
             <table className="table">
-
               <thead>
                 <tr>
                   <th>Photo</th>
@@ -574,28 +538,20 @@ const AdminPhotosManagement = () => {
                   <th>Category</th>
                   <th>Featured</th>
                   <th>Published</th>
-                  <th className="text-right">
-                    Actions
-                  </th>
+                  <th className="text-right">Actions</th>
                 </tr>
               </thead>
 
               <tbody>
-
                 {filteredPhotos.map((photo) => {
-
-                  const isFeatured =
-                    Boolean(photo.featured);
+                  const isFeatured = Boolean(photo.featured);
 
                   // GLOBAL count ব্যবহার হচ্ছে
                   const cannotFeature =
-                    !isFeatured &&
-                    featuredCount >=
-                      MAX_FEATURED_PHOTOS;
+                    !isFeatured && featuredCount >= MAX_FEATURED_PHOTOS;
 
                   return (
                     <tr key={photo._id}>
-
                       {/* PHOTO */}
 
                       <td>
@@ -614,9 +570,7 @@ const AdminPhotosManagement = () => {
 
                       <td>
                         <div className="max-w-[220px]">
-                          <p className="truncate font-medium">
-                            {photo.title}
-                          </p>
+                          <p className="truncate font-medium">{photo.title}</p>
                         </div>
                       </td>
 
@@ -631,23 +585,14 @@ const AdminPhotosManagement = () => {
                       {/* FEATURED */}
 
                       <td>
-
                         <button
                           type="button"
-                          onClick={() =>
-                            handleFeaturedToggle(
-                              photo,
-                            )
-                          }
+                          onClick={() => handleFeaturedToggle(photo)}
                           disabled={cannotFeature}
                           className={`btn btn-sm gap-1 ${
-                            isFeatured
-                              ? "btn-primary"
-                              : "btn-outline"
+                            isFeatured ? "btn-primary" : "btn-outline"
                           } ${
-                            cannotFeature
-                              ? "cursor-not-allowed opacity-40"
-                              : ""
+                            cannotFeature ? "cursor-not-allowed opacity-40" : ""
                           }`}
                           title={
                             isFeatured
@@ -657,7 +602,6 @@ const AdminPhotosManagement = () => {
                                 : "Add to Featured Gallery"
                           }
                         >
-
                           {isFeatured ? (
                             <>
                               <Check className="h-4 w-4" />
@@ -669,15 +613,12 @@ const AdminPhotosManagement = () => {
                               Set Featured
                             </>
                           )}
-
                         </button>
-
                       </td>
 
                       {/* PUBLISHED */}
 
                       <td>
-
                         <span
                           className={`badge ${
                             photo.isPublished
@@ -685,25 +626,18 @@ const AdminPhotosManagement = () => {
                               : "badge-warning"
                           }`}
                         >
-                          {photo.isPublished
-                            ? "Published"
-                            : "Draft"}
+                          {photo.isPublished ? "Published" : "Draft"}
                         </span>
-
                       </td>
 
                       {/* ACTIONS */}
 
                       <td>
-
                         <div className="flex justify-end gap-2">
-
                           <button
                             type="button"
                             className="btn btn-sm btn-outline"
-                            onClick={() =>
-                              openEditModal(photo)
-                            }
+                            onClick={() => openEditModal(photo)}
                           >
                             <Pencil className="h-4 w-4" />
                             Edit
@@ -712,34 +646,21 @@ const AdminPhotosManagement = () => {
                           <button
                             type="button"
                             className="btn btn-sm btn-error btn-outline"
-                            onClick={() =>
-                              handleDelete(
-                                photo._id,
-                              )
-                            }
-                            disabled={
-                              deletingId ===
-                              photo._id
-                            }
+                            onClick={() => handleDelete(photo._id)}
+                            disabled={deletingId === photo._id}
                           >
                             <Trash2 className="h-4 w-4" />
 
-                            {deletingId ===
-                            photo._id
+                            {deletingId === photo._id
                               ? "Deleting..."
                               : "Delete"}
                           </button>
-
                         </div>
-
                       </td>
-
                     </tr>
                   );
                 })}
-
               </tbody>
-
             </table>
 
             {/* =================================================
@@ -748,14 +669,11 @@ const AdminPhotosManagement = () => {
 
             {totalPages > 1 && (
               <div className="mt-5 flex justify-center gap-2">
-
                 <button
                   type="button"
                   className="btn btn-sm"
                   onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.max(prev - 1, 1),
-                    )
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1}
                 >
@@ -763,31 +681,21 @@ const AdminPhotosManagement = () => {
                 </button>
 
                 <span className="btn btn-sm btn-disabled">
-                  Page {currentPage} of{" "}
-                  {totalPages}
+                  Page {currentPage} of {totalPages}
                 </span>
 
                 <button
                   type="button"
                   className="btn btn-sm"
                   onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(
-                        prev + 1,
-                        totalPages,
-                      ),
-                    )
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
-                  disabled={
-                    currentPage === totalPages
-                  }
+                  disabled={currentPage === totalPages}
                 >
                   Next
                 </button>
-
               </div>
             )}
-
           </div>
         )}
       </section>
@@ -798,11 +706,8 @@ const AdminPhotosManagement = () => {
 
       {editingPhoto && (
         <dialog className="modal modal-open">
-
           <div className="modal-box max-w-2xl">
-
             <div className="flex items-center justify-between">
-
               <div>
                 <h3 className="font-playfair text-2xl font-semibold">
                   Edit Photo
@@ -821,20 +726,13 @@ const AdminPhotosManagement = () => {
               >
                 <X className="h-5 w-5" />
               </button>
-
             </div>
 
-            <form
-              onSubmit={handleUpdate}
-              className="mt-5 space-y-4"
-            >
-
+            <form onSubmit={handleUpdate} className="mt-5 space-y-4">
               {/* TITLE */}
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Title
-                </span>
+                <span className="label-text mb-1 font-medium">Title</span>
 
                 <input
                   type="text"
@@ -853,9 +751,7 @@ const AdminPhotosManagement = () => {
               {/* IMAGE */}
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Image URL
-                </span>
+                <span className="label-text mb-1 font-medium">Image URL</span>
 
                 <input
                   type="url"
@@ -874,11 +770,8 @@ const AdminPhotosManagement = () => {
               {/* CATEGORY + TAGS */}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 font-medium">
-                    Category
-                  </span>
+                  <span className="label-text mb-1 font-medium">Category</span>
 
                   <input
                     type="text"
@@ -887,8 +780,7 @@ const AdminPhotosManagement = () => {
                     onChange={(event) =>
                       setFormData((prev) => ({
                         ...prev,
-                        category:
-                          event.target.value,
+                        category: event.target.value,
                       }))
                     }
                   />
@@ -911,13 +803,11 @@ const AdminPhotosManagement = () => {
                     }
                   />
                 </label>
-
               </div>
 
               {/* PHOTOGRAPHER + LOCATION */}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
                 <label className="form-control w-full">
                   <span className="label-text mb-1 font-medium">
                     Photographer
@@ -930,17 +820,14 @@ const AdminPhotosManagement = () => {
                     onChange={(event) =>
                       setFormData((prev) => ({
                         ...prev,
-                        photographer:
-                          event.target.value,
+                        photographer: event.target.value,
                       }))
                     }
                   />
                 </label>
 
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 font-medium">
-                    Location
-                  </span>
+                  <span className="label-text mb-1 font-medium">Location</span>
 
                   <input
                     type="text"
@@ -949,21 +836,17 @@ const AdminPhotosManagement = () => {
                     onChange={(event) =>
                       setFormData((prev) => ({
                         ...prev,
-                        location:
-                          event.target.value,
+                        location: event.target.value,
                       }))
                     }
                   />
                 </label>
-
               </div>
 
               {/* DESCRIPTION */}
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Description
-                </span>
+                <span className="label-text mb-1 font-medium">Description</span>
 
                 <textarea
                   className="textarea textarea-bordered h-24 w-full"
@@ -971,8 +854,7 @@ const AdminPhotosManagement = () => {
                   onChange={(event) =>
                     setFormData((prev) => ({
                       ...prev,
-                      description:
-                        event.target.value,
+                      description: event.target.value,
                     }))
                   }
                 />
@@ -981,83 +863,62 @@ const AdminPhotosManagement = () => {
               {/* FEATURED + PUBLISHED */}
 
               <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
-
                 <div className="flex flex-wrap gap-5">
-
                   {/* FEATURED */}
 
                   <label className="label cursor-pointer gap-3">
-
                     <input
                       type="checkbox"
                       className="toggle toggle-primary"
                       checked={formData.featured}
                       disabled={
                         !formData.featured &&
-                        featuredCount >=
-                          MAX_FEATURED_PHOTOS
+                        featuredCount >= MAX_FEATURED_PHOTOS
                       }
                       onChange={(event) =>
                         setFormData((prev) => ({
                           ...prev,
-                          featured:
-                            event.target.checked,
+                          featured: event.target.checked,
                         }))
                       }
                     />
 
-                    <span className="label-text font-medium">
-                      Featured
-                    </span>
-
+                    <span className="label-text font-medium">Featured</span>
                   </label>
 
                   {/* PUBLISHED */}
 
                   <label className="label cursor-pointer gap-3">
-
                     <input
                       type="checkbox"
                       className="toggle toggle-success"
-                      checked={
-                        formData.isPublished
-                      }
+                      checked={formData.isPublished}
                       onChange={(event) =>
                         setFormData((prev) => ({
                           ...prev,
-                          isPublished:
-                            event.target.checked,
+                          isPublished: event.target.checked,
                         }))
                       }
                     />
 
-                    <span className="label-text font-medium">
-                      Published
-                    </span>
-
+                    <span className="label-text font-medium">Published</span>
                   </label>
-
                 </div>
 
                 {/* FEATURED INFO */}
 
                 <p className="mt-3 text-xs text-base-content/55">
-
                   {formData.featured
                     ? "This photo will appear in the Featured Gallery."
-                    : featuredCount >=
-                        MAX_FEATURED_PHOTOS
+                    : featuredCount >= MAX_FEATURED_PHOTOS
                       ? "Maximum 8 featured photos already selected. Remove one first to select this photo."
                       : "You can select this photo for the Featured Gallery."}
-
                 </p>
-
               </div>
 
               {/* ACTIONS */}
 
               <div className="modal-action">
-
                 <button
                   type="button"
                   className="btn"
@@ -1072,15 +933,10 @@ const AdminPhotosManagement = () => {
                   className="btn btn-primary text-primary-content"
                   disabled={saving}
                 >
-                  {saving
-                    ? "Saving..."
-                    : "Update Photo"}
+                  {saving ? "Saving..." : "Update Photo"}
                 </button>
-
               </div>
-
             </form>
-
           </div>
 
           <button
@@ -1090,10 +946,8 @@ const AdminPhotosManagement = () => {
           >
             Close
           </button>
-
         </dialog>
       )}
-
     </div>
   );
 };
