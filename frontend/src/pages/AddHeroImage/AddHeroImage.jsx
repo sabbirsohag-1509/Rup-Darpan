@@ -11,6 +11,7 @@ import {
   Save,
   RotateCcw,
   Eye,
+  ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -30,15 +31,18 @@ const AddHeroImage = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
+      title: "",
       image: "",
+      publicId: "",
       altText: "Rup Darpon Photography",
-      order: 0,
+      displayOrder: 1,
       isActive: true,
     },
   });
 
+  const watchTitle = watch("title");
   const watchAltText = watch("altText");
-  const watchOrder = watch("order");
+  const watchDisplayOrder = watch("displayOrder");
   const watchIsActive = watch("isActive");
 
   // =========================================================
@@ -89,16 +93,22 @@ const AddHeroImage = () => {
 
       const response = await axios.post(
         "https://api.cloudinary.com/v1_1/dgshzmhyk/image/upload",
-        formData
+        formData,
       );
 
       const imageUrl = response.data.secure_url;
+      const publicId = response.data.public_id;
 
       // -------------------------------------------------------
-      // Save Cloudinary URL to React Hook Form
+      // Save Cloudinary data to React Hook Form
       // -------------------------------------------------------
 
       setValue("image", imageUrl, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+
+      setValue("publicId", publicId, {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -109,14 +119,21 @@ const AddHeroImage = () => {
 
       setPreviewImage(imageUrl);
 
-      toast.success("Hero image uploaded successfully!", {
+      toast.success("Cloudinary uploaded!", {
         icon: "📸",
       });
     } catch (error) {
       console.error("Cloudinary upload error:", error);
 
       setPreviewImage("");
-      setValue("image", "");
+
+      setValue("image", "", {
+        shouldValidate: true,
+      });
+
+      setValue("publicId", "", {
+        shouldValidate: true,
+      });
 
       toast.error("Failed to upload image to Cloudinary.");
     } finally {
@@ -130,7 +147,13 @@ const AddHeroImage = () => {
 
   const handleRemoveImage = () => {
     setPreviewImage("");
+
     setValue("image", "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    setValue("publicId", "", {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -149,44 +172,57 @@ const AddHeroImage = () => {
     setLoading(true);
 
     try {
+      // -------------------------------------------------------
+      // Backend payload
+      // -------------------------------------------------------
+
       const heroData = {
-        image: data.image,
-        altText: data.altText,
-        order: Number(data.order || 0),
-        isActive: data.isActive,
-        createdAt: new Date(),
+        title: data.title?.trim() || "",
+        image: data.image.trim(),
+        publicId: data.publicId?.trim() || "",
+        altText:
+          data.altText?.trim() || data.title?.trim() || "Rup Darpon Hero Image",
+        displayOrder: Number(data.displayOrder) || 1,
+        isActive: data.isActive !== false,
       };
 
-      // -------------------------------------------------------
-      // Save Cloudinary URL + metadata to MongoDB
-      // -------------------------------------------------------
+      console.log("Hero Data:", heroData);
 
+      // -------------------------------------------------------
+      // POST HERO IMAGE
       const response = await axios.post(
         "http://localhost:5000/hero-images",
         heroData,
         {
           withCredentials: true,
-        }
+        },
       );
 
-      if (response.data.insertedId) {
+      if (response.data?.success && response.data?.insertedId) {
         toast.success("Hero image added successfully!", {
           icon: "✨",
         });
 
-        reset();
+        reset({
+          title: "",
+          image: "",
+          publicId: "",
+          altText: "Rup Darpon Photography",
+          displayOrder: 1,
+          isActive: true,
+        });
+
         setPreviewImage("");
 
-        navigate("/admin/photos");
+        navigate("/admin/hero-images");
       } else {
-        toast.error("Hero image could not be added.");
+        toast.error(response.data?.message || "Hero image could not be added.");
       }
     } catch (error) {
       console.error("Hero image save error:", error);
 
       toast.error(
-        error?.response?.data?.message ||
-          "Failed to save hero image."
+        error?.response?.data?.message || "Failed to save hero image.",
       );
     } finally {
       setLoading(false);
@@ -198,7 +234,15 @@ const AddHeroImage = () => {
   // =========================================================
 
   const handleReset = () => {
-    reset();
+    reset({
+      title: "",
+      image: "",
+      publicId: "",
+      altText: "Rup Darpon Photography",
+      displayOrder: 1,
+      isActive: true,
+    });
+
     setPreviewImage("");
 
     toast.success("Form reset.");
@@ -206,14 +250,27 @@ const AddHeroImage = () => {
 
   return (
     <div className="mx-auto max-w-7xl py-6 sm:py-10">
-
       {/* =====================================================
           PAGE HEADER
       ===================================================== */}
 
       <div className="mb-8 text-center sm:text-left">
+        
+      <div>
+        {/* back to previous btn  */}
+        <button
+          type="button"
+          onClick={() => navigate("/admin/hero-images")}
+          className="group inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-all duration-200 hover:border-primary/40 hover:bg-primary/10 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 mb-4"
+        >
+          <ArrowLeft
+            className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
+            aria-hidden="true"
+          />
+          Back to Previous
+        </button>
+      </div>
         <div className="flex items-center justify-center gap-2 sm:justify-start">
-
           <h1 className="font-playfair text-3xl font-semibold text-primary sm:text-4xl lg:text-5xl">
             Add Hero Image
           </h1>
@@ -234,10 +291,41 @@ const AddHeroImage = () => {
         =================================================== */}
 
         <div className="rounded-2xl border border-primary/10 bg-base-200/50 p-5 shadow-xl backdrop-blur-sm sm:p-8 lg:col-span-7">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* =================================================
+                TITLE
+            ================================================= */}
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text font-semibold">
+                  Hero Image Title
+                </span>
+              </label>
+
+              <input
+                type="text"
+                placeholder="e.g. Wedding Photography"
+                className={`input input-bordered w-full border-primary/20 focus:border-primary focus:outline-none ${
+                  errors.title ? "border-error" : ""
+                }`}
+                {...register("title", {
+                  maxLength: {
+                    value: 150,
+                    message: "Title cannot exceed 150 characters",
+                  },
+                })}
+              />
+
+              {errors.title && (
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {errors.title.message}
+                  </span>
+                </label>
+              )}
+            </div>
+
             {/* =================================================
                 IMAGE UPLOAD
             ================================================= */}
@@ -246,12 +334,9 @@ const AddHeroImage = () => {
               <label className="label">
                 <span className="flex items-center gap-1.5 font-semibold">
                   Hero Image
-
                   <span className="text-error">*</span>
                 </span>
               </label>
-
-              {/* Upload Area */}
 
               {!previewImage ? (
                 <div
@@ -261,9 +346,7 @@ const AddHeroImage = () => {
                       : "border-primary/20 hover:border-primary/50 hover:bg-base-200"
                   }`}
                   onClick={() =>
-                    document
-                      .getElementById("hero-image-upload")
-                      ?.click()
+                    document.getElementById("hero-image-upload")?.click()
                   }
                 >
                   <input
@@ -296,7 +379,7 @@ const AddHeroImage = () => {
                     className="aspect-video w-full object-cover"
                   />
 
-                  {/* Remove button */}
+                  {/* Remove */}
 
                   <button
                     type="button"
@@ -308,7 +391,7 @@ const AddHeroImage = () => {
                     <X className="h-4 w-4" />
                   </button>
 
-                  {/* Uploading overlay */}
+                  {/* Uploading */}
 
                   {isUploading && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white backdrop-blur-sm">
@@ -322,7 +405,7 @@ const AddHeroImage = () => {
                 </div>
               )}
 
-              {/* Hidden React Hook Form field */}
+              {/* Hidden image field */}
 
               <input
                 type="hidden"
@@ -330,6 +413,10 @@ const AddHeroImage = () => {
                   required: "Hero image is required",
                 })}
               />
+
+              {/* Hidden publicId field */}
+
+              <input type="hidden" {...register("publicId")} />
 
               {errors.image && (
                 <label className="label">
@@ -346,9 +433,7 @@ const AddHeroImage = () => {
 
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text font-semibold">
-                  Image Alt Text
-                </span>
+                <span className="label-text font-semibold">Image Alt Text</span>
               </label>
 
               <input
@@ -380,25 +465,26 @@ const AddHeroImage = () => {
             </div>
 
             {/* =================================================
-                ORDER
+                DISPLAY ORDER
             ================================================= */}
 
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text font-semibold">
-                  Display Order
-                </span>
+                <span className="label-text font-semibold">Display Order</span>
               </label>
 
               <input
                 type="number"
-                min="0"
-                placeholder="0"
-                className="input input-bordered w-full border-primary/20 focus:border-primary focus:outline-none"
-                {...register("order", {
+                min="1"
+                placeholder="1"
+                className={`input input-bordered w-full border-primary/20 focus:border-primary focus:outline-none ${
+                  errors.displayOrder ? "border-error" : ""
+                }`}
+                {...register("displayOrder", {
+                  valueAsNumber: true,
                   min: {
-                    value: 0,
-                    message: "Order cannot be negative",
+                    value: 1,
+                    message: "Display order must be at least 1",
                   },
                 })}
               />
@@ -409,10 +495,10 @@ const AddHeroImage = () => {
                 </span>
               </label>
 
-              {errors.order && (
+              {errors.displayOrder && (
                 <label className="label">
                   <span className="label-text-alt text-error">
-                    {errors.order.message}
+                    {errors.displayOrder.message}
                   </span>
                 </label>
               )}
@@ -427,7 +513,6 @@ const AddHeroImage = () => {
                 <div>
                   <span className="flex items-center gap-2 font-semibold">
                     <Eye className="h-4 w-4 text-primary" />
-
                     Active Hero Image
                   </span>
 
@@ -443,6 +528,7 @@ const AddHeroImage = () => {
                 />
               </label>
             </div>
+
             {/* =================================================
                 BUTTONS
             ================================================= */}
@@ -455,7 +541,6 @@ const AddHeroImage = () => {
                 className="btn btn-outline btn-secondary flex-1 rounded-full font-semibold"
               >
                 <RotateCcw className="h-4 w-4" />
-
                 Reset
               </button>
 
@@ -467,19 +552,16 @@ const AddHeroImage = () => {
                 {loading ? (
                   <>
                     <span className="loading loading-spinner loading-sm" />
-
                     Saving Hero Image...
                   </>
                 ) : isUploading ? (
                   <>
                     <span className="loading loading-spinner loading-sm" />
-
                     Uploading...
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4" />
-
                     Add Hero Image
                   </>
                 )}
@@ -496,7 +578,6 @@ const AddHeroImage = () => {
           <div className="rounded-2xl border border-primary/10 bg-base-200/50 p-6 shadow-xl backdrop-blur-sm">
             <h3 className="mb-4 flex items-center gap-2 font-playfair text-xl font-semibold text-primary">
               <ImageIcon className="h-5 w-5" />
-
               Hero Image Preview
             </h3>
 
@@ -516,14 +597,22 @@ const AddHeroImage = () => {
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
+                    {/* Title */}
+
+                    {watchTitle && (
+                      <div className="absolute bottom-10 left-4 right-4">
+                        <p className="font-playfair text-xl font-semibold text-white">
+                          {watchTitle}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Active badge */}
 
                     <div className="absolute left-3 top-3">
                       <span
                         className={`badge gap-1 border-0 py-3 text-xs font-semibold text-white ${
-                          watchIsActive
-                            ? "bg-success/80"
-                            : "bg-error/80"
+                          watchIsActive ? "bg-success/80" : "bg-error/80"
                         }`}
                       >
                         <span className="h-1.5 w-1.5 rounded-full bg-white" />
@@ -536,7 +625,7 @@ const AddHeroImage = () => {
 
                     <div className="absolute right-3 top-3">
                       <span className="badge border-0 bg-black/60 py-3 text-xs text-white backdrop-blur-md">
-                        Order: {watchOrder || 0}
+                        Order: {watchDisplayOrder || 1}
                       </span>
                     </div>
 
@@ -579,9 +668,7 @@ const AddHeroImage = () => {
                 <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold">
                   <CheckCircle2
                     className={`h-4 w-4 ${
-                      watchIsActive
-                        ? "text-success"
-                        : "text-base-content/30"
+                      watchIsActive ? "text-success" : "text-base-content/30"
                     }`}
                   />
 
@@ -595,7 +682,7 @@ const AddHeroImage = () => {
                 </p>
 
                 <p className="mt-1 text-sm font-semibold">
-                  #{watchOrder || 0}
+                  #{watchDisplayOrder || 1}
                 </p>
               </div>
             </div>
