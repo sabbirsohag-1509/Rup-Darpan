@@ -256,7 +256,7 @@ async function run() {
           message: "Internal Server Error",
         });
       }
-    });
+    });   
 
     //My Profile - GET
     app.get("/users/me", verifyToken, async (req, res) => {
@@ -1853,7 +1853,7 @@ async function run() {
         });
       }
     });
-    //Apporeve review - Admin only
+    //Approve review - Admin only
     app.patch(
       "/admin/reviews/:id/approve",
       verifyToken,
