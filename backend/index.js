@@ -1278,7 +1278,7 @@ async function run() {
     });
     ////////////////////////   HERO IMAGE RELATED API ///////////////////////////////////////
     // POST
-    app.post("/hero-images", async (req, res) => {
+    app.post("/hero-images", verifyToken, verifyAdmin, async (req, res) => {
       try {
         const { title, image, publicId, altText, displayOrder, isActive } =
           req.body;
@@ -1349,7 +1349,7 @@ async function run() {
       }
     });
     //PUT
-    app.put("/hero-images/:id", async (req, res) => {
+    app.put("/hero-images/:id", verifyToken, verifyAdmin, async (req, res) => {
       try {
         const { id } = req.params;
 
@@ -1403,7 +1403,7 @@ async function run() {
       }
     });
     //DELETE
-    app.delete("/hero-images/:id", async (req, res) => {
+    app.delete("/hero-images/:id", verifyToken, verifyAdmin, async (req, res) => {
       try {
         const { id } = req.params;
 
