@@ -3,25 +3,27 @@ import { Navigate, useLocation } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
 import Loader from "../../components/shared/Loader";
 
-const AdminRouter = ({ children }) => {
+const UserRouter = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
+  // Auth checking
   if (loading) {
-    return (
-      <Loader></Loader>
-    );
+    return <Loader />;
   }
 
+  // Not logged in
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (user.role !== "admin") {
-    return <Navigate to="/dashboard" replace />;
+  // Admin trying to access user dashboard
+  if (user.role === "admin") {
+    return <Navigate to="/admin" replace />;
   }
 
+  // Normal user
   return children;
 };
 
-export default AdminRouter;
+export default UserRouter;

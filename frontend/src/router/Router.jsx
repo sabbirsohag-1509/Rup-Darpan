@@ -33,6 +33,7 @@ import GalleryPhotos from "../components/Gallery/GalleryPhotos/GalleryPhotos";
 import GalleryVideos from "../components/Gallery/GalleryVideos/GalleryVideos";
 import AddHeroImage from "../pages/AddHeroImage/AddHeroImage";
 import AdminHeroImageManagement from "../pages/Dashboard/AdminHeroImageManagement/AdminHeroImageManagement";
+import UserRouter from "./UserRouter/UserRouter";
 
 export const router = createBrowserRouter([
   {
@@ -100,7 +101,9 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     element: (
       <PrivateRoute>
-        <DashboardLayout />
+        <UserRouter>
+          <DashboardLayout />
+        </UserRouter>
       </PrivateRoute>
     ),
     children: [
@@ -184,11 +187,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminHeroImageManagement></AdminHeroImageManagement>
+            element: <AdminHeroImageManagement></AdminHeroImageManagement>,
           },
           {
             path: "add-hero-photos",
-            element: <AddHeroImage></AddHeroImage>
+            element: <AddHeroImage></AddHeroImage>,
           },
         ],
       },
