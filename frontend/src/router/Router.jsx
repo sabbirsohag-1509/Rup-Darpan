@@ -1,41 +1,56 @@
 import { createBrowserRouter } from "react-router";
+
 import RootLayout from "../layout/RootLayout";
-import Home from "../pages/Home/Home/Home";
-import AddPhoto from "../pages/AddPhoto/AddPhoto";
 import AuthLayout from "../layout/AuthLayout";
-import Login from "../pages/Authentication/Login";
-import Register from "../pages/Authentication/Register";
-import PrivateRoute from "../pages/Authentication/PrivateRoute";
-import Dashboard from "../pages/Dashboard/Dashboard";
 import DashboardLayout from "../layout/DashboardLayout";
-import DashboardPlaceholderPage from "../pages/Dashboard/DashboardPlaceholderPage";
-import AdminRouter from "./AdminRouter/AdminRouter";
-import AdminPhotosManagement from "../pages/Dashboard/AdminPhotosManagement";
-import AdminUsersManagement from "../pages/Dashboard/AdminUsersManagement";
-import AdminPackageManagement from "../pages/Dashboard/AdminPackageManagement";
-import AddPackage from "../pages/AddPackage/AddPackage";
-import ErrorPage from "../components/ErrorPage/ErrorPage";
+
+import Home from "../pages/Home/Home/Home";
 import Gallery from "../components/Gallery/Gallery";
+import GalleryPhotos from "../components/Gallery/GalleryPhotos/GalleryPhotos";
+import GalleryVideos from "../components/Gallery/GalleryVideos/GalleryVideos";
 import About from "../components/About/About";
 import Contact from "../components/Contact/Contact";
 import Packages from "../components/Packages/Packages";
 import PackagesDetails from "../components/Packages/PackagesDetails";
 import Booking from "../components/Booking/Booking";
+
+import Login from "../pages/Authentication/Login";
+import Register from "../pages/Authentication/Register";
+import PrivateRoute from "../pages/Authentication/PrivateRoute";
+
+import UserRouter from "./UserRouter/UserRouter";
+import AdminRouter from "./AdminRouter/AdminRouter";
+
+import Dashboard from "../pages/Dashboard/Dashboard";
+import AdminDashboard from "../pages/Dashboard/AdminDashboard";
+import DashboardPlaceholderPage from "../pages/Dashboard/DashboardPlaceholderPage";
+
 import MyBookings from "../components/Booking/MyBookings/MyBookings";
-import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
-import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
 import MyReview from "../components/Review/MyReview";
+
 import UserProfile from "../pages/Dashboard/MyProfile/UserProfile";
 import AdminProfile from "../pages/Dashboard/MyProfile/AdminProfile";
+
+import AdminBookingManagement from "../pages/Dashboard/AdminBookingManagement";
+import AdminPhotosManagement from "../pages/Dashboard/AdminPhotosManagement";
 import AdminVideosManagement from "../pages/Dashboard/AdminVideosManagement";
+import AdminUsersManagement from "../pages/Dashboard/AdminUsersManagement";
+import AdminPackageManagement from "../pages/Dashboard/AdminPackageManagement";
+import AdminReviewManagement from "../pages/Dashboard/AdminReviewManagement";
+
+import AddPhoto from "../pages/AddPhoto/AddPhoto";
 import AddVideo from "../pages/AddVideo/AddVideo";
-import GalleryPhotos from "../components/Gallery/GalleryPhotos/GalleryPhotos";
-import GalleryVideos from "../components/Gallery/GalleryVideos/GalleryVideos";
+import AddPackage from "../pages/AddPackage/AddPackage";
 import AddHeroImage from "../pages/AddHeroImage/AddHeroImage";
+
 import AdminHeroImageManagement from "../pages/Dashboard/AdminHeroImageManagement/AdminHeroImageManagement";
-import UserRouter from "./UserRouter/UserRouter";
+
+import ErrorPage from "../components/ErrorPage/ErrorPage";
 
 export const router = createBrowserRouter([
+  // =====================================================
+  // PUBLIC ROUTES
+  // =====================================================
   {
     path: "/",
     element: <RootLayout />,
@@ -46,43 +61,54 @@ export const router = createBrowserRouter([
       },
 
       {
-        path: "/gallery",
+        path: "gallery",
         element: <Gallery />,
       },
+
       {
-        path: "/gallery/photos",
+        path: "gallery/photos",
         element: <GalleryPhotos />,
       },
+
       {
-        path: "/gallery/videos",
+        path: "gallery/videos",
         element: <GalleryVideos />,
       },
+
       {
-        path: "/about",
+        path: "about",
         element: <About />,
       },
+
       {
-        path: "/contact",
+        path: "contact",
         element: <Contact />,
       },
+
       {
-        path: "/packages",
-        element: <Packages></Packages>,
+        path: "packages",
+        element: <Packages />,
       },
+
       {
-        path: "/packages/:id",
-        element: <PackagesDetails></PackagesDetails>,
+        path: "packages/:id",
+        element: <PackagesDetails />,
       },
+
       {
-        path: "/booking",
+        path: "booking",
         element: (
           <PrivateRoute>
-            <Booking></Booking>
+            <Booking />
           </PrivateRoute>
         ),
       },
     ],
   },
+
+  // =====================================================
+  // AUTH ROUTES
+  // =====================================================
   {
     element: <AuthLayout />,
     children: [
@@ -90,13 +116,17 @@ export const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
+
       {
         path: "/register",
         element: <Register />,
       },
     ],
   },
-  //User Dashboard Routes
+
+  // =====================================================
+  // USER DASHBOARD ROUTES
+  // =====================================================
   {
     path: "/dashboard",
     element: (
@@ -125,7 +155,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <MyReview></MyReview>,
+            element: <MyReview />,
           },
         ],
       },
@@ -134,7 +164,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <UserProfile></UserProfile>,
+            element: <UserProfile />,
           },
         ],
       },
@@ -149,7 +179,10 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  //Admin Dashboard Routes
+
+  // =====================================================
+  // ADMIN DASHBOARD ROUTES
+  // =====================================================
   {
     path: "/admin",
     element: (
@@ -159,13 +192,18 @@ export const router = createBrowserRouter([
         </AdminRouter>
       </PrivateRoute>
     ),
+
     children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
       {
         path: "bookings",
         children: [
           {
             index: true,
-            element: <AdminBookingManagement></AdminBookingManagement>,
+            element: <AdminBookingManagement />,
           },
         ],
       },
@@ -187,11 +225,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminHeroImageManagement></AdminHeroImageManagement>,
+            element: <AdminHeroImageManagement />,
           },
           {
             path: "add-hero-photos",
-            element: <AddHeroImage></AddHeroImage>,
+            element: <AddHeroImage />,
           },
         ],
       },
@@ -200,11 +238,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminVideosManagement></AdminVideosManagement>,
+            element: <AdminVideosManagement />,
           },
           {
             path: "add-videos",
-            element: <AddVideo></AddVideo>,
+            element: <AddVideo />,
           },
         ],
       },
@@ -213,7 +251,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminUsersManagement></AdminUsersManagement>,
+            element: <AdminUsersManagement />,
           },
         ],
       },
@@ -222,11 +260,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminPackageManagement></AdminPackageManagement>,
+            element: <AdminPackageManagement />,
           },
           {
             path: "add-package",
-            element: <AddPackage></AddPackage>,
+            element: <AddPackage />,
           },
         ],
       },
@@ -253,7 +291,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminProfile></AdminProfile>,
+            element: <AdminProfile />,
           },
         ],
       },
@@ -270,6 +308,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <ErrorPage></ErrorPage>,
+    element: <ErrorPage />,
   },
 ]);
