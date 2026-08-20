@@ -160,42 +160,27 @@ const Footer = () => {
               Services
             </h6>
 
-            <Link
-              to="/services/wedding"
-              className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary"
-            >
+            <Link className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary">
               <ChevronRight className="h-3.5 w-3.5 text-primary opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
               Wedding Photography
             </Link>
 
-            <Link
-              to="/services/portrait"
-              className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary"
-            >
+            <Link className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary">
               <ChevronRight className="h-3.5 w-3.5 text-primary opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
               Portrait Photography
             </Link>
 
-            <Link
-              to="/services/event"
-              className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary"
-            >
+            <Link className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary">
               <ChevronRight className="h-3.5 w-3.5 text-primary opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
               Event Photography
             </Link>
 
-            <Link
-              to="/services/pre-wedding"
-              className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary"
-            >
+            <Link className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary">
               <ChevronRight className="h-3.5 w-3.5 text-primary opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
               Pre-Wedding
             </Link>
 
-            <Link
-              to="/services/outdoor"
-              className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary"
-            >
+            <Link className="group flex items-center gap-1.5 py-1.5 text-sm text-base-content/60 transition-colors hover:text-primary">
               <ChevronRight className="h-3.5 w-3.5 text-primary opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
               Outdoor Session
             </Link>
@@ -288,8 +273,12 @@ const Footer = () => {
       <div className="border-t border-base-300">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-5 text-center sm:px-8 md:flex-row md:items-center md:justify-between md:text-left lg:px-10">
           <p className="text-xs text-base-content/45 font-medium">
-            © {new Date().getFullYear()} <span className="border p-[1px] border-medium"><span className="font-bold text-red-600">RUP</span> <span className="text-base-content/65">DARPON</span></span> Photography. All rights
-            reserved.
+            © {new Date().getFullYear()}{" "}
+            <span className="border p-[1px] border-medium">
+              <span className="font-bold text-red-600">RUP</span>{" "}
+              <span className="text-base-content/65">DARPON</span>
+            </span>{" "}
+            Photography. All rights reserved.
           </p>
           {/* Developed by Sabbir Hossain Sohag */}
           <div className="flex items-center gap-4">
