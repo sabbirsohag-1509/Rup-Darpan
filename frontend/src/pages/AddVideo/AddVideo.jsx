@@ -315,12 +315,6 @@ const AddVideo = () => {
               required
             />
 
-            <label className="label">
-              <span className="label-text-alt text-base-content/50">
-                Give the video a clear and memorable title.
-              </span>
-            </label>
-
           </div>
 
           {/* =================================================
@@ -349,12 +343,6 @@ const AddVideo = () => {
                 required
               />
 
-            </label>
-
-            <label className="label">
-              <span className="label-text-alt leading-5 text-base-content/50">
-                Paste the original Facebook Reel, video, or share URL.
-              </span>
             </label>
 
           </div>

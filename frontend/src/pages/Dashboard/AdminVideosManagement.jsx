@@ -37,7 +37,6 @@ const AdminVideosManagement = () => {
   const [formData, setFormData] = useState({
     title: "",
     videoUrl: "",
-    embedUrl: "",
     category: "",
     description: "",
     featured: false,
@@ -161,7 +160,6 @@ const AdminVideosManagement = () => {
     setFormData({
       title: video.title || "",
       videoUrl: video.videoUrl || "",
-      embedUrl: video.embedUrl || "",
       category: video.category || "",
       description: video.description || "",
       featured: Boolean(video.featured),
@@ -219,8 +217,6 @@ const AdminVideosManagement = () => {
           title: formData.title.trim(),
 
           videoUrl: formData.videoUrl.trim(),
-
-          embedUrl: formData.embedUrl.trim(),
 
           category: formData.category.trim(),
 
@@ -695,36 +691,6 @@ const handleFeaturedToggle = async (video) => {
                     }))
                   }
                 />
-
-                <span className="mt-1 text-xs text-base-content/50">
-                  Original Facebook video URL.
-                </span>
-              </label>
-
-              {/* EMBED URL */}
-
-              <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Facebook Embed URL
-                </span>
-
-                <input
-                  type="url"
-                  required
-                  className="input input-bordered w-full"
-                  placeholder="https://www.facebook.com/plugins/video.php?..."
-                  value={formData.embedUrl}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      embedUrl: event.target.value,
-                    }))
-                  }
-                />
-
-                <span className="mt-1 text-xs text-base-content/50">
-                  Facebook player URL used on the website.
-                </span>
               </label>
 
               {/* CATEGORY */}
