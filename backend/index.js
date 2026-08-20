@@ -256,7 +256,7 @@ async function run() {
           message: "Internal Server Error",
         });
       }
-    });   
+    });
 
     //My Profile - GET
     app.get("/users/me", verifyToken, async (req, res) => {
@@ -991,21 +991,22 @@ async function run() {
       try {
         const { id } = req.params;
 
-        // =====================================================
+        // =======================================================
         // ID VALIDATION
-        // =====================================================
+        // =======================================================
 
         if (!ObjectId.isValid(id)) {
           return res.status(400).send({
+            success: false,
             message: "Invalid video id.",
           });
         }
 
         const videoId = new ObjectId(id);
 
-        // =====================================================
+        // =======================================================
         // FIND CURRENT VIDEO
-        // =====================================================
+        // =======================================================
 
         const currentVideo = await videoCollection.findOne({
           _id: videoId,
@@ -1013,13 +1014,14 @@ async function run() {
 
         if (!currentVideo) {
           return res.status(404).send({
+            success: false,
             message: "Video not found.",
           });
         }
 
-        // =====================================================
+        // =======================================================
         // REQUEST DATA
-        // =====================================================
+        // =======================================================
 
         const {
           title,
@@ -1030,58 +1032,48 @@ async function run() {
           isPublished,
         } = req.body;
 
-        // =====================================================
+        // =======================================================
         // BASIC VALIDATION
-        // =====================================================
+        // =======================================================
 
-        if (!title?.trim()) {
+        if (typeof title !== "string" || !title.trim()) {
           return res.status(400).send({
+            success: false,
             message: "Video title is required.",
           });
         }
 
-        if (!videoUrl?.trim()) {
+        if (typeof videoUrl !== "string" || !videoUrl.trim()) {
           return res.status(400).send({
+            success: false,
             message: "Facebook video URL is required.",
           });
         }
 
-        // =====================================================
+        // =======================================================
         // FACEBOOK URL VALIDATION
-        // =====================================================
+        // =======================================================
 
-        if (!isFacebookUrl(videoUrl)) {
+        if (!isFacebookUrl(videoUrl.trim())) {
           return res.status(400).send({
+            success: false,
             message: "Only Facebook video URLs are allowed.",
           });
         }
 
-        // =====================================================
-        // RESOLVE SHARE URL → CANONICAL URL
-        // =====================================================
-
-        const canonicalVideoUrl = await resolveFacebookVideoUrl(videoUrl);
-
-        console.log("Original Facebook URL:", videoUrl);
-        console.log("Canonical Facebook URL:", canonicalVideoUrl);
-
-        // =====================================================
-        // GENERATE NEW EMBED URL
-        // =====================================================
-
-        const embedUrl = createFacebookEmbedUrl(canonicalVideoUrl);
-
-        console.log("Generated Facebook Embed URL:", embedUrl);
-
-        // =====================================================
-        // FEATURED LIMIT
-        // =====================================================
+        // =======================================================
+        // FEATURED VALUE
+        // =======================================================
 
         const wantsFeatured = Boolean(featured);
 
         const isCurrentlyFeatured = Boolean(currentVideo.featured);
 
         const tryingToAddFeatured = wantsFeatured && !isCurrentlyFeatured;
+
+        // =======================================================
+        // MAX 8 FEATURED VIDEOS
+        // =======================================================
 
         if (tryingToAddFeatured) {
           const featuredCount = await videoCollection.countDocuments({
@@ -1090,28 +1082,27 @@ async function run() {
 
           if (featuredCount >= 8) {
             return res.status(400).send({
+              success: false,
               message:
                 "Maximum 8 featured videos are allowed. Please remove one featured video first.",
             });
           }
         }
 
-        // =====================================================
-        // UPDATE DATA
-        // =====================================================
+        // =======================================================
+        // UPDATE PAYLOAD
+        // =======================================================
 
         const updatePayload = {
           title: title.trim(),
 
-          // SAVE CANONICAL URL
-          videoUrl: canonicalVideoUrl,
+          // Save Facebook URL directly
+          videoUrl: videoUrl.trim(),
 
-          // SAVE NEW EMBED URL
-          embedUrl,
+          category: typeof category === "string" ? category.trim() : "",
 
-          category: category?.trim() || "",
-
-          description: description?.trim() || "",
+          description:
+            typeof description === "string" ? description.trim() : "",
 
           featured: wantsFeatured,
 
@@ -1120,9 +1111,9 @@ async function run() {
           updatedAt: new Date(),
         };
 
-        // =====================================================
+        // =======================================================
         // UPDATE DATABASE
-        // =====================================================
+        // =======================================================
 
         const result = await videoCollection.updateOne(
           {
@@ -1133,13 +1124,12 @@ async function run() {
           },
         );
 
-        // =====================================================
+        // =======================================================
         // RESPONSE
-        // =====================================================
+        // =======================================================
 
-        res.send({
+        return res.send({
           success: true,
-
           message: "Video updated successfully.",
 
           result,
@@ -1150,10 +1140,20 @@ async function run() {
           },
         });
       } catch (error) {
-        console.error("Update video error:", error);
+        // =======================================================
+        // ERROR
+        // =======================================================
 
-        res.status(500).send({
+        console.error("=================================");
+        console.error("UPDATE VIDEO ERROR");
+        console.error(error);
+        console.error("=================================");
+
+        return res.status(500).send({
+          success: false,
           message: "Failed to update video.",
+          error:
+            process.env.NODE_ENV === "development" ? error.message : undefined,
         });
       }
     });
@@ -1278,7 +1278,7 @@ async function run() {
     });
     ////////////////////////   HERO IMAGE RELATED API ///////////////////////////////////////
     // POST
-    app.post("/hero-images", verifyToken, verifyAdmin, async (req, res) => {
+    app.post("/hero-images", async (req, res) => {
       try {
         const { title, image, publicId, altText, displayOrder, isActive } =
           req.body;
@@ -1349,7 +1349,7 @@ async function run() {
       }
     });
     //PUT
-    app.put("/hero-images/:id", verifyToken, verifyAdmin, async (req, res) => {
+    app.put("/hero-images/:id", async (req, res) => {
       try {
         const { id } = req.params;
 
@@ -1403,34 +1403,37 @@ async function run() {
       }
     });
     //DELETE
-    app.delete("/hero-images/:id", verifyToken, verifyAdmin, async (req, res) => {
-      try {
-        const { id } = req.params;
+    app.delete(
+      "/hero-images/:id",
+      async (req, res) => {
+        try {
+          const { id } = req.params;
 
-        const result = await heroImagesCollection.deleteOne({
-          _id: new ObjectId(id),
-        });
+          const result = await heroImagesCollection.deleteOne({
+            _id: new ObjectId(id),
+          });
 
-        if (result.deletedCount === 0) {
-          return res.status(404).send({
+          if (result.deletedCount === 0) {
+            return res.status(404).send({
+              success: false,
+              message: "Hero image not found.",
+            });
+          }
+
+          res.status(200).send({
+            success: true,
+            message: "Hero image deleted successfully.",
+          });
+        } catch (error) {
+          console.error("Delete hero image error:", error);
+
+          res.status(500).send({
             success: false,
-            message: "Hero image not found.",
+            message: "Failed to delete hero image.",
           });
         }
-
-        res.status(200).send({
-          success: true,
-          message: "Hero image deleted successfully.",
-        });
-      } catch (error) {
-        console.error("Delete hero image error:", error);
-
-        res.status(500).send({
-          success: false,
-          message: "Failed to delete hero image.",
-        });
-      }
-    });
+      },
+    );
 
     ////////////////////////  PACKAGE RELATED API ////////////////////////////////////////////
     //POST
