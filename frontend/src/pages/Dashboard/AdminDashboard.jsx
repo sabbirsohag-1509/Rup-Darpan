@@ -10,6 +10,18 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
+
 import StatCard from "../../components/dashboard/StatCard";
 import SectionHeader from "../../components/dashboard/SectionHeader";
 import BookingStatusBadge from "../../components/dashboard/BookingStatusBadge";
@@ -55,62 +67,180 @@ const formatDate = (date) => {
 };
 
 // =====================================================
-// BAR CHART
+// REVENUE CHART
 // =====================================================
 
-const BarPlaceholder = ({
-  title,
-  description,
-  bars,
-  valueFormatter,
-}) => {
-  const maxValue = Math.max(
-    ...bars.map((bar) => Number(bar.value) || 0),
-    1,
-  );
-
+const RevenueChart = ({ data }) => {
   return (
     <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
       <SectionHeader
-        title={title}
-        description={description}
+        title="Revenue Analytics"
+        description="Monthly confirmed revenue trend."
       />
 
-      <div className="grid grid-cols-6 items-end gap-3 rounded-2xl border border-primary/10 bg-base-200/40 p-4 sm:p-5">
-        {bars.map((bar) => {
-          const numericValue = Number(bar.value) || 0;
-
-          const height =
-            numericValue === 0
-              ? 3
-              : Math.max((numericValue / maxValue) * 100, 3);
-
-          return (
-            <div
-              key={`${bar.month}-${bar.value}`}
-              className="flex min-w-0 flex-col items-center gap-2"
-            >
-              <div className="group relative flex h-44 w-full items-end justify-center rounded-lg bg-base-100 p-1">
-                <div
-                  className="w-full rounded-md bg-primary/80 transition-all duration-500 group-hover:bg-primary"
-                  style={{
-                    height: `${height}%`,
-                  }}
+      <div className="mt-5 h-80 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={data}
+            margin={{
+              top: 10,
+              right: 10,
+              left: 10,
+              bottom: 0,
+            }}
+          >
+            <defs>
+              <linearGradient
+                id="revenueGradient"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stopColor="currentColor"
+                  stopOpacity={0.35}
                 />
 
-                <span className="absolute -top-7 hidden rounded-md bg-base-content px-2 py-1 text-[10px] text-base-100 group-hover:block">
-                  {valueFormatter
-                    ? valueFormatter(numericValue)
-                    : numericValue}
-                </span>
-              </div>
+                <stop
+                  offset="100%"
+                  stopColor="currentColor"
+                  stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
 
-              <span className="text-xs font-semibold text-base-content/70">
-                {bar.month}
-              </span>
-            </div>
-          );
-        })}
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              className="stroke-base-content/10"
+            />
+
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              className="fill-base-content/60 text-xs"
+            />
+
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              width={60}
+              tickFormatter={(value) =>
+                `৳${Number(value).toLocaleString("en-BD")}`
+              }
+              className="fill-base-content/60 text-xs"
+            />
+
+            <Tooltip
+              cursor={{
+                stroke: "currentColor",
+                strokeOpacity: 0.15,
+              }}
+              formatter={(value) => [
+                formatCurrency(value),
+                "Revenue",
+              ]}
+              labelFormatter={(label) => `${label}`}
+              contentStyle={{
+                borderRadius: "12px",
+                border: "1px solid hsl(var(--p) / 0.15)",
+                backgroundColor: "hsl(var(--b1))",
+              }}
+            />
+
+            <Area
+              type="monotone"
+              dataKey="value"
+              name="Revenue"
+              stroke="currentColor"
+              strokeWidth={3}
+              fill="url(#revenueGradient)"
+              className="text-primary"
+              activeDot={{
+                r: 6,
+              }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </section>
+  );
+};
+
+// =====================================================
+// BOOKING CHART
+// =====================================================
+
+const BookingChart = ({ data }) => {
+  return (
+    <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
+      <SectionHeader
+        title="Booking Analytics"
+        description="Monthly booking overview."
+      />
+
+      <div className="mt-5 h-80 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            margin={{
+              top: 10,
+              right: 10,
+              left: 10,
+              bottom: 0,
+            }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              className="stroke-base-content/10"
+            />
+
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              className="fill-base-content/60 text-xs"
+            />
+
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              allowDecimals={false}
+              width={35}
+              className="fill-base-content/60 text-xs"
+            />
+
+            <Tooltip
+              cursor={{
+                fill: "currentColor",
+                fillOpacity: 0.05,
+              }}
+              formatter={(value) => [
+                `${value} bookings`,
+                "Bookings",
+              ]}
+              labelFormatter={(label) => `${label}`}
+              contentStyle={{
+                borderRadius: "12px",
+                border: "1px solid hsl(var(--p) / 0.15)",
+                backgroundColor: "hsl(var(--b1))",
+              }}
+            />
+
+            <Bar
+              dataKey="value"
+              name="Bookings"
+              fill="currentColor"
+              className="text-primary"
+              radius={[6, 6, 0, 0]}
+              maxBarSize={42}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </section>
   );
@@ -197,9 +327,11 @@ const AdminDashboard = () => {
     error: usersQueryError,
   } = useQuery({
     queryKey: ["admin-dashboard-users"],
+
     queryFn: async () => {
       const response = await axios.get(`${API_URL}/users`, {
         withCredentials: true,
+
         params: {
           page: 1,
           limit: 50,
@@ -221,6 +353,7 @@ const AdminDashboard = () => {
     error: bookingsQueryError,
   } = useQuery({
     queryKey: ["admin-dashboard-bookings"],
+
     queryFn: async () => {
       const response = await axios.get(
         `${API_URL}/admin/bookings`,
@@ -244,6 +377,7 @@ const AdminDashboard = () => {
     error: reviewsQueryError,
   } = useQuery({
     queryKey: ["admin-dashboard-reviews"],
+
     queryFn: async () => {
       const response = await axios.get(
         `${API_URL}/admin/reviews`,
@@ -312,7 +446,8 @@ const AdminDashboard = () => {
   // STATS
   // ===================================================
 
-  const totalUsers = usersData?.total ?? users.length;
+  const totalUsers =
+    usersData?.total ?? users.length;
 
   const totalBookings = bookings.length;
 
@@ -327,7 +462,8 @@ const AdminDashboard = () => {
 
   const totalRevenue = bookings
     .filter((booking) => {
-      const status = booking.status?.toLowerCase();
+      const status =
+        booking.status?.toLowerCase();
 
       return (
         status === "confirmed" ||
@@ -336,7 +472,9 @@ const AdminDashboard = () => {
       );
     })
     .reduce((total, booking) => {
-      return total + getBookingPrice(booking);
+      return (
+        total + getBookingPrice(booking)
+      );
     }, 0);
 
   // ===================================================
@@ -345,9 +483,11 @@ const AdminDashboard = () => {
 
   const currentDate = new Date();
 
-  const currentYear = currentDate.getFullYear();
+  const currentYear =
+    currentDate.getFullYear();
 
-  const currentMonth = currentDate.getMonth();
+  const currentMonth =
+    currentDate.getMonth();
 
   // ===================================================
   // THIS MONTH BOOKINGS
@@ -355,13 +495,19 @@ const AdminDashboard = () => {
 
   const thisMonthBookings = bookings.filter(
     (booking) => {
-      if (!booking.createdAt) return false;
+      if (!booking.createdAt) {
+        return false;
+      }
 
-      const date = new Date(booking.createdAt);
+      const date = new Date(
+        booking.createdAt,
+      );
 
       return (
-        date.getFullYear() === currentYear &&
-        date.getMonth() === currentMonth
+        date.getFullYear() ===
+          currentYear &&
+        date.getMonth() ===
+          currentMonth
       );
     },
   ).length;
@@ -382,20 +528,24 @@ const AdminDashboard = () => {
         1,
       );
 
-      const month = date.toLocaleString(
-        "en-US",
-        {
-          month: "short",
-        },
-      );
+      const month =
+        date.toLocaleString(
+          "en-US",
+          {
+            month: "short",
+          },
+        );
 
       const value = bookings.filter(
         (booking) => {
-          if (!booking.createdAt) return false;
+          if (!booking.createdAt) {
+            return false;
+          }
 
-          const bookingDate = new Date(
-            booking.createdAt,
-          );
+          const bookingDate =
+            new Date(
+              booking.createdAt,
+            );
 
           return (
             bookingDate.getFullYear() ===
@@ -429,20 +579,24 @@ const AdminDashboard = () => {
         1,
       );
 
-      const month = date.toLocaleString(
-        "en-US",
-        {
-          month: "short",
-        },
-      );
+      const month =
+        date.toLocaleString(
+          "en-US",
+          {
+            month: "short",
+          },
+        );
 
       const value = bookings
         .filter((booking) => {
-          if (!booking.createdAt) return false;
+          if (!booking.createdAt) {
+            return false;
+          }
 
-          const bookingDate = new Date(
-            booking.createdAt,
-          );
+          const bookingDate =
+            new Date(
+              booking.createdAt,
+            );
 
           const status =
             booking.status?.toLowerCase();
@@ -462,7 +616,8 @@ const AdminDashboard = () => {
         })
         .reduce((total, booking) => {
           return (
-            total + getBookingPrice(booking)
+            total +
+            getBookingPrice(booking)
           );
         }, 0);
 
@@ -517,10 +672,10 @@ const AdminDashboard = () => {
   // ===================================================
 
   const totalReviewPages = Math.ceil(
-    sortedReviews.length / REVIEWS_PER_PAGE,
+    sortedReviews.length /
+      REVIEWS_PER_PAGE,
   );
 
-  // Prevent invalid page
   const safeReviewPage =
     totalReviewPages > 0
       ? Math.min(
@@ -536,7 +691,8 @@ const AdminDashboard = () => {
   const paginatedReviews =
     sortedReviews.slice(
       reviewStartIndex,
-      reviewStartIndex + REVIEWS_PER_PAGE,
+      reviewStartIndex +
+        REVIEWS_PER_PAGE,
     );
 
   // ===================================================
@@ -546,39 +702,53 @@ const AdminDashboard = () => {
   const stats = [
     {
       label: "Total Users",
+
       value: totalUsers.toLocaleString(),
+
       description:
         thisMonthBookings > 0
           ? `${thisMonthBookings} bookings added this month`
           : "No bookings added this month",
+
       icon: Users,
     },
 
     {
       label: "Total Bookings",
+
       value: totalBookings.toLocaleString(),
+
       description:
         thisMonthBookings > 0
           ? `${thisMonthBookings} bookings added this month`
           : "No bookings added this month",
+
       icon: CalendarDays,
     },
 
     {
       label: "Total Revenue",
-      value: formatCurrency(totalRevenue),
+
+      value: formatCurrency(
+        totalRevenue,
+      ),
+
       description:
         "Revenue from confirmed/completed bookings",
+
       icon: DollarSign,
     },
 
     {
       label: "Pending Bookings",
+
       value: pendingBookings.toLocaleString(),
+
       description:
         pendingBookings > 0
           ? "Requires confirmation and follow-up"
           : "No pending bookings",
+
       icon: TrendingUp,
     },
   ];
@@ -621,23 +791,9 @@ const AdminDashboard = () => {
       ================================================= */}
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <BarPlaceholder
-          title="Booking Analytics"
-          description="Monthly booking overview."
-          bars={bookingBars}
-          valueFormatter={(value) =>
-            `${value} bookings`
-          }
-        />
+        <BookingChart data={bookingBars} />
 
-        <BarPlaceholder
-          title="Revenue Analytics"
-          description="Monthly confirmed revenue trend."
-          bars={revenueBars}
-          valueFormatter={(value) =>
-            formatCurrency(value)
-          }
-        />
+        <RevenueChart data={revenueBars} />
       </section>
 
       {/* =================================================
@@ -789,16 +945,20 @@ const AdminDashboard = () => {
               recentUsers.map((item) => (
                 <article
                   key={
-                    item._id || item.email
+                    item._id ||
+                    item.email
                   }
                   className="flex items-center gap-3 rounded-xl border border-primary/10 p-3"
                 >
                   {/* Avatar */}
+
                   <div className="avatar">
                     <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary">
                       {item.profilePhoto ? (
                         <img
-                          src={item.profilePhoto}
+                          src={
+                            item.profilePhoto
+                          }
                           alt={
                             item.name ||
                             "User"
@@ -816,6 +976,7 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* User info */}
+
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
                       {item.name ||
@@ -828,9 +989,11 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Role + Date */}
+
                   <div className="text-right">
                     <p className="text-xs uppercase tracking-wide text-primary">
-                      {item.role || "user"}
+                      {item.role ||
+                        "user"}
                     </p>
 
                     <p className="text-xs text-base-content/65">
@@ -857,7 +1020,6 @@ const AdminDashboard = () => {
             actionTo="/admin/reviews"
           />
 
-          {/* Reviews */}
           <div className="space-y-3">
             {sortedReviews.length === 0 ? (
               <div className="py-8 text-center text-sm text-base-content/60">
@@ -869,8 +1031,9 @@ const AdminDashboard = () => {
                   const rating =
                     Math.min(
                       Math.max(
-                        Number(item.rating) ||
-                          0,
+                        Number(
+                          item.rating,
+                        ) || 0,
                         0,
                       ),
                       5,
@@ -891,6 +1054,7 @@ const AdminDashboard = () => {
                       className="rounded-xl border border-primary/10 p-4"
                     >
                       {/* Customer + Date */}
+
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="text-sm font-semibold">
                           {customerName}
@@ -904,6 +1068,7 @@ const AdminDashboard = () => {
                       </div>
 
                       {/* Rating */}
+
                       <div className="mt-2 flex items-center gap-1">
                         <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map(
@@ -913,7 +1078,8 @@ const AdminDashboard = () => {
                                 size={16}
                                 strokeWidth={1.8}
                                 className={
-                                  star <= rating
+                                  star <=
+                                  rating
                                     ? "fill-primary text-primary"
                                     : "text-base-content/20"
                                 }
@@ -928,12 +1094,14 @@ const AdminDashboard = () => {
                       </div>
 
                       {/* Review */}
+
                       <p className="mt-2 text-sm text-base-content/75">
                         {item.comment ||
                           "No review text."}
                       </p>
 
                       {/* Status */}
+
                       <div className="mt-3">
                         <BookingStatusBadge
                           status={
@@ -962,10 +1130,13 @@ const AdminDashboard = () => {
           {totalReviewPages > 1 && (
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
               {/* Previous */}
+
               <button
                 type="button"
                 className="btn btn-sm btn-outline"
-                disabled={safeReviewPage === 1}
+                disabled={
+                  safeReviewPage === 1
+                }
                 onClick={() =>
                   setReviewPage(
                     (prev) =>
@@ -980,10 +1151,12 @@ const AdminDashboard = () => {
               </button>
 
               {/* Page numbers */}
+
               <div className="flex items-center gap-1">
                 {Array.from(
                   {
-                    length: totalReviewPages,
+                    length:
+                      totalReviewPages,
                   },
                   (_, index) => {
                     const page =
@@ -1013,6 +1186,7 @@ const AdminDashboard = () => {
               </div>
 
               {/* Next */}
+
               <button
                 type="button"
                 className="btn btn-sm btn-outline"

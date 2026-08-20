@@ -168,15 +168,6 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "settings",
-        element: (
-          <DashboardPlaceholderPage
-            title="Settings"
-            description="User preference controls can be connected in this section."
-          />
-        ),
-      },
     ],
   },
 
@@ -282,7 +273,7 @@ export const router = createBrowserRouter([
         element: (
           <DashboardPlaceholderPage
             title="Payments Management"
-            description="Payment operations and settlements panel is ready."
+            description="Payment Method Under Construction."
           />
         ),
       },
@@ -294,15 +285,6 @@ export const router = createBrowserRouter([
             element: <AdminProfile />,
           },
         ],
-      },
-      {
-        path: "settings",
-        element: (
-          <DashboardPlaceholderPage
-            title="Admin Settings"
-            description="Platform-level admin preferences and controls belong here."
-          />
-        ),
       },
     ],
   },

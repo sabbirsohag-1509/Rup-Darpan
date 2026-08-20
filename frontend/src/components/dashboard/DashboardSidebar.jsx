@@ -25,7 +25,6 @@ const userLinks = [
   { to: "/dashboard/bookings", label: "My Bookings", icon: CalendarDays },
   { to: "/dashboard/reviews", label: "My Reviews", icon: MessageSquareText },
   { to: "/dashboard/profile", label: "Profile", icon: User },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 const adminLinks = [
@@ -40,7 +39,6 @@ const adminLinks = [
   { to: "/admin/reviews", label: "Reviews", icon: MessageSquareText },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
   {to: "/admin/admin-profile", label: "Profile", icon: User },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 const navClass = ({ isActive }) =>
