@@ -116,6 +116,11 @@ async function run() {
     const loginActivityCollection = myDB.collection("loginActivities");
     const videoCollection = myDB.collection("videos");
     const heroImagesCollection = myDB.collection("heroImages");
+    const photoLikes = myDB.collection("photoLikes");
+    await photoLikes.createIndex(
+      { photoId: 1, visitorId: 1 },
+      { unique: true },
+    );
 
     // Google Strategy
     passport.use(
@@ -1403,37 +1408,34 @@ async function run() {
       }
     });
     //DELETE
-    app.delete(
-      "/hero-images/:id",
-      async (req, res) => {
-        try {
-          const { id } = req.params;
+    app.delete("/hero-images/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
 
-          const result = await heroImagesCollection.deleteOne({
-            _id: new ObjectId(id),
-          });
+        const result = await heroImagesCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
 
-          if (result.deletedCount === 0) {
-            return res.status(404).send({
-              success: false,
-              message: "Hero image not found.",
-            });
-          }
-
-          res.status(200).send({
-            success: true,
-            message: "Hero image deleted successfully.",
-          });
-        } catch (error) {
-          console.error("Delete hero image error:", error);
-
-          res.status(500).send({
+        if (result.deletedCount === 0) {
+          return res.status(404).send({
             success: false,
-            message: "Failed to delete hero image.",
+            message: "Hero image not found.",
           });
         }
-      },
-    );
+
+        res.status(200).send({
+          success: true,
+          message: "Hero image deleted successfully.",
+        });
+      } catch (error) {
+        console.error("Delete hero image error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to delete hero image.",
+        });
+      }
+    });
 
     ////////////////////////  PACKAGE RELATED API ////////////////////////////////////////////
     //POST
@@ -2057,6 +2059,96 @@ async function run() {
 
         res.status(500).send({
           message: "Failed to delete review",
+        });
+      }
+    });
+
+    // =================== LIKES RELATED API =====================
+    //POST
+    app.post("/photos/:id/like", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { visitorId } = req.body;
+
+        if (!visitorId) {
+          return res.status(400).send({
+            message: "visitorId is required",
+          });
+        }
+
+        const existingLike = await photoLikes.findOne({
+          photoId: id,
+          visitorId,
+        });
+
+        // Already liked → Unlike
+        if (existingLike) {
+          await photoLikes.deleteOne({
+            _id: existingLike._id,
+          });
+
+          const likes = await photoLikes.countDocuments({
+            photoId: id,
+          });
+
+          return res.send({
+            liked: false,
+            likes,
+          });
+        }
+
+        // New like
+        await photoLikes.insertOne({
+          photoId: id,
+          visitorId,
+          createdAt: new Date(),
+        });
+
+        const likes = await photoLikes.countDocuments({
+          photoId: id,
+        });
+
+        res.send({
+          liked: true,
+          likes,
+        });
+      } catch (error) {
+        console.error("Photo like error:", error);
+
+        res.status(500).send({
+          message: "Failed to like photo",
+        });
+      }
+    });
+    //GET
+    app.get("/photos/:id/like/:visitorId", async (req, res) => {
+      try {
+        const { id, visitorId } = req.params;
+
+        if (!visitorId) {
+          return res.status(400).send({
+            message: "visitorId is required",
+          });
+        }
+
+        const existingLike = await photoLikes.findOne({
+          photoId: id,
+          visitorId,
+        });
+
+        const likes = await photoLikes.countDocuments({
+          photoId: id,
+        });
+
+        res.send({
+          liked: !!existingLike,
+          likes,
+        });
+      } catch (error) {
+        console.error("Get photo like status error:", error);
+
+        res.status(500).send({
+          message: "Failed to get photo like status",
         });
       }
     });
