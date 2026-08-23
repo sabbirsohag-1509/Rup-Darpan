@@ -850,20 +850,18 @@ const PhotoDetailModal = ({ photo, photos, onClose, onSelectPhoto }) => {
           {/* STATS */}
 
           <div className="grid grid-cols-2 gap-3 border-y border-base-200 py-5">
-            <div className="rounded-2xl bg-base-200/60 p-4">
-              <Heart className="h-4 w-4 text-primary" />
+            <div className="flex items-center justify-between rounded-2xl bg-base-200/60 p-4">
+              <div>
+                <Heart className="h-6 w-6 text-primary" />
+              </div>
 
-              <p className="mt-2 text-lg font-semibold">{photo?.likes ?? 0}</p>
+              <div>
+                <p className="mt-2 text-lg font-semibold">
+                  {photo?.likes ?? 0}
+                </p>
 
-              <p className="text-xs text-base-content/50">Likes</p>
-            </div>
-
-            <div className="rounded-2xl bg-base-200/60 p-4">
-              <Eye className="h-4 w-4 text-primary" />
-
-              <p className="mt-2 text-lg font-semibold">{photo?.views ?? 0}</p>
-
-              <p className="text-xs text-base-content/50">Views</p>
+                <p className="text-xs text-base-content/50">Likes</p>
+              </div>
             </div>
           </div>
 
