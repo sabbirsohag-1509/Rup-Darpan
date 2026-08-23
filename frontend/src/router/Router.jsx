@@ -23,7 +23,6 @@ import AdminRouter from "./AdminRouter/AdminRouter";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
 import AdminDashboard from "../pages/Dashboard/AdminDashboard";
-import DashboardPlaceholderPage from "../pages/Dashboard/DashboardPlaceholderPage";
 
 import MyBookings from "../components/Booking/MyBookings/MyBookings";
 import MyReview from "../components/Review/MyReview";
