@@ -46,6 +46,7 @@ import AddHeroImage from "../pages/AddHeroImage/AddHeroImage";
 import AdminHeroImageManagement from "../pages/Dashboard/AdminHeroImageManagement/AdminHeroImageManagement";
 
 import ErrorPage from "../components/ErrorPage/ErrorPage";
+import AdminPaymentManagement from "../pages/Dashboard/AdminPaymentManagement";
 
 export const router = createBrowserRouter([
   // =====================================================
@@ -270,12 +271,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "payments",
-        element: (
-          <DashboardPlaceholderPage
-            title="Payments Management"
-            description="Payment Method Under Construction."
-          />
-        ),
+        children: [
+          {
+            index: true,
+            element: <AdminPaymentManagement />,
+          }
+        ]
       },
       {
         path: "admin-profile",

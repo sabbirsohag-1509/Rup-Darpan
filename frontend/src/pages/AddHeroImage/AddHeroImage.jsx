@@ -250,6 +250,7 @@ const AddHeroImage = () => {
 
   return (
     <div className="mx-auto max-w-7xl py-6 sm:py-10">
+      <title>Add Hero Image | Rup Darpon</title>
       {/* =====================================================
           PAGE HEADER
       ===================================================== */}

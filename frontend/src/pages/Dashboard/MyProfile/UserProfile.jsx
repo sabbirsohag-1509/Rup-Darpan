@@ -299,6 +299,7 @@ const UserProfile = () => {
 
   return (
     <>
+      <title>My Profile | Rup Darpon</title>
       <div className="space-y-5">
         {/* =========================================
             PROFILE CARD

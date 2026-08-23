@@ -283,6 +283,7 @@ const MyReview = () => {
       />
 
       <div className="space-y-5">
+        <title>My Reviews | Rup Darpon</title>
         {/* =========================================
             HEADER
         ========================================= */}

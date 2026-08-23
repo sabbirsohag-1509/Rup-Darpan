@@ -204,6 +204,7 @@ const AddPhoto = () => {
 
   return (
     <div className="py-6 sm:py-10 max-w-7xl mx-auto">
+      <title>Add New Photo | Rup Darpon</title>
       <div>
         {/* back to previous btn  */}
         <button

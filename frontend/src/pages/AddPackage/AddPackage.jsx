@@ -323,6 +323,7 @@ const AddPackage = () => {
 
   return (
     <div className="mx-auto max-w-7xl py-6 sm:py-10">
+      <title>Add New Package | Rup Darpon</title>
       {/* Back Button */}
       <div className="mb-4">
         <button

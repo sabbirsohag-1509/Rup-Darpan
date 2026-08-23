@@ -161,6 +161,7 @@ const MyBookings = () => {
 
   return (
     <div className="space-y-5">
+      <title>My Bookings | Rup Darpon</title>
       {/* =========================================
           HEADER
       ========================================= */}

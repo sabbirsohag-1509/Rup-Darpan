@@ -156,6 +156,7 @@ const Register = () => {
 
   return (
     <div className="w-full">
+      <title>Register | Rup Darpon</title>
       <div className="mb-6">
         <h1 className="font-playfair text-3xl md:text-4xl font-semibold">
           Create Your Account
