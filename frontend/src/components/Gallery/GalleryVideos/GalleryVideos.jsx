@@ -150,6 +150,7 @@ const GalleryVideos = () => {
   return (
     <>
       <main className="min-h-screen bg-base-100">
+        <title>Gallery Videos | Rup Darpon</title>
 
         {/* =================================================
             HERO

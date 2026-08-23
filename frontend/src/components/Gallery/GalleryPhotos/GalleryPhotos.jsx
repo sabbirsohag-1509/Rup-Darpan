@@ -620,7 +620,9 @@ const GalleryPhotos = () => {
 
   return (
     <>
+      
       <main className="min-h-screen bg-base-100">
+        <title>Gallery Photos | Rup Darpon</title>
         {/* =================================================
             HERO
         ================================================= */}

@@ -1,10 +1,12 @@
 import { Outlet } from "react-router";
 import Navbar from "../components/shared/Navbar";
 import Footer from "../components/shared/Footer";
+import ScrollToTop from "../components/ScrollToTop";
 
 const RootLayout = () => {
   return (
     <div className="min-h-screen flex flex-col bg-base-100 text-base-content">
+      <ScrollToTop />
       <header className="sticky top-0 z-50 bg-base-100/90 backdrop-blur-md border-b border-primary/20">
         <Navbar />
       </header>
