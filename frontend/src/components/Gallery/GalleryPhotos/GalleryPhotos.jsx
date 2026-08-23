@@ -42,7 +42,6 @@ const API_URL = "http://localhost:5000";
 const LIMIT = 9;
 
 const VISITOR_ID_KEY = "rupdarpan_visitor_id";
-
 const LIKED_PHOTOS_KEY = "rupdarpan_liked_photos";
 
 // =========================================================
@@ -204,6 +203,23 @@ const GalleryPhotos = () => {
     useState({});
 
   // =======================================================
+  // LIKE REQUEST LOCK
+  // Prevent rapid duplicate clicks
+  // =======================================================
+
+  const likingPhotosRef = useRef(new Set());
+
+  // =======================================================
+  // SERVER LIKE STATUS SYNC TRACKER
+  // Prevent stale GET responses from overwriting
+  // fresh local like state
+  // =======================================================
+
+  const syncedLikeStatusRef = useRef(
+    new Set()
+  );
+
+  // =======================================================
   // FETCH PHOTOS
   // =======================================================
 
@@ -237,6 +253,8 @@ const GalleryPhotos = () => {
 
     placeholderData: (previousData) =>
       previousData,
+
+    refetchOnWindowFocus: false,
   });
 
   // =======================================================
@@ -275,6 +293,8 @@ const GalleryPhotos = () => {
       staleTime: 1000 * 60 * 2,
 
       refetchOnWindowFocus: false,
+
+      retry: 1,
     })),
   });
 
@@ -298,7 +318,12 @@ const GalleryPhotos = () => {
   }, [photos, likeQueries]);
 
   // =======================================================
-  // INITIAL LIKE COUNTS
+  // INITIAL LIKE COUNTS + SERVER STATUS
+  //
+  // IMPORTANT:
+  // We only sync a photo's server status once.
+  // This prevents stale GET responses from undoing
+  // a fresh POST like/unlike.
   // =======================================================
 
   useEffect(() => {
@@ -306,68 +331,94 @@ const GalleryPhotos = () => {
       return;
     }
 
-    setLikeCounts((previous) => {
-      const updated = {
-        ...previous,
-      };
+    photos.forEach((photo, index) => {
+      const photoId = photo?._id;
 
-      photos.forEach((photo, index) => {
-        const queryData =
-          likeQueries[index]?.data;
+      if (!photoId) {
+        return;
+      }
 
-        if (queryData) {
-          updated[photo._id] =
-            queryData.likes ?? 0;
-        } else if (
-          updated[photo._id] === undefined
-        ) {
-          updated[photo._id] =
-            photo.likes ?? 0;
-        }
-      });
+      const queryData =
+        likeQueries[index]?.data;
 
-      return updated;
-    });
-  }, [photos, likeQueries]);
+      // ---------------------------------------------------
+      // Initial count
+      // ---------------------------------------------------
 
-  // =======================================================
-  // SYNC SERVER LIKE STATUS
-  // =======================================================
-
-  useEffect(() => {
-    if (!photos.length) {
-      return;
-    }
-
-    const serverResults = photos
-      .map((photo, index) => ({
-        id: photo._id,
-        data: likeQueries[index]?.data,
-      }))
-      .filter((item) => item.data);
-
-    if (!serverResults.length) {
-      return;
-    }
-
-    setLikedPhotos((previous) => {
-      let updated = [...previous];
-
-      serverResults.forEach(({ id, data }) => {
-        if (data.liked === true) {
-          if (!updated.includes(id)) {
-            updated.push(id);
+      if (queryData) {
+        setLikeCounts((previous) => {
+          if (
+            previous[photoId] ===
+            queryData.likes
+          ) {
+            return previous;
           }
-        } else {
-          updated = updated.filter(
-            (photoId) => photoId !== id
-          );
-        }
-      });
 
-      saveLikedPhotos(updated);
+          return {
+            ...previous,
+            [photoId]:
+              queryData.likes ?? 0,
+          };
+        });
+      } else {
+        setLikeCounts((previous) => {
+          if (
+            previous[photoId] !== undefined
+          ) {
+            return previous;
+          }
 
-      return updated;
+          return {
+            ...previous,
+            [photoId]:
+              photo.likes ?? 0,
+          };
+        });
+      }
+
+      // ---------------------------------------------------
+      // Sync liked status only once per photo
+      // ---------------------------------------------------
+
+      if (
+        queryData &&
+        !syncedLikeStatusRef.current.has(
+          photoId
+        )
+      ) {
+        syncedLikeStatusRef.current.add(
+          photoId
+        );
+
+        setLikedPhotos((previous) => {
+          let updated = previous;
+
+          if (queryData.liked === true) {
+            if (
+              !previous.includes(photoId)
+            ) {
+              updated = [
+                ...previous,
+                photoId,
+              ];
+            }
+          } else {
+            if (
+              previous.includes(photoId)
+            ) {
+              updated = previous.filter(
+                (id) => id !== photoId
+              );
+            }
+          }
+
+          if (updated !== previous) {
+            saveLikedPhotos(updated);
+          }
+
+          return updated;
+        });
+      }
     });
   }, [photos, likeQueries]);
 
@@ -396,18 +447,20 @@ const GalleryPhotos = () => {
       searchQuery.trim().toLowerCase();
 
     return photos.filter((photo) => {
+      const searchableValues = [
+        photo.title,
+        photo.category,
+        photo.photographer,
+        photo.location,
+        photo.description,
+        ...(Array.isArray(photo.tags)
+          ? photo.tags
+          : []),
+      ];
+
       const matchesSearch =
         !query ||
-        [
-          photo.title,
-          photo.category,
-          photo.photographer,
-          photo.location,
-          photo.description,
-          ...(Array.isArray(photo.tags)
-            ? photo.tags
-            : []),
-        ]
+        searchableValues
           .filter(Boolean)
           .some((value) =>
             String(value)
@@ -437,7 +490,8 @@ const GalleryPhotos = () => {
   const openPhoto = useCallback((photo) => {
     setSelectedPhoto(photo);
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+      "hidden";
   }, []);
 
   // =======================================================
@@ -452,6 +506,12 @@ const GalleryPhotos = () => {
 
   // =======================================================
   // LIKE PHOTO
+  //
+  // Optimistic update:
+  // 1. UI changes immediately
+  // 2. Server request happens
+  // 3. Server result confirms state
+  // 4. Error rolls back
   // =======================================================
 
   const handleLike = useCallback(
@@ -460,7 +520,117 @@ const GalleryPhotos = () => {
         return null;
       }
 
+      // ---------------------------------------------------
+      // Prevent rapid duplicate requests
+      // ---------------------------------------------------
+
+      if (
+        likingPhotosRef.current.has(
+          photoId
+        )
+      ) {
+        return null;
+      }
+
+      likingPhotosRef.current.add(
+        photoId
+      );
+
+      // ---------------------------------------------------
+      // Get current state
+      // ---------------------------------------------------
+
+      const previousLiked =
+        likedPhotos.includes(photoId);
+
+      const previousLikes =
+        likeCounts[photoId] ??
+        likeDataMap[photoId]?.likes ??
+        photos.find(
+          (photo) => photo._id === photoId
+        )?.likes ??
+        0;
+
+      // ---------------------------------------------------
+      // Optimistic state
+      // ---------------------------------------------------
+
+      const optimisticLiked =
+        !previousLiked;
+
+      const optimisticLikes =
+        Math.max(
+          0,
+          previousLikes +
+            (optimisticLiked ? 1 : -1)
+        );
+
+      // ---------------------------------------------------
+      // Update liked photos immediately
+      // ---------------------------------------------------
+
+      setLikedPhotos((previous) => {
+        let updated;
+
+        if (optimisticLiked) {
+          updated = previous.includes(
+            photoId
+          )
+            ? previous
+            : [...previous, photoId];
+        } else {
+          updated = previous.filter(
+            (id) => id !== photoId
+          );
+        }
+
+        saveLikedPhotos(updated);
+
+        return updated;
+      });
+
+      // ---------------------------------------------------
+      // Update count immediately
+      // ---------------------------------------------------
+
+      setLikeCounts((previous) => ({
+        ...previous,
+        [photoId]: optimisticLikes,
+      }));
+
+      // ---------------------------------------------------
+      // Update React Query immediately
+      // ---------------------------------------------------
+
+      queryClient.setQueryData(
+        [
+          "photo-like",
+          photoId,
+          visitorId,
+        ],
+        {
+          liked: optimisticLiked,
+          likes: optimisticLikes,
+        }
+      );
+
       try {
+        // -------------------------------------------------
+        // Cancel old GET request before POST
+        // -------------------------------------------------
+
+        await queryClient.cancelQueries({
+          queryKey: [
+            "photo-like",
+            photoId,
+            visitorId,
+          ],
+        });
+
+        // -------------------------------------------------
+        // POST LIKE
+        // -------------------------------------------------
+
         const response = await axios.post(
           `${API_URL}/photos/${photoId}/like`,
           {
@@ -473,18 +643,19 @@ const GalleryPhotos = () => {
           likes,
         } = response.data;
 
-        // =================================================
-        // UPDATE LIKE COUNT
-        // =================================================
+        // -------------------------------------------------
+        // Server confirmed count
+        // -------------------------------------------------
 
         setLikeCounts((previous) => ({
           ...previous,
-          [photoId]: likes,
+          [photoId]:
+            Number(likes) || 0,
         }));
 
-        // =================================================
-        // UPDATE LOCAL LIKED PHOTOS
-        // =================================================
+        // -------------------------------------------------
+        // Server confirmed liked state
+        // -------------------------------------------------
 
         setLikedPhotos((previous) => {
           let updated;
@@ -506,9 +677,9 @@ const GalleryPhotos = () => {
           return updated;
         });
 
-        // =================================================
-        // UPDATE REACT QUERY CACHE
-        // =================================================
+        // -------------------------------------------------
+        // Update React Query cache
+        // -------------------------------------------------
 
         queryClient.setQueryData(
           [
@@ -522,6 +693,14 @@ const GalleryPhotos = () => {
           }
         );
 
+        // -------------------------------------------------
+        // Mark as freshly synced
+        // -------------------------------------------------
+
+        syncedLikeStatusRef.current.add(
+          photoId
+        );
+
         return {
           liked,
           likes,
@@ -532,10 +711,70 @@ const GalleryPhotos = () => {
           error
         );
 
+        // -------------------------------------------------
+        // ROLLBACK LIKED STATE
+        // -------------------------------------------------
+
+        setLikedPhotos((previous) => {
+          let updated;
+
+          if (previousLiked) {
+            updated = previous.includes(
+              photoId
+            )
+              ? previous
+              : [...previous, photoId];
+          } else {
+            updated = previous.filter(
+              (id) => id !== photoId
+            );
+          }
+
+          saveLikedPhotos(updated);
+
+          return updated;
+        });
+
+        // -------------------------------------------------
+        // ROLLBACK COUNT
+        // -------------------------------------------------
+
+        setLikeCounts((previous) => ({
+          ...previous,
+          [photoId]: previousLikes,
+        }));
+
+        // -------------------------------------------------
+        // ROLLBACK QUERY CACHE
+        // -------------------------------------------------
+
+        queryClient.setQueryData(
+          [
+            "photo-like",
+            photoId,
+            visitorId,
+          ],
+          {
+            liked: previousLiked,
+            likes: previousLikes,
+          }
+        );
+
         return null;
+      } finally {
+        likingPhotosRef.current.delete(
+          photoId
+        );
       }
     },
-    [visitorId, queryClient]
+    [
+      visitorId,
+      likedPhotos,
+      likeCounts,
+      likeDataMap,
+      photos,
+      queryClient,
+    ]
   );
 
   // =======================================================
@@ -551,9 +790,9 @@ const GalleryPhotos = () => {
         return;
       }
 
-      // =================================================
-      // UPDATE SELECTED PHOTO
-      // =================================================
+      // ---------------------------------------------------
+      // Update selected modal photo
+      // ---------------------------------------------------
 
       setSelectedPhoto((previous) => {
         if (
@@ -602,7 +841,8 @@ const GalleryPhotos = () => {
 
   useEffect(() => {
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
     };
   }, []);
 
@@ -620,9 +860,11 @@ const GalleryPhotos = () => {
 
   return (
     <>
-      
       <main className="min-h-screen bg-base-100">
-        <title>Gallery Photos | Rup Darpon</title>
+        <title>
+          Gallery Photos | Rup Darpon
+        </title>
+
         {/* =================================================
             HERO
         ================================================= */}
@@ -647,16 +889,18 @@ const GalleryPhotos = () => {
                 </h1>
 
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-base-content/60 sm:text-base">
-                  Explore our collection of
-                  photographs from weddings,
-                  celebrations, portraits,
-                  outdoor sessions, and
-                  beautiful moments.
+                  Explore our collection
+                  of photographs from
+                  weddings, celebrations,
+                  portraits, outdoor
+                  sessions, and beautiful
+                  moments.
                 </p>
 
                 <p className="mt-1 text-xs leading-6 text-base-content/50 sm:text-sm">
-                  আমাদের লেন্সে ধরা পড়া সুন্দর
-                  মুহূর্তগুলোর সম্পূর্ণ সংগ্রহ।
+                  আমাদের লেন্সে ধরা পড়া
+                  সুন্দর মুহূর্তগুলোর
+                  সম্পূর্ণ সংগ্রহ।
                 </p>
               </div>
 
@@ -680,7 +924,8 @@ const GalleryPhotos = () => {
 
                       <p className="mt-1 text-xs leading-5 text-base-content/55">
                         Browse photographs or
-                        watch our memorable films.
+                        watch our memorable
+                        films.
                       </p>
                     </div>
                   </div>
@@ -796,7 +1041,8 @@ const GalleryPhotos = () => {
 
             <p className="text-sm text-base-content/50">
               {filteredPhotos.length} photo
-              {filteredPhotos.length !== 1
+              {filteredPhotos.length !==
+              1
                 ? "s"
                 : ""}{" "}
               on this page
@@ -862,9 +1108,13 @@ const GalleryPhotos = () => {
 
               {totalPages > 1 && (
                 <Pagination
-                  currentPage={currentPage}
+                  currentPage={
+                    currentPage
+                  }
                   totalPages={totalPages}
-                  onPageChange={goToPage}
+                  onPageChange={
+                    goToPage
+                  }
                   isFetching={isFetching}
                 />
               )}
@@ -882,7 +1132,9 @@ const GalleryPhotos = () => {
           photo={selectedPhoto}
           photos={filteredPhotos}
           onClose={closePhoto}
-          onSelectPhoto={setSelectedPhoto}
+          onSelectPhoto={
+            setSelectedPhoto
+          }
           onLike={handlePhotoLike}
           likedPhotos={likedPhotos}
           likeCounts={likeCounts}
@@ -963,7 +1215,7 @@ const PhotoCard = ({
         }`}
       >
         <Heart
-          className={`h-3.5 w-3.5 ${
+          className={`h-3.5 w-3.5 cursor-pointer ${
             isLiked
               ? "fill-red-700 text-red-700"
               : ""
@@ -1595,10 +1847,6 @@ const PhotoDetailModal = ({
       className="fixed inset-0 z-[100] flex h-[100dvh] w-full items-center justify-center bg-black/85 p-0 backdrop-blur-md sm:p-3 lg:p-6"
       onClick={onClose}
     >
-      {/* =================================================
-          MODAL
-      ================================================= */}
-
       <div
         className="relative flex h-full max-h-[100dvh] w-full max-w-[1500px] flex-col overflow-hidden bg-base-100 shadow-2xl sm:h-[96dvh] sm:rounded-2xl lg:h-[94vh] lg:flex-row lg:rounded-3xl"
         onClick={(event) =>
@@ -1730,13 +1978,11 @@ const PhotoDetailModal = ({
                   transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${zoom})`,
                   transformOrigin:
                     "center center",
-
                   transition:
                     dragState.current
                       .isDragging
                       ? "none"
                       : "transform 150ms ease-out",
-
                   willChange:
                     "transform",
                 }}
@@ -1746,14 +1992,14 @@ const PhotoDetailModal = ({
             )}
           </div>
 
-          {/* =================================================
-              MOBILE LIKE
-          ================================================= */}
+          {/* MOBILE LIKE */}
 
           <div className="absolute bottom-3 left-1/2 z-40 -translate-x-1/2 sm:bottom-5">
             <button
               type="button"
-              onClick={handleLikeClick}
+              onClick={
+                handleLikeClick
+              }
               disabled={isLiking}
               className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-semibold shadow-xl backdrop-blur-md transition-all duration-300 sm:hidden ${
                 isLiked
@@ -1767,7 +2013,7 @@ const PhotoDetailModal = ({
               }
             >
               <Heart
-                className={`h-4 w-4 ${
+                className={`h-4 w-4 cursor-pointer ${
                   isLiked
                     ? "fill-red-700 text-red-700"
                     : ""
@@ -1775,7 +2021,9 @@ const PhotoDetailModal = ({
               />
 
               <span>
-                {formatLikeCount(likes)}
+                {formatLikeCount(
+                  likes
+                )}
               </span>
 
               <span>
@@ -1790,7 +2038,6 @@ const PhotoDetailModal = ({
 
           <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-[10px] text-white/80 backdrop-blur-md sm:bottom-5 sm:left-5 sm:text-xs">
             <Camera className="h-3.5 w-3.5" />
-
             {category}
           </div>
 
@@ -1807,8 +2054,8 @@ const PhotoDetailModal = ({
           {/* DESKTOP HINT */}
 
           <div className="pointer-events-none absolute left-1/2 top-16 hidden -translate-x-1/2 rounded-full border border-white/10 bg-black/45 px-4 py-2 text-[10px] text-white/60 backdrop-blur-md sm:block">
-            Wheel to zoom • Drag to
-            move • Double click to zoom
+            Wheel to zoom • Drag to move
+            • Double click to zoom
           </div>
 
           {/* MOBILE HINT */}
@@ -1906,7 +2153,9 @@ const PhotoDetailModal = ({
           <div className="hidden border-y border-base-200 py-4 sm:block">
             <button
               type="button"
-              onClick={handleLikeClick}
+              onClick={
+                handleLikeClick
+              }
               disabled={isLiking}
               className={`flex w-full items-center justify-between rounded-2xl p-4 transition-all duration-300 ${
                 isLiked
@@ -1994,7 +2243,9 @@ const PhotoDetailModal = ({
           <div className="mt-6 grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={showPrevious}
+              onClick={
+                showPrevious
+              }
               disabled={!hasPrevious}
               className="btn btn-outline btn-sm rounded-full disabled:opacity-30 sm:btn-md"
             >
