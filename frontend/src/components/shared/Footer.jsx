@@ -274,10 +274,7 @@ const Footer = () => {
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-5 text-center sm:px-8 md:flex-row md:items-center md:justify-between md:text-left lg:px-10">
           <p className="text-xs text-base-content/45 font-medium">
             © {new Date().getFullYear()}{" "}
-            <span className="border p-[1px] border-medium">
-              <span className="font-bold text-red-600">RUP</span>{" "}
-              <span className="text-base-content/65">DARPON</span>
-            </span>{" "}
+              <span> Rup Darpon </span>
             Photography. All rights reserved.
           </p>
           {/* Developed by Sabbir Hossain Sohag */}
