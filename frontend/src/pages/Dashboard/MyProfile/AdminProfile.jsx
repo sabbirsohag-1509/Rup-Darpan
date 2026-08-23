@@ -328,6 +328,7 @@ const AdminProfile = () => {
 
   return (
     <>
+      <title>Admin Profile | Rup Darpon</title>
       <div className="space-y-5">
         {/* =================================================
             ADMIN PROFILE CARD

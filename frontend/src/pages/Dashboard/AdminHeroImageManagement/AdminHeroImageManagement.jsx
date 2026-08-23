@@ -319,6 +319,7 @@ const AdminHeroImageManagement = () => {
 
   return (
     <div className="space-y-6">
+      <title>Admin Hero Images Management | Rup Darpon</title>
       {/* =====================================================
           HEADER
       ===================================================== */}

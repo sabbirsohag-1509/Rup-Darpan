@@ -197,6 +197,7 @@ const AdminPackageManagement = () => {
 
   return (
     <div className="space-y-6">
+      <title>Admin Package Management | Rup Darpon</title>
       {/* =================================================
           HEADER
       ================================================= */}

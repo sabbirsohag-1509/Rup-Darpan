@@ -323,6 +323,7 @@ const AdminReviewManagement = () => {
 
   return (
     <>
+      <title>Admin Review Management | Dashboard</title>
       {/* =========================================
           TOASTER
       ========================================== */}

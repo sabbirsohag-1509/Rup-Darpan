@@ -119,6 +119,7 @@ const Packages = () => {
   if (isLoading) {
     return (
       <section className="px-4 pb-20 sm:pb-24">
+
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3].map((item) => (
@@ -184,6 +185,7 @@ const Packages = () => {
 
   return (
     <>
+      <title>Packages | Rup Darpon</title>
       {/* =========================================
           PACKAGES SECTION
       ========================================= */}

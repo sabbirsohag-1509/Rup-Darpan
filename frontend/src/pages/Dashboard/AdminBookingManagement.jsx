@@ -286,6 +286,7 @@ const AdminBookingManagement = () => {
 
   return (
     <>
+      <title>Admin Booking Management | Rup Darpon</title>
       {/* =========================================
           TOASTER
       ========================================= */}

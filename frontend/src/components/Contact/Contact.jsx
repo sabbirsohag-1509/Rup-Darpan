@@ -267,6 +267,7 @@ const CrewCard = ({ member }) => {
 const Contact = () => {
   return (
     <main className="min-h-screen bg-base-100">
+      <title>Contact | Rup Darpon</title>
       {/* =================================================
           HERO
       ================================================= */}

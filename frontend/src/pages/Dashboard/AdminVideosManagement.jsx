@@ -299,6 +299,7 @@ const handleFeaturedToggle = async (video) => {
 
   return (
     <div className="space-y-6">
+      <title>Admin Videos Management | Rup Darpon</title>
       {/* =====================================================
           HEADER
       ===================================================== */}

@@ -88,6 +88,7 @@ const Gallery = () => {
 
   return (
     <main className="bg-base-100">
+      <title>Gallery | Rup Darpon</title>
       {/* =====================================================
           PHOTO GALLERY SECTION
       ===================================================== */}

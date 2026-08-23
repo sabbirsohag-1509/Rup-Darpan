@@ -8,13 +8,15 @@ import {
   Star,
   Users,
 } from "lucide-react";
+
 import OurPolicy from "../OurPolicy/OurPolicy";
-import OurTeam from "../../assets/sabbir.jpg";
-import OurStory from "../../assets/sabbir.jpg"
+import OurTeam from "../../assets/our-team.jpg";
+import OurStory from "../../assets/our-story.jpg";
 
 const About = () => {
   return (
     <main className="bg-base-100">
+      <title>About Us | Rup Darpon </title>
       {/* =======================================================
           HERO
       ======================================================== */}
@@ -30,6 +32,7 @@ const About = () => {
             <div>
               <div className="mb-4 flex items-center gap-2 text-primary">
                 <Camera className="h-5 w-5" />
+
                 <span className="text-xs font-semibold uppercase tracking-[0.2em]">
                   About Rup Darpon
                 </span>
@@ -37,7 +40,9 @@ const About = () => {
 
               <h1 className="font-playfair text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
                 Every frame tells a{" "}
-                <span className="italic text-primary">beautiful story.</span>
+                <span className="italic text-primary">
+                  beautiful story.
+                </span>
               </h1>
 
               <p className="mt-5 text-sm leading-7 text-base-content/65 sm:text-base">
@@ -54,11 +59,11 @@ const About = () => {
 
             {/* RIGHT */}
 
-            <div>
+            <div className="flex w-full items-center justify-center overflow-hidden rounded-3xl bg-base-200/30 shadow-xl">
               <img
                 src={OurTeam}
                 alt="Rup Darpon Team"
-                className="h-[420px] w-full rounded-3xl object-cover shadow-xl"
+                className="block h-auto max-h-[520px] w-full object-contain"
               />
             </div>
           </div>
@@ -70,7 +75,7 @@ const About = () => {
       ======================================================== */}
 
       <section className="py-10 sm:py-14">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 sm:grid-cols-4 sm:px-8 lg:px-10">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 sm:px-8 lg:grid-cols-4 lg:px-10">
           {[
             ["500+", "Moments Captured"],
             ["120+", "Happy Clients"],
@@ -82,6 +87,7 @@ const About = () => {
               className="rounded-2xl border border-primary/10 bg-base-100 p-5 text-center shadow-sm"
             >
               <h3 className="text-3xl font-bold text-primary">{number}</h3>
+
               <p className="mt-2 text-xs text-base-content/55">{label}</p>
             </div>
           ))}
@@ -95,6 +101,8 @@ const About = () => {
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
           <div className="grid items-center gap-10 rounded-3xl border border-primary/10 bg-base-100 p-6 shadow-sm lg:grid-cols-2 lg:p-8">
+            {/* STORY CONTENT */}
+
             <div>
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                 Our Story
@@ -117,11 +125,15 @@ const About = () => {
               </p>
             </div>
 
-            <img
-              src={OurStory}
-              alt="Our Story"
-              className="h-[340px] w-full rounded-2xl object-cover"
-            />
+            {/* STORY IMAGE */}
+
+            <div className="flex w-full items-center justify-center overflow-hidden rounded-2xl bg-base-200/30">
+              <img
+                src={OurStory}
+                alt="Our Story"
+                className="block h-auto max-h-[500px] w-full object-contain"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -214,6 +226,7 @@ const About = () => {
                 className="flex items-center gap-3 rounded-2xl border border-primary/10 bg-base-100 p-5 shadow-sm"
               >
                 <Image className="h-5 w-5 text-primary" />
+
                 <span className="font-medium">{service}</span>
               </div>
             ))}
@@ -228,37 +241,52 @@ const About = () => {
       <section className="border-t border-base-200 py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
           <div className="grid gap-4 md:grid-cols-3">
+            {/* PHONE */}
+
             <div className="flex items-center gap-4 rounded-2xl border border-primary/10 p-5">
               <Phone className="h-8 w-8 text-primary" />
+
               <div>
                 <p className="text-xs text-base-content/45">Phone</p>
+
                 <h3 className="font-semibold">+8801824-269459</h3>
               </div>
             </div>
 
+            {/* LOCATION */}
+
             <div className="flex items-center gap-4 rounded-2xl border border-primary/10 p-5">
               <MapPin className="h-8 w-8 text-primary" />
+
               <div>
                 <p className="text-xs text-base-content/45">Location</p>
+
                 <h3 className="font-semibold">Dinajpur, Bangladesh</h3>
               </div>
             </div>
 
+            {/* COMMITMENT */}
+
             <div className="flex items-center gap-4 rounded-2xl border border-primary/10 p-5">
               <Star className="h-8 w-8 text-primary" />
+
               <div>
                 <p className="text-xs text-base-content/45">Commitment</p>
-                <h3 className="font-semibold">Quality • Passion • Trust</h3>
+
+                <h3 className="font-semibold">
+                  Quality • Passion • Trust
+                </h3>
               </div>
             </div>
           </div>
         </div>
       </section>
-      {/* =======================================================
-    OUR POLICIES
-======================================================= */}
 
-      <OurPolicy></OurPolicy>
+      {/* =======================================================
+          OUR POLICIES
+      ======================================================== */}
+
+      <OurPolicy />
     </main>
   );
 };

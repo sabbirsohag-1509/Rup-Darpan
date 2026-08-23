@@ -411,6 +411,7 @@ const AdminUsersManagement = () => {
 
   return (
     <div className="space-y-6">
+      <title>Admin Users Management | Rup Darpon</title>
       {/* ==========================================
           HEADER
       ========================================== */}

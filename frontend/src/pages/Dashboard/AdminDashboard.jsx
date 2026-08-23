@@ -73,6 +73,7 @@ const formatDate = (date) => {
 const RevenueChart = ({ data }) => {
   return (
     <section className="rounded-2xl border border-primary/10 bg-base-100 p-6 shadow-sm">
+      <title>Revenue Analytics | Rup Darpon</title>
       <SectionHeader
         title="Revenue Analytics"
         description="Monthly confirmed revenue trend."
