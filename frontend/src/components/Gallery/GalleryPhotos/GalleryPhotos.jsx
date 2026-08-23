@@ -9,6 +9,7 @@ import {
 import {
   useQuery,
   useQueries,
+  useQueryClient,
 } from "@tanstack/react-query";
 
 import axios from "axios";
@@ -166,7 +167,10 @@ const formatLikeCount = (count = 0) => {
 // =========================================================
 
 const GalleryPhotos = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const queryClient = useQueryClient();
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
 
   const [searchQuery, setSearchQuery] =
     useState("");
@@ -247,17 +251,6 @@ const GalleryPhotos = () => {
   // =======================================================
   // GET LIKE STATUS + COUNT
   // =======================================================
-  //
-  // GET:
-  // /photos/:id/like/:visitorId
-  //
-  // Response:
-  // {
-  //   liked: true,
-  //   likes: 123
-  // }
-  //
-  // =======================================================
 
   const likeQueries = useQueries({
     queries: photos.map((photo) => ({
@@ -309,7 +302,9 @@ const GalleryPhotos = () => {
   // =======================================================
 
   useEffect(() => {
-    if (!photos.length) return;
+    if (!photos.length) {
+      return;
+    }
 
     setLikeCounts((previous) => {
       const updated = {
@@ -336,32 +331,39 @@ const GalleryPhotos = () => {
   }, [photos, likeQueries]);
 
   // =======================================================
-  // SYNC SERVER LIKE STATUS WITH LOCAL STATE
+  // SYNC SERVER LIKE STATUS
   // =======================================================
 
   useEffect(() => {
-    if (!photos.length) return;
+    if (!photos.length) {
+      return;
+    }
 
-    const serverLikedIds = photos
-      .filter((photo, index) => {
-        const data =
-          likeQueries[index]?.data;
+    const serverResults = photos
+      .map((photo, index) => ({
+        id: photo._id,
+        data: likeQueries[index]?.data,
+      }))
+      .filter((item) => item.data);
 
-        return data?.liked === true;
-      })
-      .map((photo) => photo._id);
-
-    if (!serverLikedIds.length) {
+    if (!serverResults.length) {
       return;
     }
 
     setLikedPhotos((previous) => {
-      const updated = [
-        ...new Set([
-          ...previous,
-          ...serverLikedIds,
-        ]),
-      ];
+      let updated = [...previous];
+
+      serverResults.forEach(({ id, data }) => {
+        if (data.liked === true) {
+          if (!updated.includes(id)) {
+            updated.push(id);
+          }
+        } else {
+          updated = updated.filter(
+            (photoId) => photoId !== id
+          );
+        }
+      });
 
       saveLikedPhotos(updated);
 
@@ -432,12 +434,11 @@ const GalleryPhotos = () => {
   // OPEN PHOTO
   // =======================================================
 
-  const openPhoto = (photo) => {
+  const openPhoto = useCallback((photo) => {
     setSelectedPhoto(photo);
 
-    document.body.style.overflow =
-      "hidden";
-  };
+    document.body.style.overflow = "hidden";
+  }, []);
 
   // =======================================================
   // CLOSE PHOTO
@@ -472,18 +473,18 @@ const GalleryPhotos = () => {
           likes,
         } = response.data;
 
-        // ---------------------------------------------------
+        // =================================================
         // UPDATE LIKE COUNT
-        // ---------------------------------------------------
+        // =================================================
 
         setLikeCounts((previous) => ({
           ...previous,
           [photoId]: likes,
         }));
 
-        // ---------------------------------------------------
+        // =================================================
         // UPDATE LOCAL LIKED PHOTOS
-        // ---------------------------------------------------
+        // =================================================
 
         setLikedPhotos((previous) => {
           let updated;
@@ -505,6 +506,22 @@ const GalleryPhotos = () => {
           return updated;
         });
 
+        // =================================================
+        // UPDATE REACT QUERY CACHE
+        // =================================================
+
+        queryClient.setQueryData(
+          [
+            "photo-like",
+            photoId,
+            visitorId,
+          ],
+          {
+            liked,
+            likes,
+          }
+        );
+
         return {
           liked,
           likes,
@@ -518,11 +535,11 @@ const GalleryPhotos = () => {
         return null;
       }
     },
-    [visitorId]
+    [visitorId, queryClient]
   );
 
   // =======================================================
-  // UPDATE TANSTACK LIKE QUERY
+  // HANDLE PHOTO LIKE
   // =======================================================
 
   const handlePhotoLike = useCallback(
@@ -534,9 +551,9 @@ const GalleryPhotos = () => {
         return;
       }
 
-      // -----------------------------------------------
+      // =================================================
       // UPDATE SELECTED PHOTO
-      // -----------------------------------------------
+      // =================================================
 
       setSelectedPhoto((previous) => {
         if (
@@ -551,16 +568,6 @@ const GalleryPhotos = () => {
           likes: result.likes,
         };
       });
-
-      // -----------------------------------------------
-      // UPDATE LIKE QUERY CACHE
-      // -----------------------------------------------
-
-      // React Query's cache is automatically
-      // updated through the query result on next fetch.
-      //
-      // Current page UI is already updated through
-      // likeCounts + likedPhotos.
     },
     [handleLike]
   );
@@ -569,22 +576,25 @@ const GalleryPhotos = () => {
   // PAGINATION
   // =======================================================
 
-  const goToPage = (page) => {
-    if (
-      page < 1 ||
-      page > totalPages ||
-      page === currentPage
-    ) {
-      return;
-    }
+  const goToPage = useCallback(
+    (page) => {
+      if (
+        page < 1 ||
+        page > totalPages ||
+        page === currentPage
+      ) {
+        return;
+      }
 
-    setCurrentPage(page);
+      setCurrentPage(page);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    },
+    [currentPage, totalPages]
+  );
 
   // =======================================================
   // CLEAN BODY SCROLL
@@ -819,7 +829,6 @@ const GalleryPhotos = () => {
                       ];
 
                     const isLiked =
-                      serverLikeData?.liked ??
                       likedPhotos.includes(
                         photo._id
                       );
@@ -974,6 +983,7 @@ const PhotoCard = ({
             {photo?.photographer && (
               <p className="mt-1 flex items-center gap-1.5 text-xs text-white/70">
                 <User className="h-3.5 w-3.5" />
+
                 {photo.photographer}
               </p>
             )}
@@ -1026,12 +1036,6 @@ const PhotoDetailModal = ({
     useState(false);
 
   // =======================================================
-  // IMAGE AREA REF
-  // =======================================================
-
-  const imageAreaRef = useRef(null);
-
-  // =======================================================
   // DRAG STATE
   // =======================================================
 
@@ -1071,9 +1075,7 @@ const PhotoDetailModal = ({
     photo?.category ||
     "Photography";
 
-  const tags = Array.isArray(
-    photo?.tags
-  )
+  const tags = Array.isArray(photo?.tags)
     ? photo.tags
     : [];
 
@@ -1085,7 +1087,6 @@ const PhotoDetailModal = ({
     likeDataMap?.[photo?._id];
 
   const isLiked =
-    serverLikeData?.liked ??
     likedPhotos.includes(photo?._id);
 
   const likes =
@@ -1109,8 +1110,7 @@ const PhotoDetailModal = ({
 
   const hasNext =
     currentIndex !== -1 &&
-    currentIndex <
-      photos.length - 1;
+    currentIndex < photos.length - 1;
 
   // =======================================================
   // LIKE HANDLER
@@ -1212,26 +1212,29 @@ const PhotoDetailModal = ({
   // PREVIOUS
   // =======================================================
 
-  const showPrevious =
-    useCallback(() => {
-      if (!hasPrevious) return;
+  const showPrevious = useCallback(() => {
+    if (!hasPrevious) {
+      return;
+    }
 
-      onSelectPhoto(
-        photos[currentIndex - 1]
-      );
-    }, [
-      hasPrevious,
-      currentIndex,
-      photos,
-      onSelectPhoto,
-    ]);
+    onSelectPhoto(
+      photos[currentIndex - 1]
+    );
+  }, [
+    hasPrevious,
+    currentIndex,
+    photos,
+    onSelectPhoto,
+  ]);
 
   // =======================================================
   // NEXT
   // =======================================================
 
   const showNext = useCallback(() => {
-    if (!hasNext) return;
+    if (!hasNext) {
+      return;
+    }
 
     onSelectPhoto(
       photos[currentIndex + 1]
@@ -1259,9 +1262,7 @@ const PhotoDetailModal = ({
   // =======================================================
 
   useEffect(() => {
-    const handleKeyDown = (
-      event
-    ) => {
+    const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         onClose();
       }
@@ -1314,11 +1315,8 @@ const PhotoDetailModal = ({
   // DISTANCE BETWEEN TWO FINGERS
   // =======================================================
 
-  const getDistance = (
-    touches
-  ) => {
+  const getDistance = (touches) => {
     const first = touches[0];
-
     const second = touches[1];
 
     const dx =
@@ -1360,8 +1358,7 @@ const PhotoDetailModal = ({
       touches.length === 1 &&
       zoom > 1
     ) {
-      const touch =
-        touches[0];
+      const touch = touches[0];
 
       dragState.current = {
         isDragging: true,
@@ -1432,18 +1429,15 @@ const PhotoDetailModal = ({
     ) {
       event.preventDefault();
 
-      const touch =
-        touches[0];
+      const touch = touches[0];
 
       const deltaX =
         touch.clientX -
-        dragState.current
-          .startX;
+        dragState.current.startX;
 
       const deltaY =
         touch.clientY -
-        dragState.current
-          .startY;
+        dragState.current.startY;
 
       setPosition({
         x:
@@ -1550,9 +1544,7 @@ const PhotoDetailModal = ({
   // MOUSE WHEEL
   // =======================================================
 
-  const handleWheel = (
-    event
-  ) => {
+  const handleWheel = (event) => {
     event.preventDefault();
 
     if (event.deltaY < 0) {
@@ -1685,7 +1677,6 @@ const PhotoDetailModal = ({
         ================================================= */}
 
         <div
-          ref={imageAreaRef}
           className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black"
           style={{
             touchAction:
@@ -1737,11 +1728,13 @@ const PhotoDetailModal = ({
                   transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${zoom})`,
                   transformOrigin:
                     "center center",
+
                   transition:
                     dragState.current
                       .isDragging
                       ? "none"
                       : "transform 150ms ease-out",
+
                   willChange:
                     "transform",
                 }}
@@ -1780,9 +1773,7 @@ const PhotoDetailModal = ({
               />
 
               <span>
-                {formatLikeCount(
-                  likes
-                )}
+                {formatLikeCount(likes)}
               </span>
 
               <span>
@@ -1930,7 +1921,7 @@ const PhotoDetailModal = ({
                   }`}
                 >
                   <Heart
-                    className={`h-5 w-5 ${
+                    className={`h-5 w-5 cursor-pointer ${
                       isLiked
                         ? "fill-current"
                         : ""
@@ -2032,7 +2023,6 @@ const PhotoDetailModal = ({
             className="btn btn-ghost btn-sm mt-2 w-full rounded-full sm:btn-md"
           >
             <X className="h-4 w-4" />
-
             Close
           </button>
         </aside>
