@@ -233,19 +233,24 @@ Customers can submit reviews about their experience.
 
 The application implements secure authentication and authorization.
 
+## 🔐 Authentication & Authorization
+
+Rup Darpon uses a custom backend authentication system built with Node.js, Express.js, MongoDB, JWT, and Passport.js.
+
 ### Authentication Features
 
-* Email/password authentication
-* Google OAuth
-* Firebase Authentication
-* JWT authentication
-* HTTP-only cookies
-* Protected routes
-* Admin authorization
-* Forgot password
-* Password reset
-* Change password
-* Login activity tracking
+- Custom email/password authentication
+- Google OAuth authentication
+- Password hashing
+- JWT-based authentication
+- HTTP-only cookies
+- Protected routes
+- Role-based authorization
+- Admin authorization
+- Forgot password
+- Password reset
+- Change password
+- Login activity tracking
 
 ---
 
@@ -328,7 +333,7 @@ Administrators can manage featured videos.
 * Axios
 * Tailwind CSS
 * DaisyUI
-* Firebase Authentication
+* Custom Authentication
 * React Hook Form
 
 ---
@@ -348,7 +353,7 @@ Administrators can manage featured videos.
 
 ## Other Technologies & Services
 
-* Firebase
+* Custom Authentication
 * MongoDB Atlas
 * Cloudinary
 * Google OAuth
@@ -506,7 +511,7 @@ Never expose:
 
 * MongoDB credentials
 * JWT secret
-* Firebase private credentials
+* Custom authentication private credentials
 * Google OAuth secret
 * Email credentials
 * API keys that should remain private
@@ -637,7 +642,7 @@ While developing Rup Darpon, I worked with and gained practical experience in:
 * REST API development
 * MongoDB database design
 * Authentication & authorization
-* Firebase authentication
+* Custom authentication
 * Google OAuth
 * JWT-based authentication
 * React Query
