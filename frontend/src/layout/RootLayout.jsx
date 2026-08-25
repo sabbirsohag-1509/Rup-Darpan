@@ -12,7 +12,7 @@ const RootLayout = () => {
 
       <ScrollToTop />
 
-      <header className="sticky top-0 z-50 bg-base-100/90 backdrop-blur-md border-b border-primary/20">
+      <header className="sticky top-0 z-50 bg-base-100 border-b border-primary/20">
         <Navbar />
       </header>
 

@@ -46,6 +46,7 @@ import AdminHeroImageManagement from "../pages/Dashboard/AdminHeroImageManagemen
 
 import ErrorPage from "../components/ErrorPage/ErrorPage";
 import AdminPaymentManagement from "../pages/Dashboard/AdminPaymentManagement";
+import OurPolicy from "../components/OurPolicy/OurPolicy";
 
 export const router = createBrowserRouter([
   // =====================================================
@@ -103,6 +104,10 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "policy",
+        element: <OurPolicy></OurPolicy>
+      }
     ],
   },
 
