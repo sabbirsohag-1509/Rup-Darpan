@@ -3,6 +3,7 @@ import Navbar from "../components/shared/Navbar";
 import Footer from "../components/shared/Footer";
 import ScrollToTop from "../components/ScrollToTop";
 import SmoothScroll from "../components/SmoothScroll";
+import SocialFloating from "../components/shared/SocialFloating";
 
 const RootLayout = () => {
   return (
@@ -18,6 +19,8 @@ const RootLayout = () => {
       <main className="flex-1 w-full">
         <Outlet />
       </main>
+
+      <SocialFloating />
 
       <Footer />
     </div>
