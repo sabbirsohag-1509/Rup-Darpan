@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="YOUR-LIVE-URL">🌐 Live Website</a>
+  <a href="LIVE-URL">🌐 Live Website</a>
   &nbsp; • &nbsp;
   <a href="https://github.com/sabbirsohag-1509/Rup-Darpan">💻 GitHub Repository</a>
 </p>
@@ -29,7 +29,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 ### 🔗 Live Demo
 
 **Live URL:**
-`YOUR-LIVE-URL`
+`LIVE-URL`
 
 ---
 
@@ -48,7 +48,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 
 <!-- Add homepage screenshot here -->
 
-![Rup Darpon Homepage](YOUR-HOMEPAGE-SCREENSHOT-URL)
+![Rup Darpon Homepage](LIVE-URL)
 
 ---
 
@@ -56,7 +56,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 
 <!-- Add gallery screenshot here -->
 
-![Photography Gallery](YOUR-GALLERY-SCREENSHOT-URL)
+![Photography Gallery](LIVE-URL)
 
 ---
 
@@ -64,7 +64,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 
 <!-- Add featured videos screenshot here -->
 
-![Featured Videos](YOUR-FEATURED-VIDEOS-SCREENSHOT-URL)
+![Featured Videos](LIVE-URL)
 
 ---
 
@@ -72,7 +72,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 
 <!-- Add packages screenshot here -->
 
-![Photography Packages](YOUR-PACKAGES-SCREENSHOT-URL)
+![Photography Packages](LIVE-URL)
 
 ---
 
@@ -80,7 +80,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 
 <!-- Add booking screenshot here -->
 
-![Booking System](YOUR-BOOKING-SCREENSHOT-URL)
+![Booking System](LIVE-URL)
 
 ---
 
@@ -88,7 +88,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 
 <!-- Add reviews screenshot here -->
 
-![Customer Reviews](YOUR-REVIEWS-SCREENSHOT-URL)
+![Customer Reviews](LIVE-URL)
 
 ---
 
@@ -96,7 +96,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 
 <!-- Add admin dashboard screenshot here -->
 
-![Admin Dashboard](YOUR-ADMIN-DASHBOARD-SCREENSHOT-URL)
+![Admin Dashboard](LIVE-URL)
 
 ---
 
