@@ -100,3 +100,11 @@ body {
   font-family: 'Playfair Display', serif;
 }
 
+/* smooth scrolling  */
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  overflow-x: hidden;
+}
