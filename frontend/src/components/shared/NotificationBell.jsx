@@ -1,0 +1,794 @@
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
+import {
+  Bell,
+  CalendarDays,
+  Check,
+  CheckCheck,
+  Star,
+} from "lucide-react";
+
+const API_URL = "http://localhost:5000";
+
+// ============================================================
+// FORMAT TIME AGO
+// ============================================================
+
+const formatTimeAgo = (date) => {
+  const now = new Date();
+  const created = new Date(date);
+
+  const diffInSeconds = Math.floor((now - created) / 1000);
+
+  if (diffInSeconds < 10) {
+    return "Just now";
+  }
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} sec ago`;
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} min ago`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+
+  if (diffInHours < 24) {
+    return `${diffInHours} hr ago`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInDays < 7) {
+    return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+  }
+
+  const diffInWeeks = Math.floor(diffInDays / 7);
+
+  if (diffInWeeks < 4) {
+    return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
+  }
+
+  const diffInMonths = Math.floor(diffInDays / 30);
+
+  if (diffInMonths < 12) {
+    return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
+  }
+
+  const diffInYears = Math.floor(diffInDays / 365);
+
+  return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
+};
+
+// ============================================================
+// API FUNCTIONS
+// ============================================================
+
+const fetchNotifications = async () => {
+  const response = await axios.get(`${API_URL}/notifications`, {
+    withCredentials: true,
+  });
+
+  return response.data.notifications || [];
+};
+
+const fetchUnreadCount = async () => {
+  const response = await axios.get(
+    `${API_URL}/notifications/unread-count`,
+    {
+      withCredentials: true,
+    },
+  );
+
+  return response.data.unreadCount || 0;
+};
+
+// ============================================================
+// NOTIFICATION SKELETON
+// ============================================================
+
+const NotificationSkeleton = () => {
+  return (
+    <div className="flex gap-3 border-b border-base-200 px-4 py-3">
+      {/* Icon Skeleton */}
+
+      <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-base-300" />
+
+      {/* Content Skeleton */}
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-3">
+          <div className="h-3.5 w-32 animate-pulse rounded bg-base-300" />
+
+          <div className="h-2 w-2 animate-pulse rounded-full bg-base-300" />
+        </div>
+
+        <div className="mt-2 h-3 w-full animate-pulse rounded bg-base-300" />
+
+        <div className="mt-1.5 h-3 w-3/4 animate-pulse rounded bg-base-300" />
+
+        <div className="mt-2 h-2.5 w-20 animate-pulse rounded bg-base-300" />
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// NOTIFICATION BELL
+// ============================================================
+
+const NotificationBell = () => {
+  const [open, setOpen] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  const queryClient = useQueryClient();
+
+  const navigate = useNavigate();
+
+  // ==========================================================
+  // NOTIFICATIONS QUERY
+  // ==========================================================
+
+  const {
+    data: notifications = [],
+    isLoading: notificationsLoading,
+    isError: notificationsError,
+  } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: fetchNotifications,
+    enabled: open,
+    staleTime: 30 * 1000,
+  });
+
+  // ==========================================================
+  // UNREAD COUNT QUERY
+  // ==========================================================
+
+  const {
+    data: unreadCount = 0,
+    isLoading: unreadCountLoading,
+  } = useQuery({
+    queryKey: ["notifications", "unread-count"],
+    queryFn: fetchUnreadCount,
+    staleTime: 30 * 1000,
+  });
+
+  // ==========================================================
+  // MARK SINGLE NOTIFICATION AS READ
+  // ==========================================================
+
+  const markAsReadMutation = useMutation({
+    mutationFn: async (notificationId) => {
+      await axios.patch(
+        `${API_URL}/notifications/${notificationId}/read`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      return notificationId;
+    },
+
+    onSuccess: (notificationId) => {
+      // Update notification cache
+      queryClient.setQueryData(
+        ["notifications"],
+        (oldNotifications = []) =>
+          oldNotifications.map((notification) =>
+            notification._id === notificationId
+              ? {
+                  ...notification,
+                  isRead: true,
+                }
+              : notification,
+          ),
+      );
+
+      // Update unread count
+      queryClient.setQueryData(
+        ["notifications", "unread-count"],
+        (oldCount = 0) => Math.max(oldCount - 1, 0),
+      );
+    },
+
+    onError: (error) => {
+      console.error(
+        "Failed to mark notification as read:",
+        error,
+      );
+    },
+  });
+
+  // ==========================================================
+  // MARK ALL NOTIFICATIONS AS READ
+  // ==========================================================
+
+  const markAllAsReadMutation = useMutation({
+    mutationFn: async () => {
+      await axios.patch(
+        `${API_URL}/notifications/read-all`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+    },
+
+    onSuccess: () => {
+      // Update notifications cache
+      queryClient.setQueryData(
+        ["notifications"],
+        (oldNotifications = []) =>
+          oldNotifications.map((notification) => ({
+            ...notification,
+            isRead: true,
+          })),
+      );
+
+      // Reset unread count
+      queryClient.setQueryData(
+        ["notifications", "unread-count"],
+        0,
+      );
+    },
+
+    onError: (error) => {
+      console.error(
+        "Failed to mark all notifications as read:",
+        error,
+      );
+    },
+  });
+
+  // ==========================================================
+  // OUTSIDE CLICK
+  // ==========================================================
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside,
+      );
+    };
+  }, []);
+
+  // ==========================================================
+  // NOTIFICATION ICON
+  // ==========================================================
+
+  const getNotificationIcon = (type) => {
+    if (type === "booking") {
+      return <CalendarDays className="h-4 w-4" />;
+    }
+
+    if (type === "review") {
+      return <Star className="h-4 w-4" />;
+    }
+
+    return <Bell className="h-4 w-4" />;
+  };
+
+  // ==========================================================
+  // GET NOTIFICATION ROUTE
+  // ==========================================================
+
+  const getNotificationRoute = (type) => {
+    if (type === "booking") {
+      return "/admin/bookings";
+    }
+
+    if (type === "review") {
+      return "/admin/reviews";
+    }
+
+    return null;
+  };
+
+  // ==========================================================
+  // HANDLE NOTIFICATION CLICK
+  // ==========================================================
+
+  const handleNotificationClick = (notification) => {
+    // --------------------------------------------------------
+    // 1. Mark as read if unread
+    // --------------------------------------------------------
+
+    if (
+      !notification.isRead &&
+      !markAsReadMutation.isPending
+    ) {
+      markAsReadMutation.mutate(notification._id);
+    }
+
+    // --------------------------------------------------------
+    // 2. Get destination route
+    // --------------------------------------------------------
+
+    const route = getNotificationRoute(
+      notification.type,
+    );
+
+    // --------------------------------------------------------
+    // 3. Close dropdown
+    // --------------------------------------------------------
+
+    setOpen(false);
+
+    // --------------------------------------------------------
+    // 4. Navigate to related admin page
+    // --------------------------------------------------------
+
+    if (route) {
+      navigate(route);
+    }
+  };
+
+  // ==========================================================
+  // HANDLE ALL READ
+  // ==========================================================
+
+  const handleMarkAllAsRead = () => {
+    if (
+      unreadCount > 0 &&
+      !markAllAsReadMutation.isPending
+    ) {
+      markAllAsReadMutation.mutate();
+    }
+  };
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
+
+  return (
+    <div
+      ref={dropdownRef}
+      className="relative"
+    >
+      {/* ====================================================
+          BELL BUTTON
+      ==================================================== */}
+
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-label="Notifications"
+        data-tip="Notifications"
+        className="
+          tooltip
+          tooltip-left
+          relative
+          flex
+          h-10
+          w-10
+          cursor-pointer
+          items-center
+          justify-center
+          rounded-full
+          text-base-content/70
+          transition-all
+          duration-200
+          hover:bg-primary/10
+          hover:text-primary
+        "
+      >
+        <Bell className="h-5 w-5" />
+
+        {/* ==================================================
+            UNREAD BADGE
+        ================================================== */}
+
+        {unreadCount > 0 && (
+          <span
+            className="
+              absolute
+              -right-0.5
+              -top-0.5
+              flex
+              min-h-4
+              min-w-4
+              items-center
+              justify-center
+              rounded-full
+              bg-error
+              px-1
+              text-[9px]
+              font-bold
+              leading-none
+              text-error-content
+              ring-2
+              ring-base-100
+            "
+          >
+            {unreadCount > 99
+              ? "99+"
+              : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {/* ====================================================
+          NOTIFICATION DROPDOWN
+      ==================================================== */}
+
+      {open && (
+        <div
+          className="
+            absolute
+            right-0
+            top-12
+            z-[100]
+            w-[350px]
+            max-w-[calc(100vw-1.5rem)]
+            overflow-hidden
+            rounded-2xl
+            border
+            border-base-300
+            bg-base-100
+            shadow-2xl
+          "
+        >
+          {/* ==================================================
+              HEADER
+          ================================================== */}
+
+          <div
+            className="
+              flex
+              items-center
+              justify-between
+              gap-3
+              border-b
+              border-base-300
+              px-4
+              py-3
+            "
+          >
+            <div className="min-w-0">
+              <h3 className="font-semibold text-base-content">
+                Notifications
+              </h3>
+
+              {unreadCount > 0 && (
+                <p className="mt-0.5 text-xs text-base-content/50">
+                  {unreadCount} unread notification
+                  {unreadCount > 1 ? "s" : ""}
+                </p>
+              )}
+            </div>
+
+            {unreadCount > 0 && (
+              <button
+                type="button"
+                onClick={handleMarkAllAsRead}
+                disabled={
+                  markAllAsReadMutation.isPending
+                }
+                className="
+                  flex
+                  shrink-0
+                  cursor-pointer
+                  items-center
+                  gap-1
+                  text-xs
+                  font-medium
+                  text-primary
+                  transition
+                  hover:opacity-70
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
+                "
+              >
+                <CheckCheck className="h-4 w-4" />
+
+                {markAllAsReadMutation.isPending
+                  ? "Marking..."
+                  : "Mark all as read"}
+              </button>
+            )}
+          </div>
+
+          {/* ==================================================
+              NOTIFICATION LIST
+              ONLY THIS SECTION SCROLLS
+          ================================================== */}
+
+          <div
+            className="
+              max-h-[420px]
+              overflow-y-auto
+              overscroll-contain
+              scrollbar-thin
+              scrollbar-thumb-base-300
+              scrollbar-track-transparent
+            "
+          >
+            {/* =================================================
+                LOADING
+            ================================================= */}
+
+            {notificationsLoading ? (
+              <>
+                <NotificationSkeleton />
+                <NotificationSkeleton />
+                <NotificationSkeleton />
+                <NotificationSkeleton />
+                <NotificationSkeleton />
+              </>
+            ) : notificationsError ? (
+              /* =================================================
+                  ERROR
+              ================================================= */
+
+              <div className="px-5 py-12 text-center">
+                <Bell className="mx-auto mb-3 h-8 w-8 text-error/40" />
+
+                <p className="text-sm font-medium text-base-content/60">
+                  Failed to load notifications
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    queryClient.invalidateQueries({
+                      queryKey: ["notifications"],
+                    })
+                  }
+                  className="
+                    mt-3
+                    cursor-pointer
+                    rounded-lg
+                    bg-primary/10
+                    px-3
+                    py-2
+                    text-xs
+                    font-medium
+                    text-primary
+                    transition
+                    hover:bg-primary/20
+                  "
+                >
+                  Try again
+                </button>
+              </div>
+            ) : notifications.length === 0 ? (
+              /* =================================================
+                  EMPTY STATE
+              ================================================= */
+
+              <div className="px-5 py-12 text-center">
+                <Bell className="mx-auto mb-3 h-8 w-8 text-base-content/20" />
+
+                <p className="text-sm font-medium text-base-content/60">
+                  No notifications
+                </p>
+
+                <p className="mt-1 text-xs text-base-content/40">
+                  You're all caught up!
+                </p>
+              </div>
+            ) : (
+              /* =================================================
+                  NOTIFICATION ITEMS
+              ================================================= */
+
+              notifications.map((notification) => {
+                const route = getNotificationRoute(
+                  notification.type,
+                );
+
+                return (
+                  <div
+                    key={notification._id}
+                    onClick={() =>
+                      handleNotificationClick(
+                        notification,
+                      )
+                    }
+                    title={
+                      route
+                        ? notification.type ===
+                          "booking"
+                          ? "View booking"
+                          : notification.type ===
+                            "review"
+                          ? "View review"
+                          : "View notification"
+                        : "Notification"
+                    }
+                    className={`
+                      flex
+                      cursor-pointer
+                      gap-3
+                      border-b
+                      border-base-200
+                      px-4
+                      py-3
+                      transition
+                      hover:bg-base-200/60
+
+                      ${
+                        !notification.isRead
+                          ? "bg-primary/5"
+                          : ""
+                      }
+                    `}
+                  >
+                    {/* ======================================
+                        ICON
+                    ====================================== */}
+
+                    <div
+                      className={`
+                        flex
+                        h-9
+                        w-9
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-full
+
+                        ${
+                          notification.type ===
+                          "booking"
+                            ? "bg-info/10 text-info"
+                            : notification.type ===
+                                "review"
+                              ? "bg-warning/10 text-warning"
+                              : "bg-primary/10 text-primary"
+                        }
+                      `}
+                    >
+                      {getNotificationIcon(
+                        notification.type,
+                      )}
+                    </div>
+
+                    {/* ======================================
+                        CONTENT
+                    ====================================== */}
+
+                    <div className="min-w-0 flex-1">
+                      {/* Title */}
+
+                      <div className="flex items-start justify-between gap-2">
+                        <h4
+                          className={`
+                            min-w-0
+                            text-sm
+                            ${
+                              !notification.isRead
+                                ? "font-semibold"
+                                : "font-medium"
+                            }
+                          `}
+                        >
+                          {notification.title}
+                        </h4>
+
+                        {/* Unread Dot */}
+
+                        {!notification.isRead && (
+                          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                        )}
+                      </div>
+
+                      {/* Message */}
+
+                      <p
+                        className="
+                          mt-1
+                          text-xs
+                          leading-relaxed
+                          text-base-content/60
+                        "
+                      >
+                        {notification.message}
+                      </p>
+
+                      {/* Time */}
+
+                      <div
+                        className="
+                          mt-2
+                          flex
+                          items-center
+                          gap-1
+                          text-[11px]
+                          text-base-content/40
+                        "
+                      >
+                        {formatTimeAgo(
+                          notification.createdAt,
+                        )}
+
+                        {notification.isRead && (
+                          <>
+                            <span>•</span>
+
+                            <Check className="h-3 w-3" />
+
+                            <span>Read</span>
+                          </>
+                        )}
+
+                        {/* Route indicator */}
+
+                        {route && (
+                          <>
+                            <span>•</span>
+
+                            <span className="text-primary/70">
+                              View
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* ==================================================
+              FOOTER
+          ================================================== */}
+
+          {notifications.length > 0 && (
+            <div
+              className="
+                border-t
+                border-base-300
+                px-4
+                py-2
+              "
+            >
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="
+                  w-full
+                  cursor-pointer
+                  rounded-lg
+                  py-2
+                  text-xs
+                  font-medium
+                  text-primary
+                  transition
+                  hover:bg-primary/10
+                "
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default NotificationBell;

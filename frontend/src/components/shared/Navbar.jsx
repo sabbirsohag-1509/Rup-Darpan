@@ -14,10 +14,12 @@ import {
   ChevronDown,
   BookAlert,
 } from "lucide-react";
+
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import NotificationBell from "./NotificationBell";
 
 // =====================================================
 // NAVIGATION LINKS
@@ -72,7 +74,9 @@ const navLinkClass = ({ isActive }) =>
     "after:origin-left after:transition-transform",
     "after:duration-200",
 
-    isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100",
+    isActive
+      ? "after:scale-x-100"
+      : "after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
 
 // =====================================================
@@ -217,13 +221,9 @@ const AboutDropdown = ({ onClose }) => {
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [profileOpen, setProfileOpen] = useState(false);
-
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-
   const [isScrolled, setIsScrolled] = useState(false);
-
   const [aboutOpen, setAboutOpen] = useState(false);
 
   const { user, loading, logout } = useContext(AuthContext);
@@ -289,7 +289,11 @@ const Navbar = () => {
   // RENDER DESKTOP LINKS
   // ===================================================
 
-  const renderLinks = (className, onNavigate, iconSize = "h-4 w-4") => {
+  const renderLinks = (
+    className,
+    onNavigate,
+    iconSize = "h-4 w-4"
+  ) => {
     return navLinks.map(({ to, label, end, icon: Icon }) => {
       // =================================================
       // ABOUT DROPDOWN
@@ -313,62 +317,46 @@ const Navbar = () => {
           >
             <NavLink
               to="/about"
-              className={`
-      relative
-      flex
-      items-center
-      gap-1.5
-      px-3
-      py-2
-      text-sm
-      font-medium
-      tracking-wide
-      transition-colors
-      duration-200
-      hover:text-primary
-
-      ${
-        isPolicyPage || location.pathname === "/about"
-          ? "font-semibold text-primary"
-          : "text-base-content/70"
-      }
-
-      after:absolute
-      after:bottom-0
-      after:left-3
-      after:right-3
-      after:h-0.5
-      after:rounded-full
-      after:bg-primary
-      after:origin-left
-      after:transition-transform
-      after:duration-200
-
-      ${
-        isPolicyPage || location.pathname === "/about"
-          ? "after:scale-x-100"
-          : "after:scale-x-0 hover:after:scale-x-100"
-      }
-    `}
+              className="
+                relative
+                flex
+                items-center
+                gap-1.5
+                px-3
+                py-2
+                text-sm
+                font-medium
+                tracking-wide
+                transition-colors
+                duration-200
+                hover:text-primary
+              "
               aria-expanded={aboutOpen}
               aria-haspopup="true"
             >
-              <Icon className={iconSize} aria-hidden="true" />
+              <Icon
+                className={iconSize}
+                aria-hidden="true"
+              />
 
               <span>About</span>
 
               <ChevronDown
                 className={`
-        h-4 w-4
-        transition-transform
-        duration-200
-        ${aboutOpen ? "rotate-180" : "rotate-0"}
-      `}
+                  h-4 w-4
+                  transition-transform
+                  duration-200
+                  ${aboutOpen ? "rotate-180" : "rotate-0"}
+                `}
                 aria-hidden="true"
               />
             </NavLink>
 
-            {aboutOpen && <AboutDropdown onClose={() => setAboutOpen(false)} />}
+            {aboutOpen && (
+              <AboutDropdown
+                onClose={() => setAboutOpen(false)}
+              />
+            )}
           </li>
         );
       }
@@ -379,14 +367,128 @@ const Navbar = () => {
 
       return (
         <li key={to}>
-          <NavLink to={to} end={end} className={className} onClick={onNavigate}>
-            <Icon className={iconSize} aria-hidden="true" />
+          <NavLink
+            to={to}
+            end={end}
+            className={className}
+            onClick={onNavigate}
+          >
+            <Icon
+              className={iconSize}
+              aria-hidden="true"
+            />
 
             {label}
           </NavLink>
         </li>
       );
     });
+  };
+
+  // ===================================================
+  // ADMIN NOTIFICATION
+  // ===================================================
+
+  const AdminNotification = () => {
+    if (loading || user?.role !== "admin") {
+      return null;
+    }
+
+    return <NotificationBell />;
+  };
+
+  // ===================================================
+  // PROFILE
+  // ===================================================
+
+  const ProfileSection = () => {
+    if (loading) {
+      return (
+        <span className="loading loading-spinner loading-sm" />
+      );
+    }
+
+    if (!user) {
+      return (
+        <NavLink
+          to="/login"
+          className="
+            btn
+            btn-primary
+            btn-sm
+            gap-1.5
+            px-4
+            font-semibold
+            text-primary-content
+          "
+        >
+          <LogIn className="h-4 w-4" />
+          Login
+        </NavLink>
+      );
+    }
+
+    return (
+      <div className="relative">
+        <button
+          type="button"
+          className="avatar cursor-pointer"
+          onClick={() => {
+            setProfileOpen((prev) => !prev);
+            setMenuOpen(false);
+          }}
+          aria-label="Open profile menu"
+          aria-expanded={profileOpen}
+        >
+          <div
+            className="
+              h-10
+              w-10
+              overflow-hidden
+              rounded-full
+              ring-2
+              ring-primary/30
+              ring-offset-2
+              ring-offset-base-100
+            "
+          >
+            {user.profilePhoto ? (
+              <img
+                src={user.profilePhoto}
+                alt={user.name || "User profile"}
+                className="
+                  h-full
+                  w-full
+                  object-cover
+                "
+              />
+            ) : (
+              <div
+                className="
+                  flex
+                  h-full
+                  w-full
+                  items-center
+                  justify-center
+                  bg-primary
+                  font-semibold
+                  text-primary-content
+                "
+              >
+                {user.name?.charAt(0).toUpperCase() || "U"}
+              </div>
+            )}
+          </div>
+        </button>
+
+        {profileOpen && (
+          <ProfileDropdown
+            setProfileOpen={setProfileOpen}
+            setLogoutModalOpen={setLogoutModalOpen}
+          />
+        )}
+      </div>
+    );
   };
 
   // ===================================================
@@ -397,26 +499,23 @@ const Navbar = () => {
     <>
       {/* =================================================
           NAVBAR WRAPPER
-
-          Background intentionally removed.
-          RootLayout controls background.
       ================================================= */}
 
       <div
-  className={`
-    z-[80]
-    w-full
-    transition-all
-    duration-300
-    ease-in-out
+        className={`
+          z-[80]
+          w-full
+          transition-all
+          duration-300
+          ease-in-out
 
-    ${
-      isScrolled
-        ? "lg:fixed lg:inset-x-0 lg:top-0 lg:px-0 lg:pt-2"
-        : "relative"
-    }
-  `}
->
+          ${
+            isScrolled
+              ? "lg:fixed lg:inset-x-0 lg:top-0 lg:px-0 lg:pt-2"
+              : "relative"
+          }
+        `}
+      >
         {/* =================================================
             NAVBAR
         ================================================= */}
@@ -437,6 +536,7 @@ const Navbar = () => {
                   border border-primary/10
                   shadow-lg
                   backdrop-blur-xl
+                  bg-base-100/80
                 `
                 : ""
             }
@@ -458,14 +558,10 @@ const Navbar = () => {
                 px-4
               "
             >
-              {/* =================================================
-                  MOBILE LEFT — MENU
-              ================================================= */}
+              {/* MOBILE LEFT */}
 
               <div className="flex items-center">
                 <div className="relative">
-                  {/* Hamburger Button */}
-
                   <button
                     type="button"
                     className="
@@ -473,11 +569,14 @@ const Navbar = () => {
                       btn-ghost
                       btn-square
                     "
-                    aria-label={menuOpen ? "Close menu" : "Open menu"}
+                    aria-label={
+                      menuOpen
+                        ? "Close menu"
+                        : "Open menu"
+                    }
                     aria-expanded={menuOpen}
                     onClick={() => {
                       setMenuOpen((open) => !open);
-
                       setProfileOpen(false);
                     }}
                   >
@@ -488,9 +587,7 @@ const Navbar = () => {
                     )}
                   </button>
 
-                  {/* =================================================
-                      MOBILE MENU
-                  ================================================= */}
+                  {/* MOBILE MENU */}
 
                   {menuOpen && (
                     <ul
@@ -508,185 +605,173 @@ const Navbar = () => {
                         shadow-xl
                       "
                     >
-                      {/* =================================================
-                          MOBILE NAVIGATION
-                      ================================================= */}
-
-                      {navLinks.map(({ to, label, end, icon: Icon }) => {
-                        // =========================================
-                        // MOBILE ABOUT
-                        // =========================================
-
-                        if (label === "About") {
-                          return (
-                            <li key={to}>
-                              {/* Mobile About */}
-
-                              <div
-                                className={`
-      flex
-      w-full
-      items-center
-      rounded-lg
-      transition-colors
-      duration-200
-
-      ${
-        isPolicyPage || location.pathname === "/about"
-          ? "bg-primary/10 text-primary"
-          : "text-base-content/80"
-      }
-    `}
-                              >
-                                {/* About → /about */}
-
-                                <NavLink
-                                  to="/about"
-                                  onClick={() => {
-                                    setMenuOpen(false);
-                                    setAboutOpen(false);
-                                  }}
-                                  className={`
-        flex
-        flex-1
-        items-center
-        gap-2.5
-        px-3
-        py-2.5
-        text-base
-        font-medium
-        transition-colors
-        duration-200
-        hover:text-primary
-
-        ${
-          isPolicyPage || location.pathname === "/about"
-            ? "font-semibold text-primary"
-            : ""
-        }
-      `}
-                                >
-                                  <Icon className="h-4 w-4 shrink-0" />
-
-                                  <span>About</span>
-                                </NavLink>
-
-                                {/* Dropdown Toggle */}
-
-                                <button
-                                  type="button"
-                                  onClick={() => setAboutOpen((prev) => !prev)}
-                                  className="
-        flex
-        items-center
-        justify-center
-        px-3
-        py-2.5
-        text-base-content/70
-        hover:text-primary
-      "
-                                  aria-label="Toggle About submenu"
-                                  aria-expanded={aboutOpen}
-                                >
-                                  <ChevronDown
-                                    className={`
-          h-4
-          w-4
-          transition-transform
-          duration-200
-
-          ${aboutOpen ? "rotate-180" : "rotate-0"}
-        `}
-                                  />
-                                </button>
-                              </div>
-
-                              {/* Mobile About Submenu */}
-
-                              {aboutOpen && (
+                      {navLinks.map(
+                        ({
+                          to,
+                          label,
+                          end,
+                          icon: Icon,
+                        }) => {
+                          if (label === "About") {
+                            return (
+                              <li key={to}>
                                 <div
-                                  className="
-        mt-1
-        ml-4
-        border-l
-        border-primary/20
-        pl-2
-      "
+                                  className={`
+                                    flex
+                                    w-full
+                                    items-center
+                                    rounded-lg
+                                    transition-colors
+                                    duration-200
+
+                                    ${
+                                      isPolicyPage ||
+                                      location.pathname ===
+                                        "/about"
+                                        ? "bg-primary/10 text-primary"
+                                        : "text-base-content/80"
+                                    }
+                                  `}
                                 >
                                   <NavLink
-                                    to="/policy"
+                                    to="/about"
                                     onClick={() => {
                                       setMenuOpen(false);
                                       setAboutOpen(false);
                                     }}
-                                    className={({ isActive }) =>
-                                      `
-            flex
-            w-full
-            items-center
-            gap-2.5
-            rounded-lg
-            px-3
-            py-2.5
-            text-sm
-            font-medium
-            transition-all
-            duration-200
-
-            ${
-              isActive
-                ? "bg-primary/10 font-semibold text-primary"
-                : "text-base-content/70 hover:bg-primary/10 hover:text-primary"
-            }
-          `
-                                    }
+                                    className="
+                                      flex
+                                      flex-1
+                                      items-center
+                                      gap-2.5
+                                      px-3
+                                      py-2.5
+                                      text-base
+                                      font-medium
+                                    "
                                   >
-                                    <BookAlert className="h-4 w-4 shrink-0" />
+                                    <Icon className="h-4 w-4" />
 
-                                    <span>Our Policy</span>
+                                    <span>About</span>
                                   </NavLink>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setAboutOpen(
+                                        (prev) => !prev
+                                      )
+                                    }
+                                    className="
+                                      flex
+                                      items-center
+                                      justify-center
+                                      px-3
+                                      py-2.5
+                                      text-base-content/70
+                                      hover:text-primary
+                                    "
+                                    aria-label="Toggle About submenu"
+                                  >
+                                    <ChevronDown
+                                      className={`
+                                        h-4
+                                        w-4
+                                        transition-transform
+                                        duration-200
+
+                                        ${
+                                          aboutOpen
+                                            ? "rotate-180"
+                                            : "rotate-0"
+                                        }
+                                      `}
+                                    />
+                                  </button>
                                 </div>
-                              )}
+
+                                {aboutOpen && (
+                                  <div
+                                    className="
+                                      mt-1
+                                      ml-4
+                                      border-l
+                                      border-primary/20
+                                      pl-2
+                                    "
+                                  >
+                                    <NavLink
+                                      to="/policy"
+                                      onClick={() => {
+                                        setMenuOpen(false);
+                                        setAboutOpen(false);
+                                      }}
+                                      className={({
+                                        isActive,
+                                      }) =>
+                                        `
+                                          flex
+                                          w-full
+                                          items-center
+                                          gap-2.5
+                                          rounded-lg
+                                          px-3
+                                          py-2.5
+                                          text-sm
+                                          font-medium
+
+                                          ${
+                                            isActive
+                                              ? "bg-primary/10 font-semibold text-primary"
+                                              : "text-base-content/70 hover:bg-primary/10 hover:text-primary"
+                                          }
+                                        `
+                                      }
+                                    >
+                                      <BookAlert className="h-4 w-4" />
+
+                                      <span>
+                                        Our Policy
+                                      </span>
+                                    </NavLink>
+                                  </div>
+                                )}
+                              </li>
+                            );
+                          }
+
+                          return (
+                            <li key={to}>
+                              <NavLink
+                                to={to}
+                                end={end}
+                                className={
+                                  mobileLinkClass
+                                }
+                                onClick={closeMenu}
+                              >
+                                <Icon className="h-4 w-4" />
+                                {label}
+                              </NavLink>
                             </li>
                           );
                         }
+                      )}
 
-                        // =========================================
-                        // NORMAL MOBILE LINK
-                        // =========================================
-
-                        return (
-                          <li key={to}>
-                            <NavLink
-                              to={to}
-                              end={end}
-                              className={mobileLinkClass}
-                              onClick={closeMenu}
-                            >
-                              <Icon className="h-4 w-4" />
-
-                              {label}
-                            </NavLink>
-                          </li>
-                        );
-                      })}
-
-                      {/* =================================================
-                          LOGIN
-                      ================================================= */}
+                      {/* MOBILE LOGIN */}
 
                       {!loading && !user && (
                         <li className="mt-1 border-t border-primary/10 pt-2">
                           <NavLink
                             to="/login"
                             className="
-                                btn
-                                btn-primary
-                                btn-sm
-                                w-full
-                                gap-2
-                                text-primary-content
-                              "
+                              btn
+                              btn-primary
+                              btn-sm
+                              w-full
+                              gap-2
+                              text-primary-content
+                            "
                             onClick={closeMenu}
                           >
                             <LogIn className="h-4 w-4" />
@@ -699,9 +784,7 @@ const Navbar = () => {
                 </div>
               </div>
 
-              {/* =================================================
-                  MOBILE LOGO
-              ================================================= */}
+              {/* MOBILE LOGO */}
 
               <NavLink
                 to="/"
@@ -720,91 +803,16 @@ const Navbar = () => {
                 <Logo compact />
               </NavLink>
 
-              {/* =================================================
-                  MOBILE RIGHT
-              ================================================= */}
+              {/* MOBILE RIGHT */}
 
               <div className="flex items-center gap-2">
+                {/* Admin Notification */}
+
+                <AdminNotification />
+
                 <ThemeToggle />
 
-                {loading ? (
-                  <span className="loading loading-spinner loading-sm" />
-                ) : user ? (
-                  <div className="relative">
-                    <button
-                      type="button"
-                      className="avatar cursor-pointer"
-                      onClick={() => {
-                        setProfileOpen((prev) => !prev);
-
-                        setMenuOpen(false);
-                      }}
-                      aria-label="Open profile menu"
-                      aria-expanded={profileOpen}
-                    >
-                      <div
-                        className="
-                          h-10
-                          w-10
-                          overflow-hidden
-                          rounded-full
-                          ring-2
-                          ring-primary/30
-                          ring-offset-2
-                          ring-offset-base-100
-                        "
-                      >
-                        {user.profilePhoto ? (
-                          <img
-                            src={user.profilePhoto}
-                            alt={user.name || "User profile"}
-                            className="
-                              h-full
-                              w-full
-                              object-cover
-                            "
-                          />
-                        ) : (
-                          <div
-                            className="
-                              flex
-                              h-full
-                              w-full
-                              items-center
-                              justify-center
-                              bg-primary
-                              font-semibold
-                              text-primary-content
-                            "
-                          >
-                            {user.name?.charAt(0).toUpperCase() || "U"}
-                          </div>
-                        )}
-                      </div>
-                    </button>
-
-                    {profileOpen && (
-                      <ProfileDropdown
-                        setProfileOpen={setProfileOpen}
-                        setLogoutModalOpen={setLogoutModalOpen}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <NavLink
-                    to="/login"
-                    className="
-                      btn
-                      btn-primary
-                      btn-sm
-                      px-3
-                      font-semibold
-                      text-primary-content
-                    "
-                  >
-                    <LogIn className="h-4 w-4" />
-                  </NavLink>
-                )}
+                <ProfileSection />
               </div>
             </div>
           </div>
@@ -820,10 +828,6 @@ const Navbar = () => {
 
             {!isScrolled ? (
               <div className="px-6">
-                {/* =================================================
-                    TOP AREA
-                ================================================= */}
-
                 <div
                   className="
                     relative
@@ -833,11 +837,11 @@ const Navbar = () => {
                     justify-between
                   "
                 >
-                  {/* Left Spacer */}
+                  {/* LEFT SPACER */}
 
                   <div className="w-1/3" />
 
-                  {/* Center Logo */}
+                  {/* CENTER LOGO */}
 
                   <NavLink
                     to="/"
@@ -855,7 +859,7 @@ const Navbar = () => {
                     <Logo compact />
                   </NavLink>
 
-                  {/* Right Controls */}
+                  {/* RIGHT CONTROLS */}
 
                   <div
                     className="
@@ -866,90 +870,21 @@ const Navbar = () => {
                       gap-3
                     "
                   >
+                    {/* ADMIN NOTIFICATION */}
+
+                    <AdminNotification />
+
+                    {/* THEME */}
+
                     <ThemeToggle />
 
-                    {loading ? (
-                      <span className="loading loading-spinner loading-sm" />
-                    ) : user ? (
-                      <div className="relative">
-                        <button
-                          type="button"
-                          className="avatar cursor-pointer"
-                          onClick={() => setProfileOpen((prev) => !prev)}
-                          aria-label="Open profile menu"
-                          aria-expanded={profileOpen}
-                        >
-                          <div
-                            className="
-                              h-10
-                              w-10
-                              overflow-hidden
-                              rounded-full
-                              ring-2
-                              ring-primary/30
-                              ring-offset-2
-                              ring-offset-base-100
-                            "
-                          >
-                            {user.profilePhoto ? (
-                              <img
-                                src={user.profilePhoto}
-                                alt={user.name || "User profile"}
-                                className="
-                                  h-full
-                                  w-full
-                                  object-cover
-                                "
-                              />
-                            ) : (
-                              <div
-                                className="
-                                  flex
-                                  h-full
-                                  w-full
-                                  items-center
-                                  justify-center
-                                  bg-primary
-                                  font-semibold
-                                  text-primary-content
-                                "
-                              >
-                                {user.name?.charAt(0).toUpperCase() || "U"}
-                              </div>
-                            )}
-                          </div>
-                        </button>
+                    {/* PROFILE */}
 
-                        {profileOpen && (
-                          <ProfileDropdown
-                            setProfileOpen={setProfileOpen}
-                            setLogoutModalOpen={setLogoutModalOpen}
-                          />
-                        )}
-                      </div>
-                    ) : (
-                      <NavLink
-                        to="/login"
-                        className="
-                          btn
-                          btn-primary
-                          btn-sm
-                          gap-1.5
-                          px-4
-                          font-semibold
-                          text-primary-content
-                        "
-                      >
-                        <LogIn className="h-4 w-4" />
-                        Login
-                      </NavLink>
-                    )}
+                    <ProfileSection />
                   </div>
                 </div>
 
-                {/* =================================================
-                    NORMAL DESKTOP NAVIGATION
-                ================================================= */}
+                {/* NAVIGATION */}
 
                 <div
                   className="
@@ -982,7 +917,7 @@ const Navbar = () => {
                   sm:px-5
                 "
               >
-                {/* Logo */}
+                {/* LOGO */}
 
                 <div className="flex shrink-0 items-center">
                   <NavLink
@@ -999,7 +934,7 @@ const Navbar = () => {
                   </NavLink>
                 </div>
 
-                {/* Navigation */}
+                {/* NAVIGATION */}
 
                 <div
                   className="
@@ -1022,7 +957,7 @@ const Navbar = () => {
                   </ul>
                 </div>
 
-                {/* Right Controls */}
+                {/* RIGHT CONTROLS */}
 
                 <div
                   className="
@@ -1033,84 +968,17 @@ const Navbar = () => {
                     gap-3
                   "
                 >
+                  {/* ADMIN NOTIFICATION */}
+
+                  <AdminNotification />
+
+                  {/* THEME */}
+
                   <ThemeToggle />
 
-                  {loading ? (
-                    <span className="loading loading-spinner loading-sm" />
-                  ) : user ? (
-                    <div className="relative">
-                      <button
-                        type="button"
-                        className="avatar cursor-pointer"
-                        onClick={() => setProfileOpen((prev) => !prev)}
-                        aria-label="Open profile menu"
-                        aria-expanded={profileOpen}
-                      >
-                        <div
-                          className="
-                            h-10
-                            w-10
-                            overflow-hidden
-                            rounded-full
-                            ring-2
-                            ring-primary/30
-                            ring-offset-2
-                            ring-offset-base-100
-                          "
-                        >
-                          {user.profilePhoto ? (
-                            <img
-                              src={user.profilePhoto}
-                              alt={user.name || "User profile"}
-                              className="
-                                h-full
-                                w-full
-                                object-cover
-                              "
-                            />
-                          ) : (
-                            <div
-                              className="
-                                flex
-                                h-full
-                                w-full
-                                items-center
-                                justify-center
-                                bg-primary
-                                font-semibold
-                                text-primary-content
-                              "
-                            >
-                              {user.name?.charAt(0).toUpperCase() || "U"}
-                            </div>
-                          )}
-                        </div>
-                      </button>
+                  {/* PROFILE */}
 
-                      {profileOpen && (
-                        <ProfileDropdown
-                          setProfileOpen={setProfileOpen}
-                          setLogoutModalOpen={setLogoutModalOpen}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <NavLink
-                      to="/login"
-                      className="
-                        btn
-                        btn-primary
-                        btn-sm
-                        gap-1.5
-                        px-4
-                        font-semibold
-                        text-primary-content
-                      "
-                    >
-                      <LogIn className="h-4 w-4" />
-                      Login
-                    </NavLink>
-                  )}
+                  <ProfileSection />
                 </div>
               </div>
             )}
@@ -1122,7 +990,9 @@ const Navbar = () => {
           DESKTOP FIXED NAVBAR SPACER
       ================================================= */}
 
-      {isScrolled && <div className="hidden h-[5rem] lg:block" />}
+      {isScrolled && (
+        <div className="hidden h-[5rem] lg:block" />
+      )}
 
       {/* =================================================
           LOGOUT MODAL
@@ -1159,7 +1029,7 @@ const Navbar = () => {
             "
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Icon */}
+            {/* ICON */}
 
             <div
               className="
@@ -1180,20 +1050,22 @@ const Navbar = () => {
               <LogOut className="h-6 w-6" />
             </div>
 
-            {/* Content */}
+            {/* CONTENT */}
 
             <div className="text-center">
-              <h3 className="font-playfair text-2xl font-semibold">Logout?</h3>
+              <h3 className="font-playfair text-2xl font-semibold">
+                Logout?
+              </h3>
 
               <p className="mt-2 text-sm text-base-content/65">
                 Are you sure you want to log out of your account?
               </p>
             </div>
 
-            {/* Buttons */}
+            {/* BUTTONS */}
 
             <div className="mt-6 flex gap-3">
-              {/* Cancel */}
+              {/* CANCEL */}
 
               <button
                 type="button"
@@ -1209,7 +1081,7 @@ const Navbar = () => {
                 Cancel
               </button>
 
-              {/* Logout */}
+              {/* LOGOUT */}
 
               <button
                 type="button"
@@ -1218,12 +1090,19 @@ const Navbar = () => {
                     .then(() => {
                       setLogoutModalOpen(false);
 
-                      toast.success("Logged out successfully!");
+                      toast.success(
+                        "Logged out successfully!"
+                      );
                     })
                     .catch((error) => {
-                      console.error("Logout error:", error);
+                      console.error(
+                        "Logout error:",
+                        error
+                      );
 
-                      toast.error("Failed to log out. Please try again.");
+                      toast.error(
+                        "Failed to log out. Please try again."
+                      );
                     });
                 }}
                 className="
