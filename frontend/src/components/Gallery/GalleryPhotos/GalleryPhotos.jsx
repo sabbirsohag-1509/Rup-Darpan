@@ -1435,7 +1435,7 @@ const PhotoDetailModal = ({
     setZoom((previous) =>
       Math.min(
         previous + 0.25,
-        3
+        10
       )
     );
   }, []);

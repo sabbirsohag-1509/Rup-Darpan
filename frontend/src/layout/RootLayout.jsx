@@ -51,8 +51,8 @@ const RootLayout = () => {
 
       {/* HEADER */}
 
-     <header
-  className={`
+      <header
+        className={`
     sticky
     top-0
     z-50
@@ -64,17 +64,13 @@ const RootLayout = () => {
     ease-in-out
     will-change-transform
 
-    ${
-      showMobileNavbar
-        ? "translate-y-0"
-        : "-translate-y-full"
-    }
+    ${showMobileNavbar ? "translate-y-0" : "-translate-y-full"}
 
     lg:translate-y-0
   `}
->
-  <Navbar />
-</header>
+      >
+        <Navbar />
+      </header>
 
       <main className="flex-1 w-full">
         <Outlet />
