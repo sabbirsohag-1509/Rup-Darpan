@@ -6,6 +6,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const UAParser = require("ua-parser-js");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
@@ -117,10 +118,55 @@ async function run() {
     const videoCollection = myDB.collection("videos");
     const heroImagesCollection = myDB.collection("heroImages");
     const photoLikes = myDB.collection("photoLikes");
+    //likes indexes
     await photoLikes.createIndex(
       { photoId: 1, visitorId: 1 },
       { unique: true },
     );
+    const notificationsCollection = myDB.collection("notifications");
+    //Helper function to create a notification
+    const createNotification = async ({
+      recipientId,
+      recipientRole,
+      type,
+      title,
+      message,
+      relatedId = null,
+    }) => {
+      try {
+        const notificationData = {
+          recipientId: recipientId.toString(),
+          recipientRole,
+          type,
+          title,
+          message,
+          relatedId: relatedId ? relatedId.toString() : null,
+          isRead: false,
+          createdAt: new Date(),
+        };
+
+        const result =
+          await notificationsCollection.insertOne(notificationData);
+
+        return {
+          _id: result.insertedId,
+          ...notificationData,
+        };
+      } catch (error) {
+        console.error("Create notification error:", error);
+        throw error;
+      }
+    };
+    // Notification indexes
+    await notificationsCollection.createIndex({
+      recipientId: 1,
+      createdAt: -1,
+    });
+
+    await notificationsCollection.createIndex({
+      recipientId: 1,
+      isRead: 1,
+    });
 
     // Google Strategy
     passport.use(
@@ -1596,10 +1642,24 @@ async function run() {
       try {
         const bookingData = req.body;
 
+        // Get logged-in user
+        const user = await userCollection.findOne({
+          _id: new ObjectId(req.user.userId),
+        });
+
+        if (!user) {
+          return res.status(404).send({
+            message: "User not found.",
+          });
+        }
+
         const newBooking = {
           ...bookingData,
 
           userId: req.user.userId,
+
+          userName: user.name,
+          userEmail: user.email,
 
           status: "pending",
 
@@ -1608,7 +1668,38 @@ async function run() {
 
         const result = await bookingCollection.insertOne(newBooking);
 
-        res.status(201).send(result);
+        // ============================================
+        // CREATE ADMIN NOTIFICATIONS
+        // ============================================
+
+        const admins = await userCollection
+          .find({
+            role: "admin",
+          })
+          .project({
+            _id: 1,
+            name: 1,
+          })
+          .toArray();
+
+        await Promise.all(
+          admins.map((admin) =>
+            createNotification({
+              recipientId: admin._id,
+              recipientRole: "admin",
+              type: "booking",
+              title: "New Booking Received",
+              message: `${user.name} has submitted a new booking request.`,
+              relatedId: result.insertedId,
+            }),
+          ),
+        );
+
+        res.status(201).send({
+          success: true,
+          message: "Booking created successfully.",
+          insertedId: result.insertedId,
+        });
       } catch (error) {
         console.error("Failed to create booking:", error);
 
@@ -1772,10 +1863,9 @@ async function run() {
       try {
         const { packageId, packageName, rating, comment } = req.body;
 
-        // Logged-in user
         const userId = req.user.userId;
 
-        // User collection to get user details
+        // Get user
         const user = await userCollection.findOne({
           _id: new ObjectId(userId),
         });
@@ -1791,6 +1881,7 @@ async function run() {
           packageName,
 
           userId,
+
           userName: user.name,
           userPhoto: user.profilePhoto || user.photo || "",
 
@@ -1801,7 +1892,35 @@ async function run() {
           status: "pending",
         };
 
+        // Insert review
         const result = await reviewCollection.insertOne(newReview);
+
+        // ============================================
+        // CREATE ADMIN NOTIFICATIONS
+        // ============================================
+
+        const admins = await userCollection
+          .find({
+            role: "admin",
+          })
+          .project({
+            _id: 1,
+            name: 1,
+          })
+          .toArray();
+
+        await Promise.all(
+          admins.map((admin) =>
+            createNotification({
+              recipientId: admin._id,
+              recipientRole: "admin",
+              type: "review",
+              title: "New Review Submitted",
+              message: `${user.name} submitted a review for ${packageName || "a package"}.`,
+              relatedId: result.insertedId,
+            }),
+          ),
+        );
 
         res.status(201).send({
           success: true,
@@ -2149,6 +2268,239 @@ async function run() {
 
         res.status(500).send({
           message: "Failed to get photo like status",
+        });
+      }
+    });
+    //////////////////////// NOTIFICATION IMAGE RELATED API /////////////////////////////////
+    //POST
+    app.post("/notifications", verifyToken, async (req, res) => {
+      try {
+        const { recipientId, recipientRole, type, title, message, relatedId } =
+          req.body;
+
+        // VALIDATION
+
+        if (!recipientId) {
+          return res.status(400).send({
+            success: false,
+            message: "Recipient ID is required.",
+          });
+        }
+
+        if (!title?.trim()) {
+          return res.status(400).send({
+            success: false,
+            message: "Notification title is required.",
+          });
+        }
+
+        if (!message?.trim()) {
+          return res.status(400).send({
+            success: false,
+            message: "Notification message is required.",
+          });
+        }
+        // CREATE NOTIFICATION
+        const newNotification = {
+          recipientId: recipientId.toString(),
+
+          recipientRole: recipientRole === "admin" ? "admin" : "user",
+
+          type: type?.trim() || "general",
+
+          title: title.trim(),
+
+          message: message.trim(),
+
+          relatedId: relatedId?.toString() || null,
+
+          isRead: false,
+
+          createdAt: new Date(),
+        };
+
+        const result = await notificationsCollection.insertOne(newNotification);
+
+        res.status(201).send({
+          success: true,
+          message: "Notification created successfully.",
+
+          notification: {
+            _id: result.insertedId,
+            ...newNotification,
+          },
+        });
+      } catch (error) {
+        console.error("Create notification error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to create notification.",
+        });
+      }
+    });
+    //GET
+    app.get("/notifications", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.userId;
+
+        const notifications = await notificationsCollection
+          .find({
+            recipientId: userId,
+          })
+          .sort({
+            createdAt: -1,
+          })
+          .limit(50)
+          .toArray();
+
+        res.status(200).send({
+          success: true,
+          notifications,
+        });
+      } catch (error) {
+        console.error("Get notifications error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to fetch notifications.",
+        });
+      }
+    });
+    // GET UNREAD NOTIFICATION COUNT
+    app.get("/notifications/unread-count", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.userId;
+
+        const unreadCount = await notificationsCollection.countDocuments({
+          recipientId: userId,
+          isRead: false,
+        });
+
+        res.status(200).send({
+          success: true,
+          unreadCount,
+        });
+      } catch (error) {
+        console.error("Get unread notification count error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to fetch unread notification count.",
+        });
+      }
+    });
+    // MARK SINGLE NOTIFICATION AS READ
+    app.patch("/notifications/:id/read", verifyToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            success: false,
+            message: "Invalid notification ID.",
+          });
+        }
+
+        const result = await notificationsCollection.updateOne(
+          {
+            _id: new ObjectId(id),
+            recipientId: req.user.userId,
+          },
+          {
+            $set: {
+              isRead: true,
+              readAt: new Date(),
+            },
+          },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send({
+            success: false,
+            message: "Notification not found or you are not authorized.",
+          });
+        }
+
+        res.status(200).send({
+          success: true,
+          message: "Notification marked as read.",
+        });
+      } catch (error) {
+        console.error("Mark notification as read error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to mark notification as read.",
+        });
+      }
+    });
+    // MARK ALL NOTIFICATIONS AS READ
+    app.patch("/notifications/read-all", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.userId;
+
+        const result = await notificationsCollection.updateMany(
+          {
+            recipientId: userId,
+            isRead: false,
+          },
+          {
+            $set: {
+              isRead: true,
+              readAt: new Date(),
+            },
+          },
+        );
+
+        res.status(200).send({
+          success: true,
+          message: "All notifications marked as read.",
+          modifiedCount: result.modifiedCount,
+        });
+      } catch (error) {
+        console.error("Mark all notifications as read error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to mark all notifications as read.",
+        });
+      }
+    });
+    // DELETE NOTIFICATION
+    app.delete("/notifications/:id", verifyToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({
+            success: false,
+            message: "Invalid notification ID.",
+          });
+        }
+
+        const result = await notificationsCollection.deleteOne({
+          _id: new ObjectId(id),
+          recipientId: req.user.userId,
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).send({
+            success: false,
+            message: "Notification not found or you are not authorized.",
+          });
+        }
+
+        res.status(200).send({
+          success: true,
+          message: "Notification deleted successfully.",
+        });
+      } catch (error) {
+        console.error("Delete notification error:", error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to delete notification.",
         });
       }
     });
