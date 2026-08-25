@@ -65,18 +65,14 @@ const navLinkClass = ({ isActive }) =>
     "transition-colors duration-200",
     "hover:text-primary",
 
-    isActive
-      ? "font-semibold text-primary"
-      : "text-base-content/70",
+    isActive ? "font-semibold text-primary" : "text-base-content/70",
 
     "after:absolute after:bottom-0 after:left-3 after:right-3",
     "after:h-0.5 after:rounded-full after:bg-primary",
     "after:origin-left after:transition-transform",
     "after:duration-200",
 
-    isActive
-      ? "after:scale-x-100"
-      : "after:scale-x-0 hover:after:scale-x-100",
+    isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
 
 // =====================================================
@@ -97,10 +93,7 @@ const mobileLinkClass = ({ isActive }) =>
 // PROFILE DROPDOWN
 // =====================================================
 
-const ProfileDropdown = ({
-  setProfileOpen,
-  setLogoutModalOpen,
-}) => {
+const ProfileDropdown = ({ setProfileOpen, setLogoutModalOpen }) => {
   return (
     <div
       className="
@@ -133,7 +126,6 @@ const ProfileDropdown = ({
         "
       >
         <LayoutDashboard className="h-4 w-4" />
-
         Dashboard
       </NavLink>
 
@@ -162,7 +154,6 @@ const ProfileDropdown = ({
         "
       >
         <LogOut className="h-4 w-4" />
-
         Logout
       </button>
     </div>
@@ -229,15 +220,13 @@ const Navbar = () => {
 
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const [logoutModalOpen, setLogoutModalOpen] =
-    useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
   const [isScrolled, setIsScrolled] = useState(false);
 
   const [aboutOpen, setAboutOpen] = useState(false);
 
-  const { user, loading, logout } =
-    useContext(AuthContext);
+  const { user, loading, logout } = useContext(AuthContext);
 
   const location = useLocation();
 
@@ -247,8 +236,7 @@ const Navbar = () => {
   // POLICY PAGE CHECK
   // ===================================================
 
-  const isPolicyPage =
-    location.pathname === "/policy";
+  const isPolicyPage = location.pathname === "/policy";
 
   // ===================================================
   // SCROLL DETECTION
@@ -259,21 +247,14 @@ const Navbar = () => {
       setIsScrolled(window.scrollY > 40);
     };
 
-    window.addEventListener(
-      "scroll",
-      handleScroll,
-      {
-        passive: true,
-      },
-    );
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
 
     handleScroll();
 
     return () => {
-      window.removeEventListener(
-        "scroll",
-        handleScroll,
-      );
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -308,132 +289,104 @@ const Navbar = () => {
   // RENDER DESKTOP LINKS
   // ===================================================
 
-  const renderLinks = (
-    className,
-    onNavigate,
-    iconSize = "h-4 w-4",
-  ) => {
-    return navLinks.map(
-      ({
-        to,
-        label,
-        end,
-        icon: Icon,
-      }) => {
-        // =================================================
-        // ABOUT DROPDOWN
-        // =================================================
+  const renderLinks = (className, onNavigate, iconSize = "h-4 w-4") => {
+    return navLinks.map(({ to, label, end, icon: Icon }) => {
+      // =================================================
+      // ABOUT DROPDOWN
+      // =================================================
 
-        if (label === "About") {
-          return (
-            <li
-              key={to}
-              className="relative"
-            >
-              <button
-                type="button"
-                onClick={handleAboutClick}
-                onMouseEnter={() => {
-                  if (window.innerWidth >= 1024) {
-                    setAboutOpen(true);
-                  }
-                }}
-                className={`
-                  relative
-                  flex
-                  items-center
-                  gap-1.5
-                  px-3
-                  py-2
-                  text-sm
-                  font-medium
-                  tracking-wide
-                  transition-colors
-                  duration-200
-                  hover:text-primary
-
-                  ${
-                    isPolicyPage || aboutOpen
-                      ? "font-semibold text-primary"
-                      : "text-base-content/70"
-                  }
-
-                  after:absolute
-                  after:bottom-0
-                  after:left-3
-                  after:right-3
-                  after:h-0.5
-                  after:rounded-full
-                  after:bg-primary
-                  after:origin-left
-                  after:transition-transform
-                  after:duration-200
-
-                  ${
-                    isPolicyPage || aboutOpen
-                      ? "after:scale-x-100"
-                      : "after:scale-x-0 hover:after:scale-x-100"
-                  }
-                `}
-                aria-expanded={aboutOpen}
-                aria-haspopup="true"
-              >
-                <Icon
-                  className={iconSize}
-                  aria-hidden="true"
-                />
-
-                <span>About</span>
-
-                <ChevronDown
-                  className={`
-                    h-4 w-4
-                    transition-transform
-                    duration-200
-                    ${
-                      aboutOpen
-                        ? "rotate-180"
-                        : "rotate-0"
-                    }
-                  `}
-                  aria-hidden="true"
-                />
-              </button>
-
-              {aboutOpen && (
-                <AboutDropdown
-                  onClose={() =>
-                    setAboutOpen(false)
-                  }
-                />
-              )}
-            </li>
-          );
-        }
-
-        // =================================================
-        // NORMAL DESKTOP LINK
-        // =================================================
-
+      if (label === "About") {
         return (
-          <li key={to}>
+          <li
+            key={to}
+            className="relative"
+            onMouseEnter={() => {
+              if (window.innerWidth >= 1024) {
+                setAboutOpen(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (window.innerWidth >= 1024) {
+                setAboutOpen(false);
+              }
+            }}
+          >
             <NavLink
-              to={to}
-              end={end}
-              className={className}
-              onClick={onNavigate}
+              to="/about"
+              className={`
+      relative
+      flex
+      items-center
+      gap-1.5
+      px-3
+      py-2
+      text-sm
+      font-medium
+      tracking-wide
+      transition-colors
+      duration-200
+      hover:text-primary
+
+      ${
+        isPolicyPage || location.pathname === "/about"
+          ? "font-semibold text-primary"
+          : "text-base-content/70"
+      }
+
+      after:absolute
+      after:bottom-0
+      after:left-3
+      after:right-3
+      after:h-0.5
+      after:rounded-full
+      after:bg-primary
+      after:origin-left
+      after:transition-transform
+      after:duration-200
+
+      ${
+        isPolicyPage || location.pathname === "/about"
+          ? "after:scale-x-100"
+          : "after:scale-x-0 hover:after:scale-x-100"
+      }
+    `}
+              aria-expanded={aboutOpen}
+              aria-haspopup="true"
             >
-              <Icon
-                className={iconSize}
+              <Icon className={iconSize} aria-hidden="true" />
+
+              <span>About</span>
+
+              <ChevronDown
+                className={`
+        h-4 w-4
+        transition-transform
+        duration-200
+        ${aboutOpen ? "rotate-180" : "rotate-0"}
+      `}
                 aria-hidden="true"
               />
-
-              {label}
             </NavLink>
+
+            {aboutOpen && <AboutDropdown onClose={() => setAboutOpen(false)} />}
           </li>
         );
-      },
-    );
+      }
+
+      // =================================================
+      // NORMAL DESKTOP LINK
+      // =================================================
+
+      return (
+        <li key={to}>
+          <NavLink to={to} end={end} className={className} onClick={onNavigate}>
+            <Icon className={iconSize} aria-hidden="true" />
+
+            {label}
+          </NavLink>
+        </li>
+      );
+    });
   };
 
   // ===================================================
@@ -450,20 +403,20 @@ const Navbar = () => {
       ================================================= */}
 
       <div
-        className={`
-          z-[80]
-          w-full
-          transition-all
-          duration-300
-          ease-in-out
+  className={`
+    z-[80]
+    w-full
+    transition-all
+    duration-300
+    ease-in-out
 
-          ${
-            isScrolled
-              ? "fixed inset-x-0 top-0 px-0 pt-2"
-              : "relative"
-          }
-        `}
-      >
+    ${
+      isScrolled
+        ? "lg:fixed lg:inset-x-0 lg:top-0 lg:px-0 lg:pt-2"
+        : "relative"
+    }
+  `}
+>
         {/* =================================================
             NAVBAR
         ================================================= */}
@@ -520,16 +473,10 @@ const Navbar = () => {
                       btn-ghost
                       btn-square
                     "
-                    aria-label={
-                      menuOpen
-                        ? "Close menu"
-                        : "Open menu"
-                    }
+                    aria-label={menuOpen ? "Close menu" : "Open menu"}
                     aria-expanded={menuOpen}
                     onClick={() => {
-                      setMenuOpen(
-                        (open) => !open,
-                      );
+                      setMenuOpen((open) => !open);
 
                       setProfileOpen(false);
                     }}
@@ -565,177 +512,174 @@ const Navbar = () => {
                           MOBILE NAVIGATION
                       ================================================= */}
 
-                      {navLinks.map(
-                        ({
-                          to,
-                          label,
-                          end,
-                          icon: Icon,
-                        }) => {
-                          // =========================================
-                          // MOBILE ABOUT
-                          // =========================================
+                      {navLinks.map(({ to, label, end, icon: Icon }) => {
+                        // =========================================
+                        // MOBILE ABOUT
+                        // =========================================
 
-                          if (
-                            label === "About"
-                          ) {
-                            return (
-                              <li
-                                key={to}
+                        if (label === "About") {
+                          return (
+                            <li key={to}>
+                              {/* Mobile About */}
+
+                              <div
+                                className={`
+      flex
+      w-full
+      items-center
+      rounded-lg
+      transition-colors
+      duration-200
+
+      ${
+        isPolicyPage || location.pathname === "/about"
+          ? "bg-primary/10 text-primary"
+          : "text-base-content/80"
+      }
+    `}
                               >
-                                {/* About Button */}
+                                {/* About → /about */}
 
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setAboutOpen(
-                                      (prev) =>
-                                        !prev,
-                                    )
-                                  }
+                                <NavLink
+                                  to="/about"
+                                  onClick={() => {
+                                    setMenuOpen(false);
+                                    setAboutOpen(false);
+                                  }}
                                   className={`
-                                    flex
-                                    w-full
-                                    items-center
-                                    gap-2.5
-                                    rounded-lg
-                                    px-3
-                                    py-2.5
-                                    text-base
-                                    font-medium
-                                    transition-colors
-                                    duration-200
+        flex
+        flex-1
+        items-center
+        gap-2.5
+        px-3
+        py-2.5
+        text-base
+        font-medium
+        transition-colors
+        duration-200
+        hover:text-primary
 
-                                    ${
-                                      isPolicyPage ||
-                                      aboutOpen
-                                        ? "bg-primary/10 font-semibold text-primary"
-                                        : "text-base-content/80 hover:bg-base-200 hover:text-primary"
-                                    }
-                                  `}
-                                  aria-expanded={
-                                    aboutOpen
-                                  }
+        ${
+          isPolicyPage || location.pathname === "/about"
+            ? "font-semibold text-primary"
+            : ""
+        }
+      `}
                                 >
                                   <Icon className="h-4 w-4 shrink-0" />
 
-                                  <span className="flex-1 text-left">
-                                    About
-                                  </span>
+                                  <span>About</span>
+                                </NavLink>
 
+                                {/* Dropdown Toggle */}
+
+                                <button
+                                  type="button"
+                                  onClick={() => setAboutOpen((prev) => !prev)}
+                                  className="
+        flex
+        items-center
+        justify-center
+        px-3
+        py-2.5
+        text-base-content/70
+        hover:text-primary
+      "
+                                  aria-label="Toggle About submenu"
+                                  aria-expanded={aboutOpen}
+                                >
                                   <ChevronDown
                                     className={`
-                                      h-4 w-4
-                                      transition-transform
-                                      duration-200
+          h-4
+          w-4
+          transition-transform
+          duration-200
 
-                                      ${
-                                        aboutOpen
-                                          ? "rotate-180"
-                                          : "rotate-0"
-                                      }
-                                    `}
+          ${aboutOpen ? "rotate-180" : "rotate-0"}
+        `}
                                   />
                                 </button>
+                              </div>
 
-                                {/* =====================================
-                                    MOBILE ABOUT SUBMENU
-                                ===================================== */}
+                              {/* Mobile About Submenu */}
 
-                                {aboutOpen && (
-                                  <div
-                                    className="
-                                      mt-1
-                                      ml-4
-                                      border-l
-                                      border-primary/20
-                                      pl-2
-                                    "
-                                  >
-                                    <NavLink
-                                      to="/policy"
-                                      onClick={() => {
-                                        setMenuOpen(
-                                          false,
-                                        );
-
-                                        setAboutOpen(
-                                          false,
-                                        );
-                                      }}
-                                      className={({
-                                        isActive,
-                                      }) =>
-                                        `
-                                        flex
-                                        w-full
-                                        items-center
-                                        gap-2.5
-                                        rounded-lg
-                                        px-3
-                                        py-2.5
-                                        text-sm
-                                        font-medium
-                                        transition-all
-                                        duration-200
-
-                                        ${
-                                          isActive
-                                            ? "bg-primary/10 font-semibold text-primary"
-                                            : "text-base-content/70 hover:bg-primary/10 hover:text-primary"
-                                        }
+                              {aboutOpen && (
+                                <div
+                                  className="
+        mt-1
+        ml-4
+        border-l
+        border-primary/20
+        pl-2
+      "
+                                >
+                                  <NavLink
+                                    to="/policy"
+                                    onClick={() => {
+                                      setMenuOpen(false);
+                                      setAboutOpen(false);
+                                    }}
+                                    className={({ isActive }) =>
                                       `
-                                      }
-                                    >
-                                      <BookAlert className="h-4 w-4 shrink-0" />
+            flex
+            w-full
+            items-center
+            gap-2.5
+            rounded-lg
+            px-3
+            py-2.5
+            text-sm
+            font-medium
+            transition-all
+            duration-200
 
-                                      <span>
-                                        Our Policy
-                                      </span>
-                                    </NavLink>
-                                  </div>
-                                )}
-                              </li>
-                            );
-                          }
+            ${
+              isActive
+                ? "bg-primary/10 font-semibold text-primary"
+                : "text-base-content/70 hover:bg-primary/10 hover:text-primary"
+            }
+          `
+                                    }
+                                  >
+                                    <BookAlert className="h-4 w-4 shrink-0" />
 
-                          // =========================================
-                          // NORMAL MOBILE LINK
-                          // =========================================
-
-                          return (
-                            <li
-                              key={to}
-                            >
-                              <NavLink
-                                to={to}
-                                end={end}
-                                className={
-                                  mobileLinkClass
-                                }
-                                onClick={
-                                  closeMenu
-                                }
-                              >
-                                <Icon className="h-4 w-4" />
-
-                                {label}
-                              </NavLink>
+                                    <span>Our Policy</span>
+                                  </NavLink>
+                                </div>
+                              )}
                             </li>
                           );
-                        },
-                      )}
+                        }
+
+                        // =========================================
+                        // NORMAL MOBILE LINK
+                        // =========================================
+
+                        return (
+                          <li key={to}>
+                            <NavLink
+                              to={to}
+                              end={end}
+                              className={mobileLinkClass}
+                              onClick={closeMenu}
+                            >
+                              <Icon className="h-4 w-4" />
+
+                              {label}
+                            </NavLink>
+                          </li>
+                        );
+                      })}
 
                       {/* =================================================
                           LOGIN
                       ================================================= */}
 
-                      {!loading &&
-                        !user && (
-                          <li className="mt-1 border-t border-primary/10 pt-2">
-                            <NavLink
-                              to="/login"
-                              className="
+                      {!loading && !user && (
+                        <li className="mt-1 border-t border-primary/10 pt-2">
+                          <NavLink
+                            to="/login"
+                            className="
                                 btn
                                 btn-primary
                                 btn-sm
@@ -743,16 +687,13 @@ const Navbar = () => {
                                 gap-2
                                 text-primary-content
                               "
-                              onClick={
-                                closeMenu
-                              }
-                            >
-                              <LogIn className="h-4 w-4" />
-
-                              Login
-                            </NavLink>
-                          </li>
-                        )}
+                            onClick={closeMenu}
+                          >
+                            <LogIn className="h-4 w-4" />
+                            Login
+                          </NavLink>
+                        </li>
+                      )}
                     </ul>
                   )}
                 </div>
@@ -794,16 +735,12 @@ const Navbar = () => {
                       type="button"
                       className="avatar cursor-pointer"
                       onClick={() => {
-                        setProfileOpen(
-                          (prev) => !prev,
-                        );
+                        setProfileOpen((prev) => !prev);
 
                         setMenuOpen(false);
                       }}
                       aria-label="Open profile menu"
-                      aria-expanded={
-                        profileOpen
-                      }
+                      aria-expanded={profileOpen}
                     >
                       <div
                         className="
@@ -819,13 +756,8 @@ const Navbar = () => {
                       >
                         {user.profilePhoto ? (
                           <img
-                            src={
-                              user.profilePhoto
-                            }
-                            alt={
-                              user.name ||
-                              "User profile"
-                            }
+                            src={user.profilePhoto}
+                            alt={user.name || "User profile"}
                             className="
                               h-full
                               w-full
@@ -845,12 +777,7 @@ const Navbar = () => {
                               text-primary-content
                             "
                           >
-                            {user.name
-                              ?.charAt(
-                                0,
-                              )
-                              .toUpperCase() ||
-                              "U"}
+                            {user.name?.charAt(0).toUpperCase() || "U"}
                           </div>
                         )}
                       </div>
@@ -858,12 +785,8 @@ const Navbar = () => {
 
                     {profileOpen && (
                       <ProfileDropdown
-                        setProfileOpen={
-                          setProfileOpen
-                        }
-                        setLogoutModalOpen={
-                          setLogoutModalOpen
-                        }
+                        setProfileOpen={setProfileOpen}
+                        setLogoutModalOpen={setLogoutModalOpen}
                       />
                     )}
                   </div>
@@ -952,16 +875,9 @@ const Navbar = () => {
                         <button
                           type="button"
                           className="avatar cursor-pointer"
-                          onClick={() =>
-                            setProfileOpen(
-                              (prev) =>
-                                !prev,
-                            )
-                          }
+                          onClick={() => setProfileOpen((prev) => !prev)}
                           aria-label="Open profile menu"
-                          aria-expanded={
-                            profileOpen
-                          }
+                          aria-expanded={profileOpen}
                         >
                           <div
                             className="
@@ -977,13 +893,8 @@ const Navbar = () => {
                           >
                             {user.profilePhoto ? (
                               <img
-                                src={
-                                  user.profilePhoto
-                                }
-                                alt={
-                                  user.name ||
-                                  "User profile"
-                                }
+                                src={user.profilePhoto}
+                                alt={user.name || "User profile"}
                                 className="
                                   h-full
                                   w-full
@@ -1003,12 +914,7 @@ const Navbar = () => {
                                   text-primary-content
                                 "
                               >
-                                {user.name
-                                  ?.charAt(
-                                    0,
-                                  )
-                                  .toUpperCase() ||
-                                  "U"}
+                                {user.name?.charAt(0).toUpperCase() || "U"}
                               </div>
                             )}
                           </div>
@@ -1016,12 +922,8 @@ const Navbar = () => {
 
                         {profileOpen && (
                           <ProfileDropdown
-                            setProfileOpen={
-                              setProfileOpen
-                            }
-                            setLogoutModalOpen={
-                              setLogoutModalOpen
-                            }
+                            setProfileOpen={setProfileOpen}
+                            setLogoutModalOpen={setLogoutModalOpen}
                           />
                         )}
                       </div>
@@ -1039,7 +941,6 @@ const Navbar = () => {
                         "
                       >
                         <LogIn className="h-4 w-4" />
-
                         Login
                       </NavLink>
                     )}
@@ -1061,9 +962,7 @@ const Navbar = () => {
                   "
                 >
                   <ul className="menu menu-horizontal gap-1 px-1">
-                    {renderLinks(
-                      navLinkClass,
-                    )}
+                    {renderLinks(navLinkClass)}
                   </ul>
                 </div>
               </div>
@@ -1119,9 +1018,7 @@ const Navbar = () => {
                       px-0
                     "
                   >
-                    {renderLinks(
-                      navLinkClass,
-                    )}
+                    {renderLinks(navLinkClass)}
                   </ul>
                 </div>
 
@@ -1145,16 +1042,9 @@ const Navbar = () => {
                       <button
                         type="button"
                         className="avatar cursor-pointer"
-                        onClick={() =>
-                          setProfileOpen(
-                            (prev) =>
-                              !prev,
-                          )
-                        }
+                        onClick={() => setProfileOpen((prev) => !prev)}
                         aria-label="Open profile menu"
-                        aria-expanded={
-                          profileOpen
-                        }
+                        aria-expanded={profileOpen}
                       >
                         <div
                           className="
@@ -1170,13 +1060,8 @@ const Navbar = () => {
                         >
                           {user.profilePhoto ? (
                             <img
-                              src={
-                                user.profilePhoto
-                              }
-                              alt={
-                                user.name ||
-                                "User profile"
-                              }
+                              src={user.profilePhoto}
+                              alt={user.name || "User profile"}
                               className="
                                 h-full
                                 w-full
@@ -1196,12 +1081,7 @@ const Navbar = () => {
                                 text-primary-content
                               "
                             >
-                              {user.name
-                                ?.charAt(
-                                  0,
-                                )
-                                .toUpperCase() ||
-                                "U"}
+                              {user.name?.charAt(0).toUpperCase() || "U"}
                             </div>
                           )}
                         </div>
@@ -1209,12 +1089,8 @@ const Navbar = () => {
 
                       {profileOpen && (
                         <ProfileDropdown
-                          setProfileOpen={
-                            setProfileOpen
-                          }
-                          setLogoutModalOpen={
-                            setLogoutModalOpen
-                          }
+                          setProfileOpen={setProfileOpen}
+                          setLogoutModalOpen={setLogoutModalOpen}
                         />
                       )}
                     </div>
@@ -1232,7 +1108,6 @@ const Navbar = () => {
                       "
                     >
                       <LogIn className="h-4 w-4" />
-
                       Login
                     </NavLink>
                   )}
@@ -1247,9 +1122,7 @@ const Navbar = () => {
           DESKTOP FIXED NAVBAR SPACER
       ================================================= */}
 
-      {isScrolled && (
-        <div className="hidden h-[5rem] lg:block" />
-      )}
+      {isScrolled && <div className="hidden h-[5rem] lg:block" />}
 
       {/* =================================================
           LOGOUT MODAL
@@ -1270,9 +1143,7 @@ const Navbar = () => {
             px-4
             backdrop-blur-sm
           "
-          onClick={() =>
-            setLogoutModalOpen(false)
-          }
+          onClick={() => setLogoutModalOpen(false)}
         >
           <div
             className="
@@ -1286,9 +1157,7 @@ const Navbar = () => {
               shadow-2xl
               backdrop-blur-xl
             "
-            onClick={(e) =>
-              e.stopPropagation()
-            }
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Icon */}
 
@@ -1314,13 +1183,10 @@ const Navbar = () => {
             {/* Content */}
 
             <div className="text-center">
-              <h3 className="font-playfair text-2xl font-semibold">
-                Logout?
-              </h3>
+              <h3 className="font-playfair text-2xl font-semibold">Logout?</h3>
 
               <p className="mt-2 text-sm text-base-content/65">
-                Are you sure you want to log
-                out of your account?
+                Are you sure you want to log out of your account?
               </p>
             </div>
 
@@ -1331,9 +1197,7 @@ const Navbar = () => {
 
               <button
                 type="button"
-                onClick={() =>
-                  setLogoutModalOpen(false)
-                }
+                onClick={() => setLogoutModalOpen(false)}
                 className="
                   btn
                   btn-ghost
@@ -1352,23 +1216,14 @@ const Navbar = () => {
                 onClick={() => {
                   logout()
                     .then(() => {
-                      setLogoutModalOpen(
-                        false,
-                      );
+                      setLogoutModalOpen(false);
 
-                      toast.success(
-                        "Logged out successfully!",
-                      );
+                      toast.success("Logged out successfully!");
                     })
                     .catch((error) => {
-                      console.error(
-                        "Logout error:",
-                        error,
-                      );
+                      console.error("Logout error:", error);
 
-                      toast.error(
-                        "Failed to log out. Please try again.",
-                      );
+                      toast.error("Failed to log out. Please try again.");
                     });
                 }}
                 className="
@@ -1379,7 +1234,6 @@ const Navbar = () => {
                 "
               >
                 <LogOut className="h-4 w-4" />
-
                 Logout
               </button>
             </div>
