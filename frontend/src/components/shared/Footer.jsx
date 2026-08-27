@@ -9,6 +9,7 @@ import { FaFacebookF } from "react-icons/fa";
 import { Link } from "react-router";
 import Logo from "./Logo";
 import SabbirImg from "../../assets/sabbir.jpg";
+import UnderFooter from "./UnderFooter";
 
 // =========================================================
 // FACEBOOK ICON
@@ -348,6 +349,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      <UnderFooter></UnderFooter>
     </footer>
   );
 };
