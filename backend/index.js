@@ -2745,7 +2745,7 @@ async function run() {
         const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
         await transporter.sendMail({
-          from: `"Rup Darpan" <${process.env.EMAIL_USER}>`,
+          from: `"Rup Darpon Team" <${process.env.EMAIL_USER}>`,
           to: user.email,
           subject: "Reset Your Password",
           html: `
@@ -2759,7 +2759,7 @@ async function run() {
           </p>
 
           <p>
-            Click the button below to create a new password:
+            Click the button below to create a new password for your account:
           </p>
 
           <a
