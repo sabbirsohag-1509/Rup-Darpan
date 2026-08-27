@@ -223,7 +223,6 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
 
   const { user, loading, logout } = useContext(AuthContext);
@@ -237,26 +236,6 @@ const Navbar = () => {
   // ===================================================
 
   const isPolicyPage = location.pathname === "/policy";
-
-  // ===================================================
-  // SCROLL DETECTION
-  // ===================================================
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
-    };
-
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
-
-    handleScroll();
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   // ===================================================
   // AUTO OPEN ABOUT ON POLICY PAGE - DESKTOP
@@ -501,46 +480,17 @@ const Navbar = () => {
           NAVBAR WRAPPER
       ================================================= */}
 
-      <div
-        className={`
-          z-[80]
-          w-full
-          transition-all
-          duration-300
-          ease-in-out
-
-          ${
-            isScrolled
-              ? "lg:fixed lg:inset-x-0 lg:top-0 lg:px-0 lg:pt-2"
-              : "relative"
-          }
-        `}
-      >
+      <div className="z-[80] w-full">
         {/* =================================================
             NAVBAR
         ================================================= */}
 
         <nav
-          className={`
+          className="
             mx-auto
             w-full
             max-w-7xl
-            transition-all
-            duration-300
-            ease-in-out
-
-            ${
-              isScrolled
-                ? `
-                  rounded-2xl
-                  border border-primary/10
-                  shadow-lg
-                  backdrop-blur-xl
-                  bg-base-100/80
-                `
-                : ""
-            }
-          `}
+          "
           aria-label="Main navigation"
         >
           {/* =================================================
@@ -822,177 +772,90 @@ const Navbar = () => {
           ================================================= */}
 
           <div className="hidden lg:block">
-            {/* =================================================
-                NORMAL DESKTOP STATE
-            ================================================= */}
+            <div
+              className="
+                flex
+                min-h-[4.25rem]
+                w-full
+                items-center
+                justify-between
+                px-4
+                sm:px-5
+              "
+            >
+              {/* =================================================
+                  LOGO
+              ================================================= */}
 
-            {!isScrolled ? (
-              <div className="px-6">
-                <div
+              <div className="flex shrink-0 items-center">
+                <NavLink
+                  to="/"
                   className="
-                    relative
                     flex
-                    min-h-[4.5rem]
                     items-center
-                    justify-between
+                    transition-opacity
+                    duration-200
+                    hover:opacity-90
                   "
                 >
-                  {/* LEFT SPACER */}
-
-                  <div className="w-1/3" />
-
-                  {/* CENTER LOGO */}
-
-                  <NavLink
-                    to="/"
-                    className="
-                      absolute
-                      left-1/2
-                      flex
-                      -translate-x-1/2
-                      items-center
-                      transition-opacity
-                      duration-200
-                      hover:opacity-90
-                    "
-                  >
-                    <Logo compact />
-                  </NavLink>
-
-                  {/* RIGHT CONTROLS */}
-
-                  <div
-                    className="
-                      flex
-                      w-1/3
-                      items-center
-                      justify-end
-                      gap-3
-                    "
-                  >
-                    {/* ADMIN NOTIFICATION */}
-
-                    <AdminNotification />
-
-                    {/* THEME */}
-
-                    <ThemeToggle />
-
-                    {/* PROFILE */}
-
-                    <ProfileSection />
-                  </div>
-                </div>
-
-                {/* NAVIGATION */}
-
-                <div
-                  className="
-                    flex
-                    justify-center
-                    border-t
-                    border-base-200/50
-                    pt-2
-                    pb-1
-                  "
-                >
-                  <ul className="menu menu-horizontal gap-1 px-1">
-                    {renderLinks(navLinkClass)}
-                  </ul>
-                </div>
+                  <Logo compact />
+                </NavLink>
               </div>
-            ) : (
-              /* =================================================
-                 SCROLLED DESKTOP STATE
-              ================================================= */
+
+              {/* =================================================
+                  NAVIGATION
+              ================================================= */}
 
               <div
                 className="
                   flex
-                  min-h-[4.25rem]
-                  w-full
+                  flex-1
                   items-center
-                  justify-between
-                  px-4
-                  sm:px-5
+                  justify-center
                 "
               >
-                {/* LOGO */}
-
-                <div className="flex shrink-0 items-center">
-                  <NavLink
-                    to="/"
-                    className="
-                      flex
-                      items-center
-                      transition-opacity
-                      duration-200
-                      hover:opacity-90
-                    "
-                  >
-                    <Logo compact />
-                  </NavLink>
-                </div>
-
-                {/* NAVIGATION */}
-
-                <div
+                <ul
                   className="
-                    flex
-                    flex-1
-                    items-center
-                    justify-center
-                  "
-                >
-                  <ul
-                    className="
-                      menu
-                      menu-horizontal
-                      shrink-0
-                      gap-0
-                      px-0
-                    "
-                  >
-                    {renderLinks(navLinkClass)}
-                  </ul>
-                </div>
-
-                {/* RIGHT CONTROLS */}
-
-                <div
-                  className="
-                    flex
+                    menu
+                    menu-horizontal
                     shrink-0
-                    items-center
-                    justify-end
-                    gap-3
+                    gap-0
+                    px-0
                   "
                 >
-                  {/* ADMIN NOTIFICATION */}
-
-                  <AdminNotification />
-
-                  {/* THEME */}
-
-                  <ThemeToggle />
-
-                  {/* PROFILE */}
-
-                  <ProfileSection />
-                </div>
+                  {renderLinks(navLinkClass)}
+                </ul>
               </div>
-            )}
+
+              {/* =================================================
+                  RIGHT CONTROLS
+              ================================================= */}
+
+              <div
+                className="
+                  flex
+                  shrink-0
+                  items-center
+                  justify-end
+                  gap-3
+                "
+              >
+                {/* ADMIN NOTIFICATION */}
+
+                <AdminNotification />
+
+                {/* THEME */}
+
+                <ThemeToggle />
+
+                {/* PROFILE */}
+
+                <ProfileSection />
+              </div>
+            </div>
           </div>
         </nav>
       </div>
-
-      {/* =================================================
-          DESKTOP FIXED NAVBAR SPACER
-      ================================================= */}
-
-      {isScrolled && (
-        <div className="hidden h-[5rem] lg:block" />
-      )}
 
       {/* =================================================
           LOGOUT MODAL
