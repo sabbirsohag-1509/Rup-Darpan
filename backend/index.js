@@ -2122,7 +2122,7 @@ async function run() {
             rating: Number(rating),
             comment: comment.trim(),
 
-            // Edited review আবার admin approval-এর জন্য Pending
+            // Edited review
             status: "pending",
 
             updatedAt: new Date(),
@@ -2539,14 +2539,44 @@ async function run() {
           createdAt: new Date(),
         };
 
+        // Create user
         const result = await userCollection.insertOne(newUser);
 
+        // ============================================
+        // CREATE ADMIN NOTIFICATIONS
+        // ============================================
+
+        const admins = await userCollection
+          .find({
+            role: "admin",
+          })
+          .project({
+            _id: 1,
+            name: 1,
+          })
+          .toArray();
+
+        await Promise.all(
+          admins.map((admin) =>
+            createNotification({
+              recipientId: admin._id,
+              recipientRole: "admin",
+              type: "registration",
+              title: "New User Registered",
+              message: `${name} has registered a new account.`,
+              relatedId: result.insertedId,
+            }),
+          ),
+        );
+
+        // Response
         res.status(201).send({
+          success: true,
           message: "Registration successful",
           insertedId: result.insertedId,
         });
       } catch (error) {
-        console.log(error);
+        console.error("Registration error:", error);
 
         res.status(500).send({
           message: "Internal Server Error",
