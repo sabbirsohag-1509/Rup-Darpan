@@ -1773,6 +1773,25 @@ async function run() {
             });
           }
 
+          // ============================================
+          // FIND BOOKING
+          // ============================================
+
+          const booking = await bookingCollection.findOne({
+            _id: new ObjectId(id),
+          });
+
+          if (!booking) {
+            return res.status(404).send({
+              success: false,
+              message: "Booking not found",
+            });
+          }
+
+          // ============================================
+          // UPDATE BOOKING STATUS
+          // ============================================
+
           const result = await bookingCollection.updateOne(
             { _id: new ObjectId(id) },
             {
@@ -1783,12 +1802,22 @@ async function run() {
             },
           );
 
-          if (result.matchedCount === 0) {
-            return res.status(404).send({
-              success: false,
-              message: "Booking not found",
-            });
-          }
+          // ============================================
+          // CREATE USER NOTIFICATION
+          // ============================================
+
+          await createNotification({
+            recipientId: new ObjectId(booking.userId),
+            recipientRole: "user",
+            type: "booking",
+            title: "Booking Confirmed",
+            message: "Your booking has been confirmed successfully.",
+            relatedId: new ObjectId(id),
+          });
+
+          // ============================================
+          // RESPONSE
+          // ============================================
 
           res.send({
             success: true,
@@ -1820,6 +1849,25 @@ async function run() {
             });
           }
 
+          // ============================================
+          // FIND BOOKING
+          // ============================================
+
+          const booking = await bookingCollection.findOne({
+            _id: new ObjectId(id),
+          });
+
+          if (!booking) {
+            return res.status(404).send({
+              success: false,
+              message: "Booking not found",
+            });
+          }
+
+          // ============================================
+          // UPDATE BOOKING STATUS
+          // ============================================
+
           const result = await bookingCollection.updateOne(
             { _id: new ObjectId(id) },
             {
@@ -1830,12 +1878,22 @@ async function run() {
             },
           );
 
-          if (result.matchedCount === 0) {
-            return res.status(404).send({
-              success: false,
-              message: "Booking not found",
-            });
-          }
+          // ============================================
+          // CREATE USER NOTIFICATION
+          // ============================================
+
+          await createNotification({
+            recipientId: new ObjectId(booking.userId),
+            recipientRole: "user",
+            type: "booking",
+            title: "Booking Cancelled",
+            message: "Your booking has been cancelled by the administrator.",
+            relatedId: new ObjectId(id),
+          });
+
+          // ============================================
+          // RESPONSE
+          // ============================================
 
           res.send({
             success: true,
@@ -1883,7 +1941,10 @@ async function run() {
 
         const userId = req.user.userId;
 
-        // Get user
+        // ============================================
+        // GET USER
+        // ============================================
+
         const user = await userCollection.findOne({
           _id: new ObjectId(userId),
         });
@@ -1893,6 +1954,10 @@ async function run() {
             message: "User not found",
           });
         }
+
+        // ============================================
+        // CREATE REVIEW
+        // ============================================
 
         const newReview = {
           packageId,
@@ -1910,7 +1975,10 @@ async function run() {
           status: "pending",
         };
 
-        // Insert review
+        // ============================================
+        // INSERT REVIEW
+        // ============================================
+
         const result = await reviewCollection.insertOne(newReview);
 
         // ============================================
@@ -1934,11 +2002,32 @@ async function run() {
               recipientRole: "admin",
               type: "review",
               title: "New Review Submitted",
-              message: `${user.name} submitted a review for ${packageName || "a package"}.`,
+              message: `${user.name} submitted a review for ${
+                packageName || "a package"
+              }.`,
               relatedId: result.insertedId,
             }),
           ),
         );
+
+        // ============================================
+        // CREATE USER NOTIFICATION
+        // ============================================
+
+        await createNotification({
+          recipientId: new ObjectId(userId),
+          recipientRole: "user",
+          type: "review",
+          title: "Review Submitted",
+          message: `Your review for ${
+            packageName || "the package"
+          } has been submitted successfully and is waiting for approval.`,
+          relatedId: result.insertedId,
+        });
+
+        // ============================================
+        // RESPONSE
+        // ============================================
 
         res.status(201).send({
           success: true,
@@ -1995,7 +2084,7 @@ async function run() {
         });
       }
     });
-    //Approve review - Admin only
+    // Approve review - Admin only
     app.patch(
       "/admin/reviews/:id/approve",
       verifyToken,
@@ -2004,6 +2093,26 @@ async function run() {
         try {
           const { id } = req.params;
 
+          if (!ObjectId.isValid(id)) {
+            return res.status(400).send({
+              success: false,
+              message: "Invalid review ID",
+            });
+          }
+
+          // Get review first
+          const review = await reviewCollection.findOne({
+            _id: new ObjectId(id),
+          });
+
+          if (!review) {
+            return res.status(404).send({
+              success: false,
+              message: "Review not found",
+            });
+          }
+
+          // Approve review
           const result = await reviewCollection.updateOne(
             { _id: new ObjectId(id) },
             {
@@ -2014,19 +2123,37 @@ async function run() {
             },
           );
 
-          if (result.matchedCount === 0) {
-            return res.status(404).send({
-              message: "Review not found",
+          if (result.modifiedCount === 0) {
+            return res.status(400).send({
+              success: false,
+              message: "Review was not approved",
             });
           }
 
+          // ============================================
+          // CREATE USER NOTIFICATION
+          // ============================================
+
+          await createNotification({
+            recipientId: new ObjectId(review.userId),
+            recipientRole: "user",
+            type: "review",
+            title: "Review Published",
+            message: `Your review for ${
+              review.packageName || "the package"
+            } has been approved and published.`,
+            relatedId: review._id,
+          });
+
           res.status(200).send({
+            success: true,
             message: "Review approved successfully",
           });
         } catch (error) {
           console.error("Failed to approve review:", error);
 
           res.status(500).send({
+            success: false,
             message: "Failed to approve review",
           });
         }
@@ -2041,8 +2168,30 @@ async function run() {
         try {
           const { id } = req.params;
 
+          if (!ObjectId.isValid(id)) {
+            return res.status(400).send({
+              success: false,
+              message: "Invalid review ID",
+            });
+          }
+
+          // Get review first
+          const review = await reviewCollection.findOne({
+            _id: new ObjectId(id),
+          });
+
+          if (!review) {
+            return res.status(404).send({
+              success: false,
+              message: "Review not found",
+            });
+          }
+
+          // Reject review
           const result = await reviewCollection.updateOne(
-            { _id: new ObjectId(id) },
+            {
+              _id: new ObjectId(id),
+            },
             {
               $set: {
                 status: "rejected",
@@ -2053,17 +2202,35 @@ async function run() {
 
           if (result.matchedCount === 0) {
             return res.status(404).send({
+              success: false,
               message: "Review not found",
             });
           }
 
+          // ============================================
+          // CREATE USER NOTIFICATION
+          // ============================================
+
+          await createNotification({
+            recipientId: new ObjectId(review.userId),
+            recipientRole: "user",
+            type: "review",
+            title: "Review Rejected",
+            message: `Your review for ${
+              review.packageName || "the package"
+            } has been rejected.`,
+            relatedId: review._id,
+          });
+
           res.status(200).send({
+            success: true,
             message: "Review rejected successfully",
           });
         } catch (error) {
           console.error("Failed to reject review:", error);
 
           res.status(500).send({
+            success: false,
             message: "Failed to reject review",
           });
         }
@@ -2077,23 +2244,62 @@ async function run() {
       async (req, res) => {
         try {
           const { id } = req.params;
+
+          if (!ObjectId.isValid(id)) {
+            return res.status(400).send({
+              success: false,
+              message: "Invalid review ID",
+            });
+          }
+
+          // Get review first
+          const review = await reviewCollection.findOne({
+            _id: new ObjectId(id),
+          });
+
+          if (!review) {
+            return res.status(404).send({
+              success: false,
+              message: "Review not found",
+            });
+          }
+
+          // Delete review
           const result = await reviewCollection.deleteOne({
             _id: new ObjectId(id),
           });
 
           if (result.deletedCount === 0) {
             return res.status(404).send({
+              success: false,
               message: "Review not found",
             });
           }
 
+          // ============================================
+          // CREATE USER NOTIFICATION
+          // ============================================
+
+          await createNotification({
+            recipientId: new ObjectId(review.userId),
+            recipientRole: "user",
+            type: "review",
+            title: "Review Deleted",
+            message: `Your review for ${
+              review.packageName || "the package"
+            } has been deleted by the administrator.`,
+            relatedId: review._id,
+          });
+
           res.status(200).send({
+            success: true,
             message: "Review deleted successfully",
           });
         } catch (error) {
           console.error("Failed to delete review:", error);
 
           res.status(500).send({
+            success: false,
             message: "Failed to delete review",
           });
         }
