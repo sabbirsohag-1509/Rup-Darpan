@@ -1695,6 +1695,24 @@ async function run() {
           ),
         );
 
+        // ============================================
+        // CREATE USER NOTIFICATION
+        // ============================================
+
+        await createNotification({
+          recipientId: new ObjectId(req.user.userId),
+          recipientRole: "user",
+          type: "booking",
+          title: "Booking Submitted",
+          message:
+            "Your booking request has been submitted successfully and is waiting for confirmation.",
+          relatedId: result.insertedId,
+        });
+
+        // ============================================
+        // RESPONSE
+        // ============================================
+
         res.status(201).send({
           success: true,
           message: "Booking created successfully.",
