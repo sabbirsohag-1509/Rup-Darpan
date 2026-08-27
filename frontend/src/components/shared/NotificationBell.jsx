@@ -225,14 +225,11 @@ const NotificationBell = () => {
   // ==========================================================
 
   useEffect(() => {
-    // First API response
-    // Don't play sound for existing notifications
     if (previousUnreadCountRef.current === null) {
       previousUnreadCountRef.current = unreadCount;
       return;
     }
 
-    // New unread notification arrived
     if (unreadCount > previousUnreadCountRef.current) {
       playNotificationSound();
     }
@@ -258,7 +255,6 @@ const NotificationBell = () => {
     },
 
     onSuccess: (notificationId) => {
-      // Update notifications cache
       queryClient.setQueryData(
         ["notifications"],
         (oldNotifications = []) =>
@@ -272,7 +268,6 @@ const NotificationBell = () => {
           ),
       );
 
-      // Update unread count
       queryClient.setQueryData(
         ["notifications", "unread-count"],
         (oldCount = 0) => Math.max(oldCount - 1, 0),
@@ -303,7 +298,6 @@ const NotificationBell = () => {
     },
 
     onSuccess: () => {
-      // Update notifications cache
       queryClient.setQueryData(
         ["notifications"],
         (oldNotifications = []) =>
@@ -313,13 +307,11 @@ const NotificationBell = () => {
           })),
       );
 
-      // Reset unread count
       queryClient.setQueryData(
         ["notifications", "unread-count"],
         0,
       );
 
-      // Reset local reference
       previousUnreadCountRef.current = 0;
     },
 
@@ -348,20 +340,12 @@ const NotificationBell = () => {
     },
 
     onSuccess: (notificationId) => {
-      // --------------------------------------------
-      // Find deleted notification from cache
-      // --------------------------------------------
-
       const currentNotifications =
         queryClient.getQueryData(["notifications"]) || [];
 
       const deletedNotification = currentNotifications.find(
         (notification) => notification._id === notificationId,
       );
-
-      // --------------------------------------------
-      // Remove notification from cache
-      // --------------------------------------------
 
       queryClient.setQueryData(
         ["notifications"],
@@ -371,11 +355,6 @@ const NotificationBell = () => {
               notification._id !== notificationId,
           ),
       );
-
-      // --------------------------------------------
-      // If deleted notification was unread,
-      // decrease unread count
-      // --------------------------------------------
 
       if (
         deletedNotification &&
@@ -513,10 +492,6 @@ const NotificationBell = () => {
   // ==========================================================
 
   const handleNotificationClick = (notification) => {
-    // --------------------------------------------
-    // Mark as read
-    // --------------------------------------------
-
     if (
       !notification.isRead &&
       !markAsReadMutation.isPending
@@ -524,21 +499,9 @@ const NotificationBell = () => {
       markAsReadMutation.mutate(notification._id);
     }
 
-    // --------------------------------------------
-    // Get route
-    // --------------------------------------------
-
     const route = getNotificationRoute(notification.type);
 
-    // --------------------------------------------
-    // Close dropdown
-    // --------------------------------------------
-
     setOpen(false);
-
-    // --------------------------------------------
-    // Navigate
-    // --------------------------------------------
 
     if (route) {
       navigate(route);
@@ -553,7 +516,6 @@ const NotificationBell = () => {
     event,
     notification,
   ) => {
-    // Prevent parent notification click
     event.stopPropagation();
 
     if (deleteNotificationMutation.isPending) {
@@ -616,9 +578,7 @@ const NotificationBell = () => {
       >
         <Bell className="h-5 w-5" />
 
-        {/* ==================================================
-            UNREAD BADGE
-        ================================================== */}
+        {/* UNREAD BADGE */}
 
         {unreadCount > 0 && (
           <span
@@ -654,18 +614,27 @@ const NotificationBell = () => {
       {open && (
         <div
           className="
-            absolute
-            right-0
-            top-12
+            fixed
+            left-1/2
+            top-[4.5rem]
             z-[100]
-            w-[350px]
-            max-w-[calc(100vw-1.5rem)]
+            w-[calc(100vw-1rem)]
+            max-w-[350px]
+            -translate-x-1/2
             overflow-hidden
             rounded-2xl
             border
             border-base-300
             bg-base-100
             shadow-2xl
+
+            sm:absolute
+            sm:left-auto
+            sm:right-0
+            sm:top-12
+            sm:w-[350px]
+            sm:max-w-[calc(100vw-1.5rem)]
+            sm:translate-x-0
           "
         >
           {/* ==================================================
@@ -736,10 +705,17 @@ const NotificationBell = () => {
               max-h-[420px]
               overflow-y-auto
               overscroll-contain
+              touch-pan-y
               scrollbar-thin
               scrollbar-thumb-base-300
               scrollbar-track-transparent
             "
+            onWheel={(event) => {
+              event.stopPropagation();
+            }}
+            onTouchMove={(event) => {
+              event.stopPropagation();
+            }}
           >
             {/* =================================================
                 LOADING
@@ -754,9 +730,7 @@ const NotificationBell = () => {
                 <NotificationSkeleton />
               </>
             ) : notificationsError ? (
-              /* =================================================
-                  ERROR
-              ================================================= */
+              /* ERROR */
 
               <div className="px-5 py-12 text-center">
                 <Bell className="mx-auto mb-3 h-8 w-8 text-error/40" />
@@ -790,9 +764,7 @@ const NotificationBell = () => {
                 </button>
               </div>
             ) : notifications.length === 0 ? (
-              /* =================================================
-                  EMPTY STATE
-              ================================================= */
+              /* EMPTY STATE */
 
               <div className="px-5 py-12 text-center">
                 <Bell className="mx-auto mb-3 h-8 w-8 text-base-content/20" />
@@ -858,9 +830,7 @@ const NotificationBell = () => {
                       }
                     `}
                   >
-                    {/* ======================================
-                        ICON
-                    ====================================== */}
+                    {/* ICON */}
 
                     <div
                       className={`
@@ -882,12 +852,11 @@ const NotificationBell = () => {
                       )}
                     </div>
 
-                    {/* ======================================
-                        CONTENT
-                    ====================================== */}
+                    {/* CONTENT */}
 
                     <div className="min-w-0 flex-1">
                       {/* Title + Delete */}
+
                       <div className="flex items-start justify-between gap-2">
                         <h4
                           className={`
@@ -947,7 +916,7 @@ const NotificationBell = () => {
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
 
-                        {/* Unread Dot */}
+                        {/* UNREAD DOT */}
 
                         {!notification.isRead && (
                           <span
@@ -963,7 +932,7 @@ const NotificationBell = () => {
                         )}
                       </div>
 
-                      {/* Message */}
+                      {/* MESSAGE */}
 
                       <p
                         className="
@@ -976,7 +945,7 @@ const NotificationBell = () => {
                         {notification.message}
                       </p>
 
-                      {/* Time */}
+                      {/* TIME */}
 
                       <div
                         className="
@@ -1002,7 +971,7 @@ const NotificationBell = () => {
                           </>
                         )}
 
-                        {/* Route indicator */}
+                        {/* ROUTE INDICATOR */}
 
                         {route && (
                           <>
