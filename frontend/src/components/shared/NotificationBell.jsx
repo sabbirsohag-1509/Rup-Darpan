@@ -13,6 +13,7 @@ import {
   CheckCheck,
   Star,
   Trash2,
+  UserPlus,
 } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
@@ -31,9 +32,7 @@ const formatTimeAgo = (date) => {
   const now = new Date();
   const created = new Date(date);
 
-  const diffInSeconds = Math.floor(
-    (now - created) / 1000,
-  );
+  const diffInSeconds = Math.floor((now - created) / 1000);
 
   if (diffInSeconds < 10) {
     return "Just now";
@@ -43,59 +42,39 @@ const formatTimeAgo = (date) => {
     return `${diffInSeconds} sec ago`;
   }
 
-  const diffInMinutes = Math.floor(
-    diffInSeconds / 60,
-  );
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
 
   if (diffInMinutes < 60) {
     return `${diffInMinutes} min ago`;
   }
 
-  const diffInHours = Math.floor(
-    diffInMinutes / 60,
-  );
+  const diffInHours = Math.floor(diffInMinutes / 60);
 
   if (diffInHours < 24) {
     return `${diffInHours} hr ago`;
   }
 
-  const diffInDays = Math.floor(
-    diffInHours / 24,
-  );
+  const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInDays < 7) {
-    return `${diffInDays} day${
-      diffInDays > 1 ? "s" : ""
-    } ago`;
+    return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
   }
 
-  const diffInWeeks = Math.floor(
-    diffInDays / 7,
-  );
+  const diffInWeeks = Math.floor(diffInDays / 7);
 
   if (diffInWeeks < 4) {
-    return `${diffInWeeks} week${
-      diffInWeeks > 1 ? "s" : ""
-    } ago`;
+    return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
   }
 
-  const diffInMonths = Math.floor(
-    diffInDays / 30,
-  );
+  const diffInMonths = Math.floor(diffInDays / 30);
 
   if (diffInMonths < 12) {
-    return `${diffInMonths} month${
-      diffInMonths > 1 ? "s" : ""
-    } ago`;
+    return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
   }
 
-  const diffInYears = Math.floor(
-    diffInDays / 365,
-  );
+  const diffInYears = Math.floor(diffInDays / 365);
 
-  return `${diffInYears} year${
-    diffInYears > 1 ? "s" : ""
-  } ago`;
+  return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
 };
 
 // ============================================================
@@ -103,12 +82,9 @@ const formatTimeAgo = (date) => {
 // ============================================================
 
 const fetchNotifications = async () => {
-  const response = await axios.get(
-    `${API_URL}/notifications`,
-    {
-      withCredentials: true,
-    },
-  );
+  const response = await axios.get(`${API_URL}/notifications`, {
+    withCredentials: true,
+  });
 
   return response.data.notifications || [];
 };
@@ -132,11 +108,9 @@ const NotificationSkeleton = () => {
   return (
     <div className="flex gap-3 border-b border-base-200 px-4 py-3">
       {/* Icon Skeleton */}
-
       <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-base-300" />
 
       {/* Content Skeleton */}
-
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-3">
           <div className="h-3.5 w-32 animate-pulse rounded bg-base-300" />
@@ -214,10 +188,7 @@ const NotificationBell = () => {
         });
       }
     } catch (error) {
-      console.warn(
-        "Notification sound error:",
-        error,
-      );
+      console.warn("Notification sound error:", error);
     }
   };
 
@@ -240,9 +211,7 @@ const NotificationBell = () => {
   // UNREAD COUNT QUERY
   // ==========================================================
 
-  const {
-    data: unreadCount = 0,
-  } = useQuery({
+  const { data: unreadCount = 0 } = useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: fetchUnreadCount,
     staleTime: 30 * 1000,
@@ -258,25 +227,17 @@ const NotificationBell = () => {
   useEffect(() => {
     // First API response
     // Don't play sound for existing notifications
-    if (
-      previousUnreadCountRef.current === null
-    ) {
-      previousUnreadCountRef.current =
-        unreadCount;
-
+    if (previousUnreadCountRef.current === null) {
+      previousUnreadCountRef.current = unreadCount;
       return;
     }
 
     // New unread notification arrived
-    if (
-      unreadCount >
-      previousUnreadCountRef.current
-    ) {
+    if (unreadCount > previousUnreadCountRef.current) {
       playNotificationSound();
     }
 
-    previousUnreadCountRef.current =
-      unreadCount;
+    previousUnreadCountRef.current = unreadCount;
   }, [unreadCount]);
 
   // ==========================================================
@@ -298,27 +259,23 @@ const NotificationBell = () => {
 
     onSuccess: (notificationId) => {
       // Update notifications cache
-
       queryClient.setQueryData(
         ["notifications"],
         (oldNotifications = []) =>
-          oldNotifications.map(
-            (notification) =>
-              notification._id === notificationId
-                ? {
-                    ...notification,
-                    isRead: true,
-                  }
-                : notification,
+          oldNotifications.map((notification) =>
+            notification._id === notificationId
+              ? {
+                  ...notification,
+                  isRead: true,
+                }
+              : notification,
           ),
       );
 
       // Update unread count
-
       queryClient.setQueryData(
         ["notifications", "unread-count"],
-        (oldCount = 0) =>
-          Math.max(oldCount - 1, 0),
+        (oldCount = 0) => Math.max(oldCount - 1, 0),
       );
     },
 
@@ -347,27 +304,22 @@ const NotificationBell = () => {
 
     onSuccess: () => {
       // Update notifications cache
-
       queryClient.setQueryData(
         ["notifications"],
         (oldNotifications = []) =>
-          oldNotifications.map(
-            (notification) => ({
-              ...notification,
-              isRead: true,
-            }),
-          ),
+          oldNotifications.map((notification) => ({
+            ...notification,
+            isRead: true,
+          })),
       );
 
       // Reset unread count
-
       queryClient.setQueryData(
         ["notifications", "unread-count"],
         0,
       );
 
       // Reset local reference
-
       previousUnreadCountRef.current = 0;
     },
 
@@ -383,81 +335,71 @@ const NotificationBell = () => {
   // DELETE NOTIFICATION
   // ==========================================================
 
-  const deleteNotificationMutation =
-    useMutation({
-      mutationFn: async ({
-        notificationId,
-      }) => {
-        await axios.delete(
-          `${API_URL}/notifications/${notificationId}`,
-          {
-            withCredentials: true,
-          },
-        );
+  const deleteNotificationMutation = useMutation({
+    mutationFn: async ({ notificationId }) => {
+      await axios.delete(
+        `${API_URL}/notifications/${notificationId}`,
+        {
+          withCredentials: true,
+        },
+      );
 
-        return notificationId;
-      },
+      return notificationId;
+    },
 
-      onSuccess: (notificationId) => {
-        // --------------------------------------------
-        // Find deleted notification from cache
-        // --------------------------------------------
+    onSuccess: (notificationId) => {
+      // --------------------------------------------
+      // Find deleted notification from cache
+      // --------------------------------------------
 
-        const currentNotifications =
-          queryClient.getQueryData([
-            "notifications",
-          ]) || [];
+      const currentNotifications =
+        queryClient.getQueryData(["notifications"]) || [];
 
-        const deletedNotification =
-          currentNotifications.find(
+      const deletedNotification = currentNotifications.find(
+        (notification) => notification._id === notificationId,
+      );
+
+      // --------------------------------------------
+      // Remove notification from cache
+      // --------------------------------------------
+
+      queryClient.setQueryData(
+        ["notifications"],
+        (oldNotifications = []) =>
+          oldNotifications.filter(
             (notification) =>
-              notification._id === notificationId,
-          );
+              notification._id !== notificationId,
+          ),
+      );
 
-        // --------------------------------------------
-        // Remove notification from cache
-        // --------------------------------------------
+      // --------------------------------------------
+      // If deleted notification was unread,
+      // decrease unread count
+      // --------------------------------------------
 
+      if (
+        deletedNotification &&
+        !deletedNotification.isRead
+      ) {
         queryClient.setQueryData(
-          ["notifications"],
-          (oldNotifications = []) =>
-            oldNotifications.filter(
-              (notification) =>
-                notification._id !==
-                notificationId,
-            ),
+          ["notifications", "unread-count"],
+          (oldCount = 0) => Math.max(oldCount - 1, 0),
         );
 
-        // --------------------------------------------
-        // If deleted notification was unread,
-        // decrease unread count
-        // --------------------------------------------
-
-        if (
-          deletedNotification &&
-          !deletedNotification.isRead
-        ) {
-          queryClient.setQueryData(
-            ["notifications", "unread-count"],
-            (oldCount = 0) =>
-              Math.max(oldCount - 1, 0),
-          );
-
-          previousUnreadCountRef.current =
-            Math.max(
-              previousUnreadCountRef.current ?? 0,
-              0,
-            );
-        }
-      },
-
-      onError: (error) => {
-        console.error(
-          "Failed to delete notification:",
-          error,
+        previousUnreadCountRef.current = Math.max(
+          previousUnreadCountRef.current ?? 0,
+          0,
         );
-      },
-    });
+      }
+    },
+
+    onError: (error) => {
+      console.error(
+        "Failed to delete notification:",
+        error,
+      );
+    },
+  });
 
   // ==========================================================
   // OUTSIDE CLICK
@@ -467,9 +409,7 @@ const NotificationBell = () => {
     const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(
-          event.target,
-        )
+        !dropdownRef.current.contains(event.target)
       ) {
         setOpen(false);
       }
@@ -494,15 +434,15 @@ const NotificationBell = () => {
 
   const getNotificationIcon = (type) => {
     if (type === "booking") {
-      return (
-        <CalendarDays className="h-4 w-4" />
-      );
+      return <CalendarDays className="h-4 w-4" />;
     }
 
     if (type === "review") {
-      return (
-        <Star className="h-4 w-4" />
-      );
+      return <Star className="h-4 w-4" />;
+    }
+
+    if (type === "registration") {
+      return <UserPlus className="h-4 w-4" />;
     }
 
     return <Bell className="h-4 w-4" />;
@@ -521,16 +461,58 @@ const NotificationBell = () => {
       return "/admin/reviews";
     }
 
+    if (type === "registration") {
+      return "/admin/users";
+    }
+
     return null;
+  };
+
+  // ==========================================================
+  // GET NOTIFICATION ICON COLOR
+  // ==========================================================
+
+  const getNotificationIconClass = (type) => {
+    if (type === "booking") {
+      return "bg-info/10 text-info";
+    }
+
+    if (type === "review") {
+      return "bg-warning/10 text-warning";
+    }
+
+    if (type === "registration") {
+      return "bg-success/10 text-success";
+    }
+
+    return "bg-primary/10 text-primary";
+  };
+
+  // ==========================================================
+  // GET NOTIFICATION TITLE / ROUTE LABEL
+  // ==========================================================
+
+  const getNotificationViewLabel = (type) => {
+    if (type === "booking") {
+      return "View booking";
+    }
+
+    if (type === "review") {
+      return "View review";
+    }
+
+    if (type === "registration") {
+      return "View users";
+    }
+
+    return "View notification";
   };
 
   // ==========================================================
   // HANDLE NOTIFICATION CLICK
   // ==========================================================
 
-  const handleNotificationClick = (
-    notification,
-  ) => {
+  const handleNotificationClick = (notification) => {
     // --------------------------------------------
     // Mark as read
     // --------------------------------------------
@@ -539,18 +521,14 @@ const NotificationBell = () => {
       !notification.isRead &&
       !markAsReadMutation.isPending
     ) {
-      markAsReadMutation.mutate(
-        notification._id,
-      );
+      markAsReadMutation.mutate(notification._id);
     }
 
     // --------------------------------------------
     // Get route
     // --------------------------------------------
 
-    const route = getNotificationRoute(
-      notification.type,
-    );
+    const route = getNotificationRoute(notification.type);
 
     // --------------------------------------------
     // Close dropdown
@@ -575,15 +553,10 @@ const NotificationBell = () => {
     event,
     notification,
   ) => {
-    // VERY IMPORTANT:
     // Prevent parent notification click
-    // Otherwise delete + navigate both happen.
-
     event.stopPropagation();
 
-    if (
-      deleteNotificationMutation.isPending
-    ) {
+    if (deleteNotificationMutation.isPending) {
       return;
     }
 
@@ -620,9 +593,7 @@ const NotificationBell = () => {
 
       <button
         type="button"
-        onClick={() =>
-          setOpen((prev) => !prev)
-        }
+        onClick={() => setOpen((prev) => !prev)}
         aria-label="Notifications"
         data-tip="Notifications"
         className="
@@ -671,9 +642,7 @@ const NotificationBell = () => {
               ring-base-100
             "
           >
-            {unreadCount > 99
-              ? "99+"
-              : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
@@ -722,11 +691,8 @@ const NotificationBell = () => {
 
               {unreadCount > 0 && (
                 <p className="mt-0.5 text-xs text-base-content/50">
-                  {unreadCount} unread
-                  notification
-                  {unreadCount > 1
-                    ? "s"
-                    : ""}
+                  {unreadCount} unread notification
+                  {unreadCount > 1 ? "s" : ""}
                 </p>
               )}
             </div>
@@ -734,12 +700,8 @@ const NotificationBell = () => {
             {unreadCount > 0 && (
               <button
                 type="button"
-                onClick={
-                  handleMarkAllAsRead
-                }
-                disabled={
-                  markAllAsReadMutation.isPending
-                }
+                onClick={handleMarkAllAsRead}
+                disabled={markAllAsReadMutation.isPending}
                 className="
                   flex
                   shrink-0
@@ -806,13 +768,9 @@ const NotificationBell = () => {
                 <button
                   type="button"
                   onClick={() =>
-                    queryClient.invalidateQueries(
-                      {
-                        queryKey: [
-                          "notifications",
-                        ],
-                      },
-                    )
+                    queryClient.invalidateQueries({
+                      queryKey: ["notifications"],
+                    })
                   }
                   className="
                     mt-3
@@ -831,8 +789,7 @@ const NotificationBell = () => {
                   Try again
                 </button>
               </div>
-            ) : notifications.length ===
-              0 ? (
+            ) : notifications.length === 0 ? (
               /* =================================================
                   EMPTY STATE
               ================================================= */
@@ -853,238 +810,214 @@ const NotificationBell = () => {
                   NOTIFICATION ITEMS
               ================================================= */
 
-              notifications.map(
-                (notification) => {
-                  const route =
-                    getNotificationRoute(
-                      notification.type,
-                    );
+              notifications.map((notification) => {
+                const route = getNotificationRoute(
+                  notification.type,
+                );
 
-                  const isDeleting =
-                    deleteNotificationMutation.isPending &&
-                    deleteNotificationMutation.variables
-                      ?.notificationId ===
-                      notification._id;
+                const isDeleting =
+                  deleteNotificationMutation.isPending &&
+                  deleteNotificationMutation.variables
+                    ?.notificationId === notification._id;
 
-                  return (
+                return (
+                  <div
+                    key={notification._id}
+                    onClick={() =>
+                      handleNotificationClick(notification)
+                    }
+                    title={
+                      route
+                        ? getNotificationViewLabel(
+                            notification.type,
+                          )
+                        : "Notification"
+                    }
+                    className={`
+                      group
+                      flex
+                      cursor-pointer
+                      gap-3
+                      border-b
+                      border-base-200
+                      px-4
+                      py-3
+                      transition
+                      hover:bg-base-200/60
+
+                      ${
+                        !notification.isRead
+                          ? "bg-primary/5"
+                          : ""
+                      }
+
+                      ${
+                        isDeleting
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    `}
+                  >
+                    {/* ======================================
+                        ICON
+                    ====================================== */}
+
                     <div
-                      key={
-                        notification._id
-                      }
-                      onClick={() =>
-                        handleNotificationClick(
-                          notification,
-                        )
-                      }
-                      title={
-                        route
-                          ? notification.type ===
-                            "booking"
-                            ? "View booking"
-                            : notification.type ===
-                                "review"
-                              ? "View review"
-                              : "View notification"
-                          : "Notification"
-                      }
                       className={`
-                        group
                         flex
-                        cursor-pointer
-                        gap-3
-                        border-b
-                        border-base-200
-                        px-4
-                        py-3
-                        transition
-                        hover:bg-base-200/60
+                        h-9
+                        w-9
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-full
 
-                        ${
-                          !notification.isRead
-                            ? "bg-primary/5"
-                            : ""
-                        }
-
-                        ${
-                          isDeleting
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
+                        ${getNotificationIconClass(
+                          notification.type,
+                        )}
                       `}
                     >
-                      {/* ======================================
-                          ICON
-                      ====================================== */}
+                      {getNotificationIcon(
+                        notification.type,
+                      )}
+                    </div>
 
-                      <div
-                        className={`
-                          flex
-                          h-9
-                          w-9
-                          shrink-0
-                          items-center
-                          justify-center
-                          rounded-full
+                    {/* ======================================
+                        CONTENT
+                    ====================================== */}
 
-                          ${
-                            notification.type ===
-                            "booking"
-                              ? "bg-info/10 text-info"
-                              : notification.type ===
-                                  "review"
-                                ? "bg-warning/10 text-warning"
-                                : "bg-primary/10 text-primary"
+                    <div className="min-w-0 flex-1">
+                      {/* Title + Delete */}
+                      <div className="flex items-start justify-between gap-2">
+                        <h4
+                          className={`
+                            min-w-0
+                            flex-1
+                            text-sm
+
+                            ${
+                              !notification.isRead
+                                ? "font-semibold"
+                                : "font-medium"
+                            }
+                          `}
+                        >
+                          {notification.title}
+                        </h4>
+
+                        {/* DELETE BUTTON */}
+
+                        <button
+                          type="button"
+                          onClick={(event) =>
+                            handleDeleteNotification(
+                              event,
+                              notification,
+                            )
                           }
-                        `}
-                      >
-                        {getNotificationIcon(
-                          notification.type,
+                          disabled={isDeleting}
+                          aria-label="Delete notification"
+                          data-tip={
+                            isDeleting
+                              ? "Deleting..."
+                              : "Delete notification"
+                          }
+                          className="
+                            tooltip
+                            tooltip-left
+                            flex
+                            h-7
+                            w-7
+                            shrink-0
+                            cursor-pointer
+                            items-center
+                            justify-center
+                            rounded-md
+                            text-base-content/30
+                            opacity-0
+                            transition-all
+                            duration-200
+                            hover:bg-error/10
+                            hover:text-error
+                            group-hover:opacity-100
+                            disabled:cursor-not-allowed
+                            disabled:opacity-50
+                          "
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+
+                        {/* Unread Dot */}
+
+                        {!notification.isRead && (
+                          <span
+                            className="
+                              mt-1
+                              h-2
+                              w-2
+                              shrink-0
+                              rounded-full
+                              bg-primary
+                            "
+                          />
                         )}
                       </div>
 
-                      {/* ======================================
-                          CONTENT
-                      ====================================== */}
+                      {/* Message */}
 
-                      <div className="min-w-0 flex-1">
-                        {/* Title + Delete */}
+                      <p
+                        className="
+                          mt-1
+                          text-xs
+                          leading-relaxed
+                          text-base-content/60
+                        "
+                      >
+                        {notification.message}
+                      </p>
 
-                        <div className="flex items-start justify-between gap-2">
-                          <h4
-                            className={`
-                              min-w-0
-                              flex-1
-                              text-sm
-                              ${
-                                !notification.isRead
-                                  ? "font-semibold"
-                                  : "font-medium"
-                              }
-                            `}
-                          >
-                            {
-                              notification.title
-                            }
-                          </h4>
+                      {/* Time */}
 
-                          {/* DELETE BUTTON */}
+                      <div
+                        className="
+                          mt-2
+                          flex
+                          items-center
+                          gap-1
+                          text-[11px]
+                          text-base-content/40
+                        "
+                      >
+                        {formatTimeAgo(
+                          notification.createdAt,
+                        )}
 
-                          <button
-                            type="button"
-                            onClick={(event) =>
-                              handleDeleteNotification(
-                                event,
-                                notification,
-                              )
-                            }
-                            disabled={isDeleting}
-                            aria-label="Delete notification"
-                            data-tip={
-                              isDeleting
-                                ? "Deleting..."
-                                : "Delete notification"
-                            }
-                            className="
-                              tooltip
-                              tooltip-left
-                              flex
-                              h-7
-                              w-7
-                              shrink-0
-                              cursor-pointer
-                              items-center
-                              justify-center
-                              rounded-md
-                              text-base-content/30
-                              opacity-0
-                              transition-all
-                              duration-200
-                              hover:bg-error/10
-                              hover:text-error
-                              group-hover:opacity-100
-                              disabled:cursor-not-allowed
-                              disabled:opacity-50
-                            "
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                        {notification.isRead && (
+                          <>
+                            <span>•</span>
 
-                          {/* Unread Dot */}
+                            <Check className="h-3 w-3" />
 
-                          {!notification.isRead && (
-                            <span
-                              className="
-                                mt-1
-                                h-2
-                                w-2
-                                shrink-0
-                                rounded-full
-                                bg-primary
-                              "
-                            />
-                          )}
-                        </div>
+                            <span>Read</span>
+                          </>
+                        )}
 
-                        {/* Message */}
+                        {/* Route indicator */}
 
-                        <p
-                          className="
-                            mt-1
-                            text-xs
-                            leading-relaxed
-                            text-base-content/60
-                          "
-                        >
-                          {
-                            notification.message
-                          }
-                        </p>
+                        {route && (
+                          <>
+                            <span>•</span>
 
-                        {/* Time */}
-
-                        <div
-                          className="
-                            mt-2
-                            flex
-                            items-center
-                            gap-1
-                            text-[11px]
-                            text-base-content/40
-                          "
-                        >
-                          {formatTimeAgo(
-                            notification.createdAt,
-                          )}
-
-                          {notification.isRead && (
-                            <>
-                              <span>•</span>
-
-                              <Check className="h-3 w-3" />
-
-                              <span>
-                                Read
-                              </span>
-                            </>
-                          )}
-
-                          {/* Route indicator */}
-
-                          {route && (
-                            <>
-                              <span>•</span>
-
-                              <span className="text-primary/70">
-                                View
-                              </span>
-                            </>
-                          )}
-                        </div>
+                            <span className="text-primary/70">
+                              View
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
-                  );
-                },
-              )
+                  </div>
+                );
+              })
             )}
           </div>
 
@@ -1103,9 +1036,7 @@ const NotificationBell = () => {
             >
               <button
                 type="button"
-                onClick={() =>
-                  setOpen(false)
-                }
+                onClick={() => setOpen(false)}
                 className="
                   w-full
                   cursor-pointer
