@@ -20,6 +20,7 @@ import ThemeToggle from "./ThemeToggle";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import NotificationBell from "./NotificationBell";
+import UserNotificationBell from "./UserNotificationBell";
 
 // =====================================================
 // NAVIGATION LINKS
@@ -374,6 +375,18 @@ const Navbar = () => {
     }
 
     return <NotificationBell />;
+  };
+
+  // ===================================================
+  // USER NOTIFICATION
+  // ===================================================
+
+  const UserNotification = () => {
+    if (loading || !user || user?.role === "admin") {
+      return null;
+    }
+
+    return <UserNotificationBell />;
   };
 
   // ===================================================
@@ -760,6 +773,10 @@ const Navbar = () => {
 
                 <AdminNotification />
 
+                {/* User Notification */}
+
+                <UserNotification />
+
                 <ThemeToggle />
 
                 <ProfileSection />
@@ -843,6 +860,10 @@ const Navbar = () => {
                 {/* ADMIN NOTIFICATION */}
 
                 <AdminNotification />
+
+                {/* USER NOTIFICATION */}
+
+                <UserNotification />
 
                 {/* THEME */}
 
