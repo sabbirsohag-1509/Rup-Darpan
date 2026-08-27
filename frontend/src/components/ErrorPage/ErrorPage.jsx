@@ -22,7 +22,7 @@ const ErrorPage = () => {
         <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
           <div className="w-full max-w-3xl text-center text-white">
 
-            {/* Rup Darpan Branding */}
+            {/* Rup Darpon Branding */}
             <div className="flex items-center justify-center text-primary">
               <Logo />
             </div>
@@ -59,7 +59,7 @@ const ErrorPage = () => {
 
             {/* Footer */}
             <p className="mt-10 text-xs text-white/50">
-              © {new Date().getFullYear()} Rup Darpan. Capturing moments,
+              © {new Date().getFullYear()} Rup Darpon. Capturing moments,
               creating memories.
             </p>
           </div>

@@ -407,7 +407,7 @@ const Contact = () => {
               lg:text-5xl
             "
           >
-            Meet the RUP DARPAN Crew
+            Meet the RUP DARPON Crew
           </h2>
 
           <p

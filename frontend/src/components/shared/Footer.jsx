@@ -79,7 +79,7 @@ const Footer = () => {
                 href={FACEBOOK_PAGE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="RupDarpan Facebook Page"
+                aria-label="Rup Darpon Facebook Page"
                 title="Facebook Page"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-base-300 bg-base-100 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
               >

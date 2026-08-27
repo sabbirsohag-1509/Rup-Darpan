@@ -41,8 +41,8 @@ const API_URL = "http://localhost:5000";
 
 const LIMIT = 9;
 
-const VISITOR_ID_KEY = "rupdarpan_visitor_id";
-const LIKED_PHOTOS_KEY = "rupdarpan_liked_photos";
+const VISITOR_ID_KEY = "rupdarpon_visitor_id";
+const LIKED_PHOTOS_KEY = "rupdarpon_liked_photos";
 
 // =========================================================
 // GET / CREATE VISITOR ID

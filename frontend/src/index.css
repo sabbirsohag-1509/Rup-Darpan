@@ -4,11 +4,11 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-  themes: rupdarpan --default, rupdarpan-light;
+  themes: rupdarpon --default, rupdarpon-light;
 }
 
 @plugin "daisyui/theme" {
-  name: "rupdarpan";
+  name: "rupdarpon";
   default: true;
   color-scheme: dark;
 
@@ -47,7 +47,7 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "rupdarpan-light";
+  name: "rupdarpon-light";
   color-scheme: light;
 
   --color-base-100: #fcfcfa;

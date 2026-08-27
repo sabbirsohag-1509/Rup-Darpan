@@ -444,7 +444,7 @@ const Packages = () => {
             to="/contact"
             className="btn btn-primary mt-6 text-primary-content"
           >
-            Contact Rup Darpan
+            Contact Rup Darpon
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

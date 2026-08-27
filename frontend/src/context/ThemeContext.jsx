@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-const THEME_STORAGE_KEY = "rupdarpan-theme";
+const THEME_STORAGE_KEY = "rupdarpon-theme";
 
 export const THEMES = {
-  dark: "rupdarpan",
-  light: "rupdarpan-light",
+  dark: "rupdarpon",
+  light: "rupdarpon-light",
 };
 
 const ThemeContext = createContext(null);

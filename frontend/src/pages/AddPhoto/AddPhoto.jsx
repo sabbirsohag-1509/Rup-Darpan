@@ -649,7 +649,7 @@ const AddPhoto = () => {
                 <div className="flex justify-between items-center text-xs text-base-content/50 border-t border-primary/5 pt-3">
                   <span className="flex items-center gap-1">
                     <User className="h-3.5 w-3.5 text-primary" />
-                    {watchPhotographer || "Rup Darpan"}
+                    {watchPhotographer || "Rup Darpon"}
                   </span>
                   <span className="flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5 text-primary" />
