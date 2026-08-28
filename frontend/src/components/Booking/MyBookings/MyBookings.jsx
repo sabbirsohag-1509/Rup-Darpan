@@ -17,6 +17,7 @@ import {
   ReceiptText,
   LockKeyhole,
 } from "lucide-react";
+import PaymentBtn from "../../../pages/Payment/PaymentBtn";
 
 const API_URL = "http://localhost:5000/bookings";
 
@@ -521,12 +522,12 @@ const MyBookings = () => {
                           </p>
 
                           <p className="mt-1 text-xs leading-5 text-base-content/55">
-                            To confirm your booking and reserve the selected
-                            date, you must pay at least{" "}
+                            আপনার বুকিং ও নির্বাচিত তারিখটি সুনিশ্চিত করতে
+                            আপনাকে অন্তত{" "}
                             <span className="font-bold text-primary">
                               ৳{minimumAdvance.toLocaleString()}
                             </span>{" "}
-                            (30% of the package price).
+                            (প্যাকেজ মূল্যের ৩০%) অগ্রিম প্রদান করতে হবে।
                           </p>
                         </div>
                       </div>
@@ -547,8 +548,9 @@ const MyBookings = () => {
                         </p>
 
                         <p className="mt-1 text-xs leading-5 text-base-content/50">
-                          Payment will be available once your booking is
-                          confirmed by the admin.
+                          রূপ দর্পণ টিম আপনার বুকিংটি কনফার্ম করলেই পেমেন্ট
+                          অপশনটি পেয়ে যাবেন। বুকিং কনফার্ম হলেই আপনাকে
+                          নোটিফিকেশন দিয়ে জানানো হবে।
                         </p>
                       </div>
                     </div>
@@ -560,27 +562,14 @@ const MyBookings = () => {
 
                   {canPay && (
                     <div className="mt-3">
-                      <button
-                        type="button"
-                        className="btn btn-primary w-full"
-                        onClick={() => {
-                          // =================================================
-                          // SSLCommerz integration will be connected here.
-                          // =================================================
-
-                          console.log("Start SSLCommerz payment", {
-                            bookingId: booking._id,
-                            packagePrice,
-                            minimumAdvance,
-                          });
-                        }}
-                      >
-                        <CreditCard className="h-4 w-4" />
-
-                        {isFailed
-                          ? "Try Again"
-                          : `Pay Now`}
-                      </button>
+                      <PaymentBtn
+                        bookingId={booking._id}
+                        packagePrice={Number(booking.packagePrice || 0)}
+                        minimumAdvance={Math.ceil(
+                          Number(booking.packagePrice || 0) * 0.3,
+                        )}
+                        isFailed={isFailed}
+                      />
 
                       <p className="mt-2 text-center text-[10px] text-base-content/40">
                         Secure payment via SSLCommerz
