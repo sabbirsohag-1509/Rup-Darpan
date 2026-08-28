@@ -4,7 +4,7 @@ import axios from "axios";
 import { ArrowUpRight, Camera } from "lucide-react";
 import { Link } from "react-router";
 
-const API_URL = "http://localhost:5000/featured-photos";
+const API_URL = "https://rup-darpan-backend.vercel.app/featured-photos";
 
 const FeaturedGallery = () => {
   const sectionRef = useRef(null);
@@ -36,8 +36,7 @@ const FeaturedGallery = () => {
 
     if (!section) return;
 
-    const revealItems =
-      section.querySelectorAll(".gallery-reveal");
+    const revealItems = section.querySelectorAll(".gallery-reveal");
 
     if (!revealItems.length) return;
 
@@ -136,13 +135,11 @@ const FeaturedGallery = () => {
       className="relative overflow-hidden bg-base-100 py-16 sm:py-20 lg:py-28"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
-
         {/* =====================================================
             HEADER
         ===================================================== */}
 
         <div className="mb-10 flex flex-col gap-6 sm:mb-12 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
-
           {/* Header Content */}
 
           <div
@@ -156,40 +153,30 @@ const FeaturedGallery = () => {
             {/* Heading */}
 
             <h2 className="font-playfair text-4xl font-semibold leading-[1.05] text-base-content sm:text-5xl lg:text-6xl">
-              Featured{" "}
-              <span className="italic text-primary">
-                Photos
-              </span>
+              Featured <span className="italic text-primary">Photos</span>
             </h2>
 
             {/* Description */}
 
             <p className="mt-5 max-w-xl text-sm leading-7 text-base-content/60 sm:text-base">
-              A collection of moments we loved capturing.
-              Every photograph tells a story, preserves an
-              emotion, and keeps a beautiful memory alive.
+              A collection of moments we loved capturing. Every photograph tells
+              a story, preserves an emotion, and keeps a beautiful memory alive.
               <br />
-
               <span className="text-xs text-base-content/50 sm:text-sm">
-                আমাদের ফ্রেমে বন্দি করা প্রিয় কিছু মুহূর্ত;
-                যেখানে প্রতিটি ছবি বলে একটি গল্প এবং অমলিন
-                রাখে সুন্দর স্মৃতিগুলোকে।
+                আমাদের ফ্রেমে বন্দি করা প্রিয় কিছু মুহূর্ত; যেখানে প্রতিটি ছবি
+                বলে একটি গল্প এবং অমলিন রাখে সুন্দর স্মৃতিগুলোকে।
               </span>
             </p>
           </div>
 
           {/* View Full Gallery */}
 
-          <div
-            className="gallery-reveal"
-            style={{ "--delay": "120ms" }}
-          >
+          <div className="gallery-reveal" style={{ "--delay": "120ms" }}>
             <Link
               to="/gallery/photos"
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-primary-content sm:w-fit"
             >
               View All Photos
-
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
           </div>
@@ -200,7 +187,6 @@ const FeaturedGallery = () => {
         ===================================================== */}
 
         <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-
           {photos.slice(0, 8).map((photo, index) => (
             <div
               key={photo._id}
@@ -214,24 +200,19 @@ const FeaturedGallery = () => {
                 sm:rounded-3xl
 
                 ${
-                  index === 0
-                    ? "sm:row-span-2 lg:col-span-2 lg:row-span-2"
-                    : ""
+                  index === 0 ? "sm:row-span-2 lg:col-span-2 lg:row-span-2" : ""
                 }
 
                 ${index === 3 ? "lg:col-span-2" : ""}
 
                 ${index === 4 ? "lg:col-span-2" : ""}
 
-                ${index === 5
-                  ? "sm:col-span-2 lg:col-span-2"
-                  : ""}
+                ${index === 5 ? "sm:col-span-2 lg:col-span-2" : ""}
               `}
               style={{
                 "--delay": `${index * 90 + 180}ms`,
               }}
             >
-
               {/* Image Container */}
 
               <div
@@ -245,7 +226,6 @@ const FeaturedGallery = () => {
                   }
                 `}
               >
-
                 {/* Image */}
 
                 <img
@@ -306,7 +286,6 @@ const FeaturedGallery = () => {
                 {/* BOTTOM CONTENT */}
 
                 <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-
                   <div
                     className="
                       transition-transform
@@ -317,14 +296,10 @@ const FeaturedGallery = () => {
                     "
                   >
                     <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/60 sm:text-xs">
-                      <span className="font-bold text-red-500">
-                        Rup
-                      </span>{" "}
-                      Darpon
+                      <span className="font-bold text-red-500">Rup</span> Darpon
                     </p>
 
                     <div className="flex items-end justify-between gap-3">
-
                       {/* Title */}
 
                       <h3 className="font-playfair text-lg font-semibold leading-tight text-white sm:text-2xl">
@@ -369,7 +344,6 @@ const FeaturedGallery = () => {
           style={{ "--delay": "300ms" }}
         >
           <div className="text-center lg:text-left">
-
             <h3 className="font-playfair text-xl font-semibold sm:text-2xl">
               Want to see more?{" "}
               <span className="text-base font-normal text-base-content/80 sm:text-lg">
@@ -378,13 +352,12 @@ const FeaturedGallery = () => {
             </h3>
 
             <p className="mt-1 text-sm text-base-content/55">
-              Explore our complete collection of captured
-              moments.
+              Explore our complete collection of captured moments.
             </p>
 
             <p className="mt-0.5 text-xs text-base-content/45">
-              আমাদের ক্যামেরায় বন্দি করা সমস্ত সুন্দর মুহূর্তের
-              গ্যালারি ঘুরে দেখুন।
+              আমাদের ক্যামেরায় বন্দি করা সমস্ত সুন্দর মুহূর্তের গ্যালারি ঘুরে
+              দেখুন।
             </p>
           </div>
 
@@ -393,7 +366,6 @@ const FeaturedGallery = () => {
             className="btn btn-primary w-full rounded-full px-6 font-semibold sm:w-auto"
           >
             Explore Gallery
-
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>

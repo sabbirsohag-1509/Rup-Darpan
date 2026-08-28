@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import {
   Bell,
@@ -16,7 +12,7 @@ import {
   UserPlus,
 } from "lucide-react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 // ============================================================
 // NOTIFICATION SOUND
@@ -90,12 +86,9 @@ const fetchNotifications = async () => {
 };
 
 const fetchUnreadCount = async () => {
-  const response = await axios.get(
-    `${API_URL}/notifications/unread-count`,
-    {
-      withCredentials: true,
-    },
-  );
+  const response = await axios.get(`${API_URL}/notifications/unread-count`, {
+    withCredentials: true,
+  });
 
   return response.data.unreadCount || 0;
 };
@@ -181,10 +174,7 @@ const NotificationBell = () => {
 
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
-          console.warn(
-            "Notification sound could not be played:",
-            error,
-          );
+          console.warn("Notification sound could not be played:", error);
         });
       }
     } catch (error) {
@@ -255,17 +245,15 @@ const NotificationBell = () => {
     },
 
     onSuccess: (notificationId) => {
-      queryClient.setQueryData(
-        ["notifications"],
-        (oldNotifications = []) =>
-          oldNotifications.map((notification) =>
-            notification._id === notificationId
-              ? {
-                  ...notification,
-                  isRead: true,
-                }
-              : notification,
-          ),
+      queryClient.setQueryData(["notifications"], (oldNotifications = []) =>
+        oldNotifications.map((notification) =>
+          notification._id === notificationId
+            ? {
+                ...notification,
+                isRead: true,
+              }
+            : notification,
+        ),
       );
 
       queryClient.setQueryData(
@@ -275,10 +263,7 @@ const NotificationBell = () => {
     },
 
     onError: (error) => {
-      console.error(
-        "Failed to mark notification as read:",
-        error,
-      );
+      console.error("Failed to mark notification as read:", error);
     },
   });
 
@@ -298,28 +283,20 @@ const NotificationBell = () => {
     },
 
     onSuccess: () => {
-      queryClient.setQueryData(
-        ["notifications"],
-        (oldNotifications = []) =>
-          oldNotifications.map((notification) => ({
-            ...notification,
-            isRead: true,
-          })),
+      queryClient.setQueryData(["notifications"], (oldNotifications = []) =>
+        oldNotifications.map((notification) => ({
+          ...notification,
+          isRead: true,
+        })),
       );
 
-      queryClient.setQueryData(
-        ["notifications", "unread-count"],
-        0,
-      );
+      queryClient.setQueryData(["notifications", "unread-count"], 0);
 
       previousUnreadCountRef.current = 0;
     },
 
     onError: (error) => {
-      console.error(
-        "Failed to mark all notifications as read:",
-        error,
-      );
+      console.error("Failed to mark all notifications as read:", error);
     },
   });
 
@@ -329,12 +306,9 @@ const NotificationBell = () => {
 
   const deleteNotificationMutation = useMutation({
     mutationFn: async ({ notificationId }) => {
-      await axios.delete(
-        `${API_URL}/notifications/${notificationId}`,
-        {
-          withCredentials: true,
-        },
-      );
+      await axios.delete(`${API_URL}/notifications/${notificationId}`, {
+        withCredentials: true,
+      });
 
       return notificationId;
     },
@@ -347,19 +321,13 @@ const NotificationBell = () => {
         (notification) => notification._id === notificationId,
       );
 
-      queryClient.setQueryData(
-        ["notifications"],
-        (oldNotifications = []) =>
-          oldNotifications.filter(
-            (notification) =>
-              notification._id !== notificationId,
-          ),
+      queryClient.setQueryData(["notifications"], (oldNotifications = []) =>
+        oldNotifications.filter(
+          (notification) => notification._id !== notificationId,
+        ),
       );
 
-      if (
-        deletedNotification &&
-        !deletedNotification.isRead
-      ) {
+      if (deletedNotification && !deletedNotification.isRead) {
         queryClient.setQueryData(
           ["notifications", "unread-count"],
           (oldCount = 0) => Math.max(oldCount - 1, 0),
@@ -373,10 +341,7 @@ const NotificationBell = () => {
     },
 
     onError: (error) => {
-      console.error(
-        "Failed to delete notification:",
-        error,
-      );
+      console.error("Failed to delete notification:", error);
     },
   });
 
@@ -386,24 +351,15 @@ const NotificationBell = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside,
-    );
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside,
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -492,10 +448,7 @@ const NotificationBell = () => {
   // ==========================================================
 
   const handleNotificationClick = (notification) => {
-    if (
-      !notification.isRead &&
-      !markAsReadMutation.isPending
-    ) {
+    if (!notification.isRead && !markAsReadMutation.isPending) {
       markAsReadMutation.mutate(notification._id);
     }
 
@@ -512,10 +465,7 @@ const NotificationBell = () => {
   // HANDLE DELETE NOTIFICATION
   // ==========================================================
 
-  const handleDeleteNotification = (
-    event,
-    notification,
-  ) => {
+  const handleDeleteNotification = (event, notification) => {
     event.stopPropagation();
 
     if (deleteNotificationMutation.isPending) {
@@ -532,10 +482,7 @@ const NotificationBell = () => {
   // ==========================================================
 
   const handleMarkAllAsRead = () => {
-    if (
-      unreadCount > 0 &&
-      !markAllAsReadMutation.isPending
-    ) {
+    if (unreadCount > 0 && !markAllAsReadMutation.isPending) {
       markAllAsReadMutation.mutate();
     }
   };
@@ -545,10 +492,7 @@ const NotificationBell = () => {
   // ==========================================================
 
   return (
-    <div
-      ref={dropdownRef}
-      className="relative"
-    >
+    <div ref={dropdownRef} className="relative">
       {/* ====================================================
           BELL BUTTON
       ==================================================== */}
@@ -654,9 +598,7 @@ const NotificationBell = () => {
             "
           >
             <div className="min-w-0">
-              <h3 className="font-semibold text-base-content">
-                Notifications
-              </h3>
+              <h3 className="font-semibold text-base-content">Notifications</h3>
 
               {unreadCount > 0 && (
                 <p className="mt-0.5 text-xs text-base-content/50">
@@ -783,26 +725,20 @@ const NotificationBell = () => {
               ================================================= */
 
               notifications.map((notification) => {
-                const route = getNotificationRoute(
-                  notification.type,
-                );
+                const route = getNotificationRoute(notification.type);
 
                 const isDeleting =
                   deleteNotificationMutation.isPending &&
-                  deleteNotificationMutation.variables
-                    ?.notificationId === notification._id;
+                  deleteNotificationMutation.variables?.notificationId ===
+                    notification._id;
 
                 return (
                   <div
                     key={notification._id}
-                    onClick={() =>
-                      handleNotificationClick(notification)
-                    }
+                    onClick={() => handleNotificationClick(notification)}
                     title={
                       route
-                        ? getNotificationViewLabel(
-                            notification.type,
-                          )
+                        ? getNotificationViewLabel(notification.type)
                         : "Notification"
                     }
                     className={`
@@ -817,17 +753,9 @@ const NotificationBell = () => {
                       transition
                       hover:bg-base-200/60
 
-                      ${
-                        !notification.isRead
-                          ? "bg-primary/5"
-                          : ""
-                      }
+                      ${!notification.isRead ? "bg-primary/5" : ""}
 
-                      ${
-                        isDeleting
-                          ? "pointer-events-none opacity-50"
-                          : ""
-                      }
+                      ${isDeleting ? "pointer-events-none opacity-50" : ""}
                     `}
                   >
                     {/* ICON */}
@@ -842,14 +770,10 @@ const NotificationBell = () => {
                         justify-center
                         rounded-full
 
-                        ${getNotificationIconClass(
-                          notification.type,
-                        )}
+                        ${getNotificationIconClass(notification.type)}
                       `}
                     >
-                      {getNotificationIcon(
-                        notification.type,
-                      )}
+                      {getNotificationIcon(notification.type)}
                     </div>
 
                     {/* CONTENT */}
@@ -879,17 +803,12 @@ const NotificationBell = () => {
                         <button
                           type="button"
                           onClick={(event) =>
-                            handleDeleteNotification(
-                              event,
-                              notification,
-                            )
+                            handleDeleteNotification(event, notification)
                           }
                           disabled={isDeleting}
                           aria-label="Delete notification"
                           data-tip={
-                            isDeleting
-                              ? "Deleting..."
-                              : "Delete notification"
+                            isDeleting ? "Deleting..." : "Delete notification"
                           }
                           className="
                             tooltip
@@ -957,9 +876,7 @@ const NotificationBell = () => {
                           text-base-content/40
                         "
                       >
-                        {formatTimeAgo(
-                          notification.createdAt,
-                        )}
+                        {formatTimeAgo(notification.createdAt)}
 
                         {notification.isRead && (
                           <>
@@ -977,9 +894,7 @@ const NotificationBell = () => {
                           <>
                             <span>•</span>
 
-                            <span className="text-primary/70">
-                              View
-                            </span>
+                            <span className="text-primary/70">View</span>
                           </>
                         )}
                       </div>

@@ -1,18 +1,11 @@
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  Eye,
-  EyeOff,
-  LogIn,
-  Mail,
-  X,
-  KeyRound,
-} from "lucide-react";
+import { Eye, EyeOff, LogIn, Mail, X, KeyRound } from "lucide-react";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
@@ -49,17 +42,11 @@ const Login = () => {
     try {
       const { email, password, rememberMe } = data;
 
-      const loggedInUser = await login(
-        email,
-        password,
-        rememberMe,
-      );
+      const loggedInUser = await login(email, password, rememberMe);
 
       if (loggedInUser) {
         toast.success(
-          "Login successful! Welcome back, " +
-            loggedInUser.name +
-            "!",
+          "Login successful! Welcome back, " + loggedInUser.name + "!",
         );
 
         console.log("Logged in user:", loggedInUser);
@@ -80,8 +67,7 @@ const Login = () => {
         toast.error("Invalid email or password.");
       } else {
         toast.error(
-          error.response?.data?.message ||
-            "Login failed. Please try again.",
+          error.response?.data?.message || "Login failed. Please try again.",
         );
       }
     }
@@ -129,18 +115,15 @@ const Login = () => {
     try {
       setIsSendingReset(true);
 
-      const response = await fetch(
-        `${API_URL}/users/forgot-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-          }),
+      const response = await fetch(`${API_URL}/users/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          email,
+        }),
+      });
 
       // Backend response JSON
       const data = await response.json();
@@ -148,9 +131,7 @@ const Login = () => {
       console.log("Forgot password response:", data);
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to send password reset email.",
-        );
+        throw new Error(data.message || "Failed to send password reset email.");
       }
 
       toast.success(
@@ -163,10 +144,7 @@ const Login = () => {
     } catch (error) {
       console.error("Forgot password error:", error);
 
-      toast.error(
-        error.message ||
-          "Failed to send password reset email.",
-      );
+      toast.error(error.message || "Failed to send password reset email.");
     } finally {
       setIsSendingReset(false);
     }
@@ -212,18 +190,14 @@ const Login = () => {
           {/* EMAIL */}
 
           <fieldset className="space-y-2">
-            <label className="text-sm font-semibold">
-              Email Address
-            </label>
+            <label className="text-sm font-semibold">Email Address</label>
 
             <input
               type="email"
               placeholder="youexample@gmail.com"
               autoComplete="email"
               className={`input input-bordered w-full ${
-                errors.email
-                  ? "input-error"
-                  : "focus-within:border-primary"
+                errors.email ? "input-error" : "focus-within:border-primary"
               }`}
               {...register("email", {
                 required: "Email is required.",
@@ -235,9 +209,7 @@ const Login = () => {
             />
 
             {errors.email && (
-              <p className="text-sm text-error">
-                {errors.email.message}
-              </p>
+              <p className="text-sm text-error">{errors.email.message}</p>
             )}
           </fieldset>
 
@@ -245,9 +217,7 @@ const Login = () => {
 
           <fieldset className="space-y-2">
             <div className="flex items-center justify-between gap-3">
-              <label className="text-sm font-semibold">
-                Password
-              </label>
+              <label className="text-sm font-semibold">Password</label>
 
               {/* FORGOT PASSWORD */}
 
@@ -274,42 +244,27 @@ const Login = () => {
                   required: "Password is required.",
                   minLength: {
                     value: 8,
-                    message:
-                      "Password must be at least 8 characters.",
+                    message: "Password must be at least 8 characters.",
                   },
                 })}
               />
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowPassword((prev) => !prev)
-                }
+                onClick={() => setShowPassword((prev) => !prev)}
                 className="btn btn-ghost btn-xs absolute right-2 top-1/2 -translate-y-1/2 text-base-content/70 hover:text-primary"
-                aria-label={
-                  showPassword
-                    ? "Hide password"
-                    : "Show password"
-                }
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <EyeOff
-                    className="h-4 w-4"
-                    aria-hidden="true"
-                  />
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <Eye
-                    className="h-4 w-4"
-                    aria-hidden="true"
-                  />
+                  <Eye className="h-4 w-4" aria-hidden="true" />
                 )}
               </button>
             </div>
 
             {errors.password && (
-              <p className="text-sm text-error">
-                {errors.password.message}
-              </p>
+              <p className="text-sm text-error">{errors.password.message}</p>
             )}
           </fieldset>
 
@@ -343,10 +298,7 @@ const Login = () => {
               </>
             ) : (
               <>
-                <LogIn
-                  className="h-4 w-4"
-                  aria-hidden="true"
-                />
+                <LogIn className="h-4 w-4" aria-hidden="true" />
                 Login
               </>
             )}
@@ -363,8 +315,7 @@ const Login = () => {
           <button
             type="button"
             onClick={() => {
-              window.location.href =
-                `${API_URL}/auth/google`;
+              window.location.href = `${API_URL}/auth/google`;
             }}
             className="btn btn-outline w-full border-primary/30 hover:border-primary hover:bg-primary/10"
           >
@@ -394,7 +345,6 @@ const Login = () => {
                 d="M43.611 20.083H42V20H24v8h11.303c-.793 2.237-2.231 4.166-4.094 5.571l.003-.002 6.19 5.238C36.971 39.194 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"
               />
             </svg>
-
             Continue with Google
           </button>
         </form>
@@ -420,10 +370,7 @@ const Login = () => {
         <div
           className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
           onMouseDown={(event) => {
-            if (
-              event.target === event.currentTarget &&
-              !isSendingReset
-            ) {
+            if (event.target === event.currentTarget && !isSendingReset) {
               handleCloseForgotModal();
             }
           }}
@@ -433,9 +380,7 @@ const Login = () => {
 
           <div
             className="w-full max-w-md rounded-3xl border border-primary/10 bg-base-100 shadow-2xl"
-            onMouseDown={(event) =>
-              event.stopPropagation()
-            }
+            onMouseDown={(event) => event.stopPropagation()}
           >
             {/* MODAL HEADER */}
 
@@ -451,8 +396,7 @@ const Login = () => {
                   </h2>
 
                   <p className="mt-1 text-xs leading-5 text-base-content/50 sm:text-sm">
-                    Enter your email and we'll send you a
-                    password reset link.
+                    Enter your email and we'll send you a password reset link.
                   </p>
                 </div>
               </div>
@@ -481,9 +425,8 @@ const Login = () => {
                   <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
 
                   <p className="text-sm leading-6 text-base-content/70">
-                    No worries! Enter the email address
-                    associated with your account. We'll help
-                    you reset your password.
+                    No worries! Enter the email address associated with your
+                    account. We'll help you reset your password.
                   </p>
                 </div>
               </div>
@@ -491,9 +434,7 @@ const Login = () => {
               {/* EMAIL */}
 
               <fieldset className="space-y-2">
-                <label className="text-sm font-semibold">
-                  Email Address
-                </label>
+                <label className="text-sm font-semibold">Email Address</label>
 
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/40" />
@@ -501,9 +442,7 @@ const Login = () => {
                   <input
                     type="email"
                     value={forgotEmail}
-                    onChange={(event) =>
-                      setForgotEmail(event.target.value)
-                    }
+                    onChange={(event) => setForgotEmail(event.target.value)}
                     placeholder="youexample@gmail.com"
                     autoComplete="email"
                     autoFocus

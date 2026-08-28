@@ -1,4 +1,3 @@
-
 import {
   AlertCircle,
   CheckCircle2,
@@ -18,7 +17,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const AdminReviewManagement = () => {
   const [selectedReview, setSelectedReview] = useState(null);
@@ -134,9 +133,7 @@ const AdminReviewManagement = () => {
     } catch (error) {
       console.error("Failed to reject review:", error);
 
-      toast.error(
-        error?.response?.data?.message || "Failed to reject review.",
-      );
+      toast.error(error?.response?.data?.message || "Failed to reject review.");
     }
   };
 
@@ -162,9 +159,7 @@ const AdminReviewManagement = () => {
     } catch (error) {
       console.error("Failed to delete review:", error);
 
-      toast.error(
-        error?.response?.data?.message || "Failed to delete review.",
-      );
+      toast.error(error?.response?.data?.message || "Failed to delete review.");
     }
   };
 
@@ -217,12 +212,10 @@ const AdminReviewManagement = () => {
         />
 
         <div className="space-y-5">
-
           {/* Header Skeleton */}
 
           <section className="rounded-2xl border border-primary/10 bg-base-100 p-5 shadow-sm">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
               <div className="space-y-2">
                 <div className="h-7 w-56 animate-pulse rounded bg-base-300" />
 
@@ -236,7 +229,6 @@ const AdminReviewManagement = () => {
           {/* Table Skeleton */}
 
           <section className="overflow-hidden rounded-2xl border border-primary/10 bg-base-100 shadow-sm">
-
             <div className="h-12 animate-pulse bg-base-200" />
 
             <div className="space-y-3 p-4">
@@ -247,7 +239,6 @@ const AdminReviewManagement = () => {
                 />
               ))}
             </div>
-
           </section>
         </div>
       </>
@@ -269,11 +260,8 @@ const AdminReviewManagement = () => {
         />
 
         <div className="space-y-5">
-
           <section className="rounded-2xl border border-primary/10 bg-base-100 p-5 shadow-sm">
-
             <div className="flex items-center gap-2">
-
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <MessageSquareText className="h-5 w-5 text-primary" />
               </div>
@@ -287,13 +275,10 @@ const AdminReviewManagement = () => {
                   Manage customer reviews and feedback.
                 </p>
               </div>
-
             </div>
-
           </section>
 
           <section className="rounded-2xl border border-error/20 bg-base-100 p-10 text-center shadow-sm">
-
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-error/10">
               <AlertCircle className="h-7 w-7 text-error" />
             </div>
@@ -314,7 +299,6 @@ const AdminReviewManagement = () => {
               <RefreshCw className="h-4 w-4" />
               Try Again
             </button>
-
           </section>
         </div>
       </>
@@ -336,25 +320,19 @@ const AdminReviewManagement = () => {
       />
 
       <div className="space-y-5">
-
         {/* =========================================
             HEADER
         ========================================== */}
 
         <section className="rounded-2xl border border-primary/10 bg-base-100 p-4 shadow-sm sm:p-5">
-
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
             <div className="min-w-0">
-
               <div className="flex items-center gap-2">
-
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                   <MessageSquareText className="h-5 w-5 text-primary" />
                 </div>
 
                 <div className="min-w-0">
-
                   <h2 className="font-playfair text-xl font-semibold sm:text-2xl">
                     Review Management
                   </h2>
@@ -362,25 +340,17 @@ const AdminReviewManagement = () => {
                   <p className="text-xs text-base-content/60 sm:text-sm">
                     Manage customer reviews and feedback.
                   </p>
-
                 </div>
-
               </div>
-
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-
               {/* Total */}
 
               <div className="rounded-xl border border-primary/10 bg-base-200 px-4 py-2.5">
-                <p className="text-xs text-base-content/50">
-                  Total Reviews
-                </p>
+                <p className="text-xs text-base-content/50">Total Reviews</p>
 
-                <p className="text-lg font-bold text-primary">
-                  {totalReviews}
-                </p>
+                <p className="text-lg font-bold text-primary">{totalReviews}</p>
               </div>
 
               {/* Refresh */}
@@ -393,11 +363,8 @@ const AdminReviewManagement = () => {
               >
                 <RefreshCw className="h-4 w-4" />
               </button>
-
             </div>
-
           </div>
-
         </section>
 
         {/* =========================================
@@ -405,41 +372,28 @@ const AdminReviewManagement = () => {
         ========================================== */}
 
         <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-
           {/* Total */}
 
           <div className="rounded-2xl border border-primary/10 bg-base-100 p-4 shadow-sm">
-
             <div className="flex items-center justify-between">
-
               <div>
-                <p className="text-xs text-base-content/50">
-                  Total
-                </p>
+                <p className="text-xs text-base-content/50">Total</p>
 
-                <p className="mt-1 text-2xl font-bold">
-                  {totalReviews}
-                </p>
+                <p className="mt-1 text-2xl font-bold">{totalReviews}</p>
               </div>
 
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <MessageSquareText className="h-5 w-5 text-primary" />
               </div>
-
             </div>
-
           </div>
 
           {/* Pending */}
 
           <div className="rounded-2xl border border-warning/20 bg-base-100 p-4 shadow-sm">
-
             <div className="flex items-center justify-between">
-
               <div>
-                <p className="text-xs text-base-content/50">
-                  Pending
-                </p>
+                <p className="text-xs text-base-content/50">Pending</p>
 
                 <p className="mt-1 text-2xl font-bold text-warning">
                   {pendingReviews}
@@ -449,21 +403,15 @@ const AdminReviewManagement = () => {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning/10">
                 <Clock3 className="h-5 w-5 text-warning" />
               </div>
-
             </div>
-
           </div>
 
           {/* Approved */}
 
           <div className="rounded-2xl border border-success/20 bg-base-100 p-4 shadow-sm">
-
             <div className="flex items-center justify-between">
-
               <div>
-                <p className="text-xs text-base-content/50">
-                  Approved
-                </p>
+                <p className="text-xs text-base-content/50">Approved</p>
 
                 <p className="mt-1 text-2xl font-bold text-success">
                   {approvedReviews}
@@ -473,21 +421,15 @@ const AdminReviewManagement = () => {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success/10">
                 <CheckCircle2 className="h-5 w-5 text-success" />
               </div>
-
             </div>
-
           </div>
 
           {/* Rejected */}
 
           <div className="rounded-2xl border border-error/20 bg-base-100 p-4 shadow-sm">
-
             <div className="flex items-center justify-between">
-
               <div>
-                <p className="text-xs text-base-content/50">
-                  Rejected
-                </p>
+                <p className="text-xs text-base-content/50">Rejected</p>
 
                 <p className="mt-1 text-2xl font-bold text-error">
                   {rejectedReviews}
@@ -497,11 +439,8 @@ const AdminReviewManagement = () => {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-error/10">
                 <XCircle className="h-5 w-5 text-error" />
               </div>
-
             </div>
-
           </div>
-
         </section>
 
         {/* =========================================
@@ -509,9 +448,7 @@ const AdminReviewManagement = () => {
         ========================================== */}
 
         {reviews.length === 0 ? (
-
           <section className="rounded-2xl border border-primary/10 bg-base-100 p-8 text-center shadow-sm sm:p-12">
-
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
               <MessageSquareText className="h-7 w-7 text-primary" />
             </div>
@@ -523,25 +460,18 @@ const AdminReviewManagement = () => {
             <p className="mt-1 text-sm text-base-content/60">
               There are currently no customer reviews.
             </p>
-
           </section>
-
         ) : (
-
           /* =========================================
               RESPONSIVE TABLE
           ========================================== */
 
           <section className="overflow-hidden rounded-2xl border border-primary/10 bg-base-100 shadow-sm">
-
             <div className="overflow-x-auto">
-
               <div className="min-w-[1100px]">
-
                 {/* Table Header */}
 
                 <div className="grid grid-cols-[1.5fr_1.3fr_1.4fr_1fr_1fr_1.4fr] items-center gap-4 border-b border-base-content/10 bg-base-200 px-5 py-3">
-
                   <p className="text-xs font-semibold uppercase tracking-wider text-base-content/50">
                     Customer
                   </p>
@@ -565,15 +495,12 @@ const AdminReviewManagement = () => {
                   <p className="text-right text-xs font-semibold uppercase tracking-wider text-base-content/50">
                     Actions
                   </p>
-
                 </div>
 
                 {/* Reviews */}
 
                 <div className="divide-y divide-base-content/10">
-
                   {reviews.map((review) => {
-
                     const status = getStatusStyle(review.status);
                     const StatusIcon = status.icon;
 
@@ -582,17 +509,13 @@ const AdminReviewManagement = () => {
                         key={review._id}
                         className="group px-5 py-4 transition hover:bg-base-200/50"
                       >
-
                         <div className="grid grid-cols-[1.5fr_1.3fr_1.4fr_1fr_1fr_1.4fr] items-center gap-4">
-
                           {/* =================================
                               CUSTOMER
                           ================================= */}
 
                           <div className="min-w-0">
-
                             <div className="flex items-center gap-3">
-
                               {review.userPhoto ? (
                                 <img
                                   src={review.userPhoto}
@@ -606,7 +529,6 @@ const AdminReviewManagement = () => {
                               )}
 
                               <div className="min-w-0">
-
                                 <p className="truncate text-sm font-semibold">
                                   {review.userName || "Unknown User"}
                                 </p>
@@ -618,11 +540,8 @@ const AdminReviewManagement = () => {
                                       ).toLocaleDateString()
                                     : "N/A"}
                                 </p>
-
                               </div>
-
                             </div>
-
                           </div>
 
                           {/* =================================
@@ -630,18 +549,13 @@ const AdminReviewManagement = () => {
                           ================================= */}
 
                           <div className="min-w-0">
-
                             <div className="flex items-center gap-2">
-
                               <Package className="h-4 w-4 shrink-0 text-primary" />
 
                               <p className="truncate text-sm font-medium">
-                                {review.packageName ||
-                                  "Photography Package"}
+                                {review.packageName || "Photography Package"}
                               </p>
-
                             </div>
-
                           </div>
 
                           {/* =================================
@@ -649,11 +563,9 @@ const AdminReviewManagement = () => {
                           ================================= */}
 
                           <div className="min-w-0">
-
                             <p className="line-clamp-2 text-sm leading-5 text-base-content/70">
                               {review.comment || "No review text."}
                             </p>
-
                           </div>
 
                           {/* =================================
@@ -661,9 +573,7 @@ const AdminReviewManagement = () => {
                           ================================= */}
 
                           <div>
-
                             <div className="flex items-center gap-1">
-
                               <Star className="h-4 w-4 fill-primary text-primary" />
 
                               <span className="text-sm font-semibold">
@@ -673,9 +583,7 @@ const AdminReviewManagement = () => {
                               <span className="text-xs text-base-content/40">
                                 / 5
                               </span>
-
                             </div>
-
                           </div>
 
                           {/* =================================
@@ -683,17 +591,13 @@ const AdminReviewManagement = () => {
                           ================================= */}
 
                           <div>
-
                             <span
                               className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${status.className}`}
                             >
-
                               <StatusIcon className="h-3.5 w-3.5" />
 
                               {status.label}
-
                             </span>
-
                           </div>
 
                           {/* =================================
@@ -701,14 +605,11 @@ const AdminReviewManagement = () => {
                           ================================= */}
 
                           <div className="flex justify-end gap-1.5">
-
                             {/* Approve */}
 
                             <button
                               type="button"
-                              onClick={() =>
-                                handleApprove(review._id)
-                              }
+                              onClick={() => handleApprove(review._id)}
                               className="btn btn-square btn-ghost btn-sm text-success hover:bg-success/10"
                               title="Approve review"
                             >
@@ -719,9 +620,7 @@ const AdminReviewManagement = () => {
 
                             <button
                               type="button"
-                              onClick={() =>
-                                handleReject(review._id)
-                              }
+                              onClick={() => handleReject(review._id)}
                               className="btn btn-square btn-ghost btn-sm text-error hover:bg-error/10"
                               title="Reject review"
                             >
@@ -732,9 +631,7 @@ const AdminReviewManagement = () => {
 
                             <button
                               type="button"
-                              onClick={() =>
-                                handleViewReview(review)
-                              }
+                              onClick={() => handleViewReview(review)}
                               className="btn btn-square btn-ghost btn-sm text-primary hover:bg-primary/10"
                               title="View review"
                             >
@@ -745,27 +642,19 @@ const AdminReviewManagement = () => {
 
                             <button
                               type="button"
-                              onClick={() =>
-                                setDeleteReviewId(review._id)
-                              }
+                              onClick={() => setDeleteReviewId(review._id)}
                               className="btn btn-square btn-ghost btn-sm text-error hover:bg-error/10"
                               title="Delete review"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
-
                           </div>
-
                         </div>
-
                       </div>
                     );
                   })}
-
                 </div>
-
               </div>
-
             </div>
 
             {/* Mobile hint */}
@@ -773,10 +662,8 @@ const AdminReviewManagement = () => {
             <div className="border-t border-base-content/10 bg-base-200/50 px-4 py-2 text-center text-[11px] text-base-content/40 sm:hidden">
               ← Swipe horizontally to view all review details →
             </div>
-
           </section>
         )}
-
       </div>
 
       {/* =========================================
@@ -784,23 +671,18 @@ const AdminReviewManagement = () => {
       ========================================== */}
 
       {selectedReview && (
-
         <div
           className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-3 backdrop-blur-sm sm:p-4"
           onClick={handleCloseModal}
         >
-
           <div
             className="relative flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-primary/20 bg-base-100/95 shadow-2xl backdrop-blur-xl sm:max-h-[90vh]"
             onClick={(event) => event.stopPropagation()}
           >
-
             {/* Modal Header */}
 
             <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-base-content/10 bg-base-100/95 px-4 py-3 backdrop-blur-xl sm:px-5 sm:py-4">
-
               <div className="min-w-0">
-
                 <h3 className="font-playfair text-lg font-semibold sm:text-xl">
                   Review Details
                 </h3>
@@ -808,7 +690,6 @@ const AdminReviewManagement = () => {
                 <p className="mt-0.5 truncate text-xs text-base-content/50">
                   Complete information about this customer review
                 </p>
-
               </div>
 
               <button
@@ -819,37 +700,27 @@ const AdminReviewManagement = () => {
               >
                 <X className="h-5 w-5" />
               </button>
-
             </div>
 
             {/* Modal Body */}
 
             <div className="overflow-y-auto p-4 sm:p-5">
-
               <div className="space-y-5">
-
                 {/* =================================
                     CUSTOMER
                 ================================= */}
 
                 <div>
-
                   <div className="mb-3 flex items-center gap-2">
-
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                       <User className="h-4 w-4 text-primary" />
                     </div>
 
-                    <h4 className="font-semibold">
-                      Customer Information
-                    </h4>
-
+                    <h4 className="font-semibold">Customer Information</h4>
                   </div>
 
                   <div className="rounded-xl bg-base-200 p-4">
-
                     <div className="flex items-center gap-3">
-
                       {selectedReview.userPhoto ? (
                         <img
                           src={selectedReview.userPhoto}
@@ -863,22 +734,16 @@ const AdminReviewManagement = () => {
                       )}
 
                       <div>
-
                         <p className="font-semibold">
-                          {selectedReview.userName ||
-                            "Unknown User"}
+                          {selectedReview.userName || "Unknown User"}
                         </p>
 
                         <p className="text-xs text-base-content/50">
                           User ID: {selectedReview.userId || "N/A"}
                         </p>
-
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
 
                 {/* =================================
@@ -886,37 +751,27 @@ const AdminReviewManagement = () => {
                 ================================= */}
 
                 <div>
-
                   <div className="mb-3 flex items-center gap-2">
-
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                       <Package className="h-4 w-4 text-primary" />
                     </div>
 
-                    <h4 className="font-semibold">
-                      Package Information
-                    </h4>
-
+                    <h4 className="font-semibold">Package Information</h4>
                   </div>
 
                   <div className="rounded-xl bg-base-200 p-4">
-
                     <p className="text-xs text-base-content/50">
                       Photography Package
                     </p>
 
                     <p className="mt-1 break-words text-sm font-semibold">
-                      {selectedReview.packageName ||
-                        "Photography Package"}
+                      {selectedReview.packageName || "Photography Package"}
                     </p>
 
                     <p className="mt-1 text-xs text-base-content/50">
-                      Package ID:{" "}
-                      {selectedReview.packageId || "N/A"}
+                      Package ID: {selectedReview.packageId || "N/A"}
                     </p>
-
                   </div>
-
                 </div>
 
                 {/* =================================
@@ -924,23 +779,16 @@ const AdminReviewManagement = () => {
                 ================================= */}
 
                 <div>
-
                   <div className="mb-3 flex items-center gap-2">
-
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                       <Star className="h-4 w-4 text-primary" />
                     </div>
 
-                    <h4 className="font-semibold">
-                      Customer Rating
-                    </h4>
-
+                    <h4 className="font-semibold">Customer Rating</h4>
                   </div>
 
                   <div className="rounded-xl bg-base-200 p-4">
-
                     <div className="flex items-center gap-1">
-
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
@@ -955,11 +803,8 @@ const AdminReviewManagement = () => {
                       <span className="ml-2 text-sm font-semibold">
                         {selectedReview.rating || 0}/5
                       </span>
-
                     </div>
-
                   </div>
-
                 </div>
 
                 {/* =================================
@@ -967,28 +812,19 @@ const AdminReviewManagement = () => {
                 ================================= */}
 
                 <div>
-
                   <div className="mb-3 flex items-center gap-2">
-
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                       <MessageSquareText className="h-4 w-4 text-primary" />
                     </div>
 
-                    <h4 className="font-semibold">
-                      Customer Review
-                    </h4>
-
+                    <h4 className="font-semibold">Customer Review</h4>
                   </div>
 
                   <div className="rounded-xl bg-base-200 p-4">
-
                     <p className="whitespace-pre-wrap break-words text-sm leading-7 text-base-content/70">
-                      {selectedReview.comment ||
-                        "No review text provided."}
+                      {selectedReview.comment || "No review text provided."}
                     </p>
-
                   </div>
-
                 </div>
 
                 {/* =================================
@@ -996,36 +832,26 @@ const AdminReviewManagement = () => {
                 ================================= */}
 
                 <div className="grid gap-3 sm:grid-cols-2">
-
                   <div className="rounded-xl bg-base-200 p-4">
-
                     <p className="text-xs text-base-content/50">
                       Submitted Date
                     </p>
 
                     <p className="mt-1 text-sm font-medium">
                       {selectedReview.createdAt
-                        ? new Date(
-                            selectedReview.createdAt,
-                          ).toLocaleString()
+                        ? new Date(selectedReview.createdAt).toLocaleString()
                         : "N/A"}
                     </p>
-
                   </div>
 
                   <div className="rounded-xl bg-base-200 p-4">
-
                     <p className="text-xs text-base-content/50">
                       Review Status
                     </p>
 
                     <div className="mt-2">
-
                       {(() => {
-
-                        const status = getStatusStyle(
-                          selectedReview.status,
-                        );
+                        const status = getStatusStyle(selectedReview.status);
 
                         const StatusIcon = status.icon;
 
@@ -1037,25 +863,17 @@ const AdminReviewManagement = () => {
                             {status.label}
                           </span>
                         );
-
                       })()}
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
-
             </div>
 
             {/* Modal Footer */}
 
             <div className="sticky bottom-0 shrink-0 border-t border-base-content/10 bg-base-100/95 p-3 backdrop-blur-xl sm:p-4">
-
               <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-
                 {/* Close */}
 
                 <button
@@ -1070,9 +888,7 @@ const AdminReviewManagement = () => {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    handleReject(selectedReview._id)
-                  }
+                  onClick={() => handleReject(selectedReview._id)}
                   className="btn btn-error text-white"
                 >
                   <XCircle className="h-4 w-4" />
@@ -1083,9 +899,7 @@ const AdminReviewManagement = () => {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    handleApprove(selectedReview._id)
-                  }
+                  onClick={() => handleApprove(selectedReview._id)}
                   className="btn btn-success text-white"
                 >
                   <CheckCircle2 className="h-4 w-4" />
@@ -1096,23 +910,16 @@ const AdminReviewManagement = () => {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setDeleteReviewId(selectedReview._id)
-                  }
+                  onClick={() => setDeleteReviewId(selectedReview._id)}
                   className="btn btn-outline btn-error"
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete
                 </button>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       )}
 
       {/* =========================================
@@ -1120,17 +927,14 @@ const AdminReviewManagement = () => {
       ========================================== */}
 
       {deleteReviewId && (
-
         <div
           className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
           onClick={() => setDeleteReviewId(null)}
         >
-
           <div
             className="w-full max-w-md rounded-2xl border border-error/20 bg-base-100/90 p-6 shadow-2xl backdrop-blur-xl"
             onClick={(event) => event.stopPropagation()}
           >
-
             {/* Icon */}
 
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-error/10">
@@ -1140,26 +944,23 @@ const AdminReviewManagement = () => {
             {/* Content */}
 
             <div className="mt-4 text-center">
-
               <h3 className="font-playfair text-xl font-semibold">
                 Delete Review?
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-base-content/60">
-                Are you sure you want to permanently delete this
-                customer review?
+                Are you sure you want to permanently delete this customer
+                review?
               </p>
 
               <p className="mt-1 text-xs text-error/80">
                 This action cannot be undone.
               </p>
-
             </div>
 
             {/* Actions */}
 
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
-
               <button
                 type="button"
                 onClick={() => setDeleteReviewId(null)}
@@ -1176,13 +977,9 @@ const AdminReviewManagement = () => {
                 <Trash2 className="h-4 w-4" />
                 Delete Permanently
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
     </>
   );

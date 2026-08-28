@@ -191,7 +191,7 @@ const AddHeroImage = () => {
       // -------------------------------------------------------
       // POST HERO IMAGE
       const response = await axios.post(
-        "http://localhost:5000/hero-images",
+        "https://rup-darpan-backend.vercel.app/hero-images",
         heroData,
         {
           withCredentials: true,
@@ -256,21 +256,20 @@ const AddHeroImage = () => {
       ===================================================== */}
 
       <div className="mb-8 text-center sm:text-left">
-        
-      <div>
-        {/* back to previous btn  */}
-        <button
-          type="button"
-          onClick={() => navigate("/admin/hero-images")}
-          className="group inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-all duration-200 hover:border-primary/40 hover:bg-primary/10 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 mb-4"
-        >
-          <ArrowLeft
-            className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
-            aria-hidden="true"
-          />
-          Back to Previous
-        </button>
-      </div>
+        <div>
+          {/* back to previous btn  */}
+          <button
+            type="button"
+            onClick={() => navigate("/admin/hero-images")}
+            className="group inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-all duration-200 hover:border-primary/40 hover:bg-primary/10 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 mb-4"
+          >
+            <ArrowLeft
+              className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
+              aria-hidden="true"
+            />
+            Back to Previous
+          </button>
+        </div>
         <div className="flex items-center justify-center gap-2 sm:justify-start">
           <h1 className="font-playfair text-3xl font-semibold text-primary sm:text-4xl lg:text-5xl">
             Add Hero Image

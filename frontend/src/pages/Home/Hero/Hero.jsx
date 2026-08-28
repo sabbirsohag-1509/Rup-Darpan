@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { ChevronDown } from "lucide-react";
 
-const API_URL = "http://localhost:5000/hero-images";
+const API_URL = "https://rup-darpan-backend.vercel.app/hero-images";
 
 const Hero = () => {
   // =========================================================
@@ -44,11 +44,7 @@ const Hero = () => {
 
   const images = heroImages
     .filter((hero) => hero.isActive === true)
-    .sort(
-      (a, b) =>
-        Number(a.displayOrder || 0) -
-        Number(b.displayOrder || 0),
-    );
+    .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0));
 
   const totalImages = images.length;
 
@@ -72,9 +68,7 @@ const Hero = () => {
     }
 
     const interval = setInterval(() => {
-      setActiveIndex(
-        (prev) => (prev + 1) % totalImages,
-      );
+      setActiveIndex((prev) => (prev + 1) % totalImages);
     }, 4000);
 
     return () => clearInterval(interval);
@@ -103,15 +97,10 @@ const Hero = () => {
 
     if (diff > dragThreshold) {
       // Swipe right → previous
-      setActiveIndex(
-        (prev) =>
-          (prev - 1 + totalImages) % totalImages,
-      );
+      setActiveIndex((prev) => (prev - 1 + totalImages) % totalImages);
     } else if (diff < -dragThreshold) {
       // Swipe left → next
-      setActiveIndex(
-        (prev) => (prev + 1) % totalImages,
-      );
+      setActiveIndex((prev) => (prev + 1) % totalImages);
     }
   };
 
@@ -166,8 +155,7 @@ const Hero = () => {
         </h2>
 
         <p className="mt-2 max-w-md text-sm text-[#615147]">
-          Please activate at least one hero image from the
-          admin panel.
+          Please activate at least one hero image from the admin panel.
         </p>
       </section>
     );
@@ -223,10 +211,8 @@ const Hero = () => {
         <h1 className="font-playfair text-3xl font-semibold leading-[1.2] tracking-tight text-[#332115] sm:text-4xl md:text-5xl lg:text-6xl">
           Capturing your wedding's magic,
           <br />
-
           <span className="relative mt-1 inline-block sm:mt-2">
             one moment at a time
-
             {/* Handwriting-style underline */}
             <svg
               className="absolute -bottom-3 left-0 h-4 w-full overflow-visible text-[#583923]"
@@ -266,8 +252,8 @@ const Hero = () => {
         </h1>
 
         <p className="mx-auto mt-8 max-w-2xl px-4 font-sans text-xs leading-relaxed text-[#615147] sm:text-sm md:text-base">
-          Capturing the love, joy, and magic of your wedding day,
-          preserving timeless memories to cherish forever
+          Capturing the love, joy, and magic of your wedding day, preserving
+          timeless memories to cherish forever
         </p>
       </div>
 
@@ -297,9 +283,7 @@ const Hero = () => {
 
             let distance = index - activeIndex;
 
-            const half = Math.floor(
-              totalImages / 2,
-            );
+            const half = Math.floor(totalImages / 2);
 
             if (distance > half) {
               distance -= totalImages;
@@ -311,8 +295,7 @@ const Hero = () => {
             // ONLY NEARBY CARDS
             // =================================================
 
-            const isVisible =
-              Math.abs(distance) <= 3;
+            const isVisible = Math.abs(distance) <= 3;
 
             if (!isVisible) {
               return null;
@@ -323,75 +306,56 @@ const Hero = () => {
             // =================================================
 
             const spacing =
-              typeof window !== "undefined" &&
-              window.innerWidth < 640
+              typeof window !== "undefined" && window.innerWidth < 640
                 ? 95
-                : typeof window !== "undefined" &&
-                    window.innerWidth < 1024
+                : typeof window !== "undefined" && window.innerWidth < 1024
                   ? 145
                   : 180;
 
-            const xOffset =
-              distance * spacing;
+            const xOffset = distance * spacing;
 
             // =================================================
             // SMILE CURVE
             // =================================================
 
-            const yOffset =
-              Math.pow(
-                Math.abs(distance),
-                1.55,
-              ) * -11;
+            const yOffset = Math.pow(Math.abs(distance), 1.55) * -11;
 
             // =================================================
             // Z ROTATION
             // =================================================
 
-            const rotateZ =
-              distance * -3.5;
+            const rotateZ = distance * -3.5;
 
             // =================================================
             // Y ROTATION
             // =================================================
 
-            const rotateY =
-              distance * -7.5;
+            const rotateY = distance * -7.5;
 
             // =================================================
             // SCALE
             // =================================================
 
-            const scale =
-              distance === 0
-                ? 1.2
-                : 1 -
-                  Math.abs(distance) *
-                    0.08;
+            const scale = distance === 0 ? 1.2 : 1 - Math.abs(distance) * 0.08;
 
             // =================================================
             // Z INDEX
             // =================================================
 
-            const zIndex =
-              10 - Math.abs(distance);
+            const zIndex = 10 - Math.abs(distance);
 
             // =================================================
             // OPACITY
             // =================================================
 
-            const opacity =
-              1 -
-              Math.abs(distance) *
-                0.12;
+            const opacity = 1 - Math.abs(distance) * 0.12;
 
             return (
               <motion.div
                 key={`${hero._id}-${index}`}
                 style={{
                   zIndex,
-                  transformStyle:
-                    "preserve-3d",
+                  transformStyle: "preserve-3d",
                 }}
                 animate={{
                   x: xOffset,
@@ -465,24 +429,14 @@ const Hero = () => {
                 <img
                   src={hero.image}
                   alt={
-                    hero.altText ||
-                    hero.title ||
-                    `Wedding moment ${index + 1}`
+                    hero.altText || hero.title || `Wedding moment ${index + 1}`
                   }
                   width={800}
                   height={1200}
                   className="pointer-events-none h-full w-full object-cover"
-                  loading={
-                    Math.abs(distance) <= 1
-                      ? "eager"
-                      : "lazy"
-                  }
+                  loading={Math.abs(distance) <= 1 ? "eager" : "lazy"}
                   decoding="async"
-                  fetchPriority={
-                    Math.abs(distance) <= 1
-                      ? "high"
-                      : "low"
-                  }
+                  fetchPriority={Math.abs(distance) <= 1 ? "high" : "low"}
                   sizes="
                     (max-width: 640px) 125px,
                     (max-width: 1024px) 200px,
@@ -500,10 +454,7 @@ const Hero = () => {
       ===================================================== */}
 
       <div className="z-10 mt-8 text-center sm:mt-12">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
             to="/packages"
             className="inline-block rounded-full bg-[#c33a2e] px-6 py-3.5 text-xs font-semibold uppercase tracking-wide text-white shadow-lg transition-all duration-300 hover:bg-[#b23328] hover:shadow-xl sm:px-8 sm:py-4 sm:text-sm md:text-base"

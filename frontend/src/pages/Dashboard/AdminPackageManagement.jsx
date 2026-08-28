@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:5000/packages";
+const API_URL = "https://rup-darpan-backend.vercel.app/packages";
 
 const AdminPackageManagement = () => {
   const [packages, setPackages] = useState([]);
@@ -108,8 +108,8 @@ const AdminPackageManagement = () => {
 
       toast.error("Failed to delete package.");
     } finally {
-        setDeletingId("");
-        setDeletingPackage(null);
+      setDeletingId("");
+      setDeletingPackage(null);
     }
   };
 

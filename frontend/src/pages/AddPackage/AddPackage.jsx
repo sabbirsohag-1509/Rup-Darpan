@@ -21,21 +21,23 @@ import {
 } from "lucide-react";
 import Loader from "../../components/shared/Loader";
 
-
 const CLOUDINARY_UPLOAD_URL =
   "https://api.cloudinary.com/v1_1/dgshzmhyk/image/upload";
 
 const CLOUDINARY_UPLOAD_PRESET = "rup_darpon";
 
 const createPackage = async (packageData) => {
-  const response = await fetch("http://localhost:5000/packages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    "https://rup-darpan-backend.vercel.app/packages",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(packageData),
     },
-    credentials: "include",
-    body: JSON.stringify(packageData),
-  });
+  );
 
   if (!response.ok) {
     let errorMessage = "Failed to create package.";
@@ -104,10 +106,7 @@ const AddPackage = () => {
   // TanStack Query Mutation
   // --------------------------------------------------
 
-  const {
-    mutate: submitPackage,
-    isPending,
-  } = useMutation({
+  const { mutate: submitPackage, isPending } = useMutation({
     mutationFn: createPackage,
 
     onSuccess: () => {
@@ -129,9 +128,7 @@ const AddPackage = () => {
     onError: (error) => {
       console.error("Failed to create package:", error);
 
-      toast.error(
-        error.message || "Failed to add package.",
-      );
+      toast.error(error.message || "Failed to add package.");
     },
   });
 
@@ -168,18 +165,12 @@ const AddPackage = () => {
 
       formData.append("file", file);
 
-      formData.append(
-        "upload_preset",
-        CLOUDINARY_UPLOAD_PRESET,
-      );
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
-      const response = await fetch(
-        CLOUDINARY_UPLOAD_URL,
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
+      const response = await fetch(CLOUDINARY_UPLOAD_URL, {
+        method: "POST",
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error("Cloudinary upload failed.");
@@ -208,9 +199,7 @@ const AddPackage = () => {
         shouldValidate: true,
       });
 
-      toast.error(
-        "Failed to upload cover image. Please try again.",
-      );
+      toast.error("Failed to upload cover image. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -243,11 +232,7 @@ const AddPackage = () => {
   };
 
   const removeFeature = (indexToRemove) => {
-    setFeatures((prev) =>
-      prev.filter(
-        (_, index) => index !== indexToRemove,
-      ),
-    );
+    setFeatures((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   // --------------------------------------------------
@@ -306,11 +291,7 @@ const AddPackage = () => {
 
     reset();
 
-    setFeatures([
-      "300 Edited Photos",
-      "2 Photographers",
-      "Premium Album",
-    ]);
+    setFeatures(["300 Edited Photos", "2 Photographers", "Premium Album"]);
 
     setFeatureInput("");
 
@@ -335,7 +316,6 @@ const AddPackage = () => {
             className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
             aria-hidden="true"
           />
-
           Back to Packages
         </button>
       </div>
@@ -347,8 +327,7 @@ const AddPackage = () => {
         </h1>
 
         <p className="mt-2 text-sm text-base-content/70 sm:text-base">
-          Create and configure a premium photography package
-          for your clients.
+          Create and configure a premium photography package for your clients.
         </p>
       </div>
 
@@ -358,18 +337,13 @@ const AddPackage = () => {
             FORM
         ====================================================== */}
         <div className="rounded-2xl border border-primary/10 bg-base-200/50 p-5 shadow-xl backdrop-blur-sm sm:p-8 lg:col-span-7">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Package Name */}
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text flex items-center gap-1.5 font-semibold">
                   <Package className="h-4 w-4 text-primary" />
-
                   Package Name
-
                   <span className="text-error">*</span>
                 </span>
               </label>
@@ -385,14 +359,12 @@ const AddPackage = () => {
 
                   minLength: {
                     value: 3,
-                    message:
-                      "Package name must be at least 3 characters",
+                    message: "Package name must be at least 3 characters",
                   },
 
                   maxLength: {
                     value: 50,
-                    message:
-                      "Package name cannot exceed 50 characters",
+                    message: "Package name cannot exceed 50 characters",
                   },
                 })}
               />
@@ -413,7 +385,6 @@ const AddPackage = () => {
                 <label className="label">
                   <span className="label-text font-semibold">
                     Price (৳)
-
                     <span className="ml-1 text-error">*</span>
                   </span>
                 </label>
@@ -451,9 +422,7 @@ const AddPackage = () => {
                 <label className="label">
                   <span className="label-text flex items-center gap-1.5 font-semibold">
                     <Clock3 className="h-4 w-4 text-primary" />
-
                     Duration
-
                     <span className="text-error">*</span>
                   </span>
                 </label>
@@ -469,8 +438,7 @@ const AddPackage = () => {
 
                     minLength: {
                       value: 2,
-                      message:
-                        "Please enter a valid duration",
+                      message: "Please enter a valid duration",
                     },
                   })}
                 />
@@ -490,9 +458,7 @@ const AddPackage = () => {
               <label className="label">
                 <span className="label-text flex items-center gap-1.5 font-semibold">
                   <Images className="h-4 w-4 text-primary" />
-
                   Photo Count
-
                   <span className="text-error">*</span>
                 </span>
               </label>
@@ -509,8 +475,7 @@ const AddPackage = () => {
 
                   min: {
                     value: 1,
-                    message:
-                      "Photo count must be greater than 0",
+                    message: "Photo count must be greater than 0",
                   },
 
                   valueAsNumber: true,
@@ -531,7 +496,6 @@ const AddPackage = () => {
               <label className="label">
                 <span className="label-text font-semibold">
                   Description
-
                   <span className="ml-1 text-error">*</span>
                 </span>
               </label>
@@ -546,14 +510,12 @@ const AddPackage = () => {
 
                   minLength: {
                     value: 10,
-                    message:
-                      "Description must be at least 10 characters",
+                    message: "Description must be at least 10 characters",
                   },
 
                   maxLength: {
                     value: 10000,
-                    message:
-                      "Description cannot exceed 10000 characters",
+                    message: "Description cannot exceed 10000 characters",
                   },
                 })}
               />
@@ -572,9 +534,7 @@ const AddPackage = () => {
               <label className="label">
                 <span className="label-text flex items-center gap-1.5 font-semibold">
                   Package Features
-
                   <span className="text-error">*</span>
-
                   <span
                     className="tooltip tooltip-right cursor-help"
                     data-tip="Press Enter or click Add"
@@ -590,9 +550,7 @@ const AddPackage = () => {
                   type="text"
                   placeholder="e.g. 2 Photographers"
                   value={featureInput}
-                  onChange={(event) =>
-                    setFeatureInput(event.target.value)
-                  }
+                  onChange={(event) => setFeatureInput(event.target.value)}
                   onKeyDown={handleFeatureKeyDown}
                   className="input input-bordered w-full border-primary/20 focus:border-primary focus:outline-none"
                 />
@@ -604,9 +562,7 @@ const AddPackage = () => {
                   className="btn btn-primary text-primary-content"
                 >
                   <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">
-                    Add
-                  </span>
+                  <span className="hidden sm:inline">Add</span>
                 </button>
               </div>
 
@@ -615,7 +571,6 @@ const AddPackage = () => {
                 {features.length === 0 ? (
                   <div className="flex items-center gap-2 text-xs text-base-content/40">
                     <Info className="h-4 w-4" />
-
                     No features added yet.
                   </div>
                 ) : (
@@ -631,9 +586,7 @@ const AddPackage = () => {
 
                         <button
                           type="button"
-                          onClick={() =>
-                            removeFeature(index)
-                          }
+                          onClick={() => removeFeature(index)}
                           className="rounded-full p-0.5 transition-colors hover:bg-primary-content/20"
                           aria-label={`Remove ${feature}`}
                         >
@@ -659,9 +612,7 @@ const AddPackage = () => {
               <label className="label">
                 <span className="label-text flex items-center gap-1.5 font-semibold">
                   <ImageIcon className="h-4 w-4 text-primary" />
-
                   Cover Image
-
                   <span className="text-error">*</span>
                 </span>
               </label>
@@ -674,9 +625,7 @@ const AddPackage = () => {
                 }`}
                 onClick={() => {
                   if (!isUploading) {
-                    document
-                      .getElementById("package-cover-upload")
-                      ?.click();
+                    document.getElementById("package-cover-upload")?.click();
                   }
                 }}
               >
@@ -767,7 +716,6 @@ const AddPackage = () => {
                 <label className="label cursor-pointer justify-between gap-4">
                   <span className="label-text flex items-center gap-1.5 font-semibold">
                     <Sparkles className="h-4 w-4 text-primary" />
-
                     Featured Package
                   </span>
 
@@ -814,13 +762,11 @@ const AddPackage = () => {
                 {isPending ? (
                   <>
                     <span className="loading loading-spinner loading-sm" />
-
                     Adding Package...
                   </>
                 ) : isUploading ? (
                   <>
                     <span className="loading loading-spinner loading-sm" />
-
                     Uploading...
                   </>
                 ) : (
@@ -838,7 +784,6 @@ const AddPackage = () => {
           <div className="rounded-2xl border border-primary/10 bg-base-200/50 p-6 shadow-xl backdrop-blur-sm">
             <h3 className="mb-4 flex items-center gap-2 font-playfair text-xl font-semibold text-primary">
               <Sparkles className="h-5 w-5" />
-
               Live Package Preview
             </h3>
 
@@ -851,7 +796,6 @@ const AddPackage = () => {
               {watchFeatured && (
                 <div className="absolute left-3.5 top-3.5 z-10 badge badge-primary gap-1 px-3 py-2.5 text-xs font-bold text-primary-content shadow-md">
                   <Sparkles className="h-3 w-3" />
-
                   Featured
                 </div>
               )}
@@ -859,9 +803,7 @@ const AddPackage = () => {
               {/* Active Status */}
               <div
                 className={`absolute right-3.5 top-3.5 z-10 badge border-0 px-3 py-2.5 text-xs font-semibold text-white backdrop-blur-md ${
-                  watchActive
-                    ? "bg-success/80"
-                    : "bg-error/80"
+                  watchActive ? "bg-success/80" : "bg-error/80"
                 }`}
               >
                 {watchActive ? "Active" : "Inactive"}
@@ -884,8 +826,7 @@ const AddPackage = () => {
                     </h3>
 
                     <p className="mt-2 text-sm text-base-content/50">
-                      Upload a cover image to see the
-                      package preview.
+                      Upload a cover image to see the package preview.
                     </p>
                   </div>
                 )}
@@ -925,9 +866,7 @@ const AddPackage = () => {
                   <div className="rounded-xl bg-primary/5 p-3 text-center">
                     <Clock3 className="mx-auto mb-1 h-4 w-4 text-primary" />
 
-                    <p className="text-xs text-base-content/50">
-                      Duration
-                    </p>
+                    <p className="text-xs text-base-content/50">Duration</p>
 
                     <p className="mt-0.5 text-sm font-semibold">
                       {watchDuration || "8 Hours"}
@@ -937,9 +876,7 @@ const AddPackage = () => {
                   <div className="rounded-xl bg-primary/5 p-3 text-center">
                     <Images className="mx-auto mb-1 h-4 w-4 text-primary" />
 
-                    <p className="text-xs text-base-content/50">
-                      Photos
-                    </p>
+                    <p className="text-xs text-base-content/50">Photos</p>
 
                     <p className="mt-0.5 text-sm font-semibold">
                       {watchPhotoCount || "300"}
@@ -957,9 +894,7 @@ const AddPackage = () => {
 
                 {/* Features */}
                 <div>
-                  <p className="mb-2 text-sm font-semibold">
-                    Package Includes
-                  </p>
+                  <p className="mb-2 text-sm font-semibold">Package Includes</p>
 
                   <div className="space-y-2">
                     {features.length > 0 ? (
@@ -972,9 +907,7 @@ const AddPackage = () => {
                             <Check className="h-3 w-3" />
                           </span>
 
-                          <span className="line-clamp-1">
-                            {feature}
-                          </span>
+                          <span className="line-clamp-1">{feature}</span>
                         </div>
                       ))
                     ) : (
@@ -995,9 +928,7 @@ const AddPackage = () => {
                 <div className="flex items-center justify-between border-t border-primary/5 pt-4">
                   <span
                     className={`badge ${
-                      watchActive
-                        ? "badge-success"
-                        : "badge-error"
+                      watchActive ? "badge-success" : "badge-error"
                     } badge-sm text-white`}
                   >
                     {watchActive ? "Available" : "Unavailable"}
@@ -1005,7 +936,6 @@ const AddPackage = () => {
 
                   <span className="badge badge-outline badge-sm gap-1 border-primary/20 text-primary">
                     <Package className="h-3 w-3" />
-
                     Live Preview
                   </span>
                 </div>
@@ -1017,9 +947,8 @@ const AddPackage = () => {
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
 
               <div>
-                Add a high-quality cover image and complete
-                all package details before publishing your
-                package.
+                Add a high-quality cover image and complete all package details
+                before publishing your package.
               </div>
             </div>
           </div>

@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 import ChangePassword from "./Security/ChangePassword";
 import LoginActivity from "./Security/LoginActivity";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const UserProfile = () => {
   const queryClient = useQueryClient();
@@ -815,7 +815,7 @@ const UserProfile = () => {
                       Saving...
                     </>
                   ) : (
-                    <> 
+                    <>
                       <Save className="h-4 w-4" />
                       Save Changes
                     </>
@@ -826,7 +826,7 @@ const UserProfile = () => {
           </div>
         </div>
       )}
-      <div> 
+      <div>
         <ChangePassword></ChangePassword>
         <LoginActivity></LoginActivity>
       </div>

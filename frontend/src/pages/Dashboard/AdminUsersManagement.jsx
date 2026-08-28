@@ -19,7 +19,7 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
 import Loader from "../../components/shared/Loader";
 
-const API_URL = "http://localhost:5000/users";
+const API_URL = "https://rup-darpan-backend.vercel.app/users";
 const USERS_PER_PAGE = 10;
 
 const AdminUsersManagement = () => {
@@ -292,8 +292,7 @@ const AdminUsersManagement = () => {
     if (!editingUser) return;
 
     const isEditingSelf =
-      currentUser?._id &&
-      String(currentUser._id) === String(editingUser._id);
+      currentUser?._id && String(currentUser._id) === String(editingUser._id);
 
     // Admin cannot change their own role
     if (isEditingSelf && editForm.role !== editingUser.role) {
@@ -333,8 +332,7 @@ const AdminUsersManagement = () => {
       return;
     }
 
-    const newRole =
-      roleChangeUser.role === "admin" ? "user" : "admin";
+    const newRole = roleChangeUser.role === "admin" ? "user" : "admin";
 
     roleMutation.mutate({
       userId: roleChangeUser._id,
@@ -350,8 +348,7 @@ const AdminUsersManagement = () => {
     if (!deleteUser) return;
 
     const isSelf =
-      currentUser?._id &&
-      String(currentUser._id) === String(deleteUser._id);
+      currentUser?._id && String(currentUser._id) === String(deleteUser._id);
 
     if (isSelf) {
       toast.error("You cannot delete your own account.");
@@ -385,9 +382,7 @@ const AdminUsersManagement = () => {
             <UserRound className="h-7 w-7" />
           </div>
 
-          <h3 className="text-lg font-semibold">
-            Failed to load users
-          </h3>
+          <h3 className="text-lg font-semibold">Failed to load users</h3>
 
           <p className="mt-1 text-sm text-base-content/60">
             {error?.message || "Something went wrong."}
@@ -495,9 +490,7 @@ const AdminUsersManagement = () => {
               <UserRound className="h-7 w-7" />
             </div>
 
-            <h3 className="text-lg font-semibold">
-              No users found
-            </h3>
+            <h3 className="text-lg font-semibold">No users found</h3>
 
             <p className="mt-1 text-sm text-base-content/60">
               {searchQuery
@@ -543,9 +536,7 @@ const AdminUsersManagement = () => {
                                   />
                                 ) : (
                                   <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-primary">
-                                    {user.name
-                                      ?.charAt(0)
-                                      .toUpperCase() || "U"}
+                                    {user.name?.charAt(0).toUpperCase() || "U"}
                                   </div>
                                 )}
                               </div>
@@ -564,9 +555,7 @@ const AdminUsersManagement = () => {
                         </td>
 
                         {/* Email */}
-                        <td className="text-sm">
-                          {user.email}
-                        </td>
+                        <td className="text-sm">{user.email}</td>
 
                         {/* Role */}
                         <td>
@@ -581,9 +570,7 @@ const AdminUsersManagement = () => {
                               <Shield className="h-3 w-3" />
                             )}
 
-                            {user.role === "admin"
-                              ? "Admin"
-                              : "User"}
+                            {user.role === "admin" ? "Admin" : "User"}
                           </span>
 
                           {isSelf && (
@@ -605,9 +592,7 @@ const AdminUsersManagement = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-ghost"
-                              onClick={() =>
-                                setSelectedUser(user)
-                              }
+                              onClick={() => setSelectedUser(user)}
                               title="View user"
                             >
                               <Eye className="h-4 w-4" />
@@ -617,9 +602,7 @@ const AdminUsersManagement = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-outline"
-                              onClick={() =>
-                                openEditModal(user)
-                              }
+                              onClick={() => openEditModal(user)}
                               title="Edit user"
                             >
                               <Pencil className="h-4 w-4" />
@@ -629,9 +612,7 @@ const AdminUsersManagement = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-outline"
-                              onClick={() =>
-                                setRoleChangeUser(user)
-                              }
+                              onClick={() => setRoleChangeUser(user)}
                               disabled={isSelf}
                               title={
                                 isSelf
@@ -646,13 +627,8 @@ const AdminUsersManagement = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-error btn-outline"
-                              onClick={() =>
-                                setDeleteUser(user)
-                              }
-                              disabled={
-                                isSelf ||
-                                deleteMutation.isPending
-                              }
+                              onClick={() => setDeleteUser(user)}
+                              disabled={isSelf || deleteMutation.isPending}
                               title={
                                 isSelf
                                   ? "You cannot delete yourself"
@@ -686,9 +662,7 @@ const AdminUsersManagement = () => {
                   className="btn btn-sm btn-outline"
                   disabled={currentPage === 1 || isFetching}
                   onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.max(prev - 1, 1),
-                    )
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                 >
                   Previous
@@ -701,13 +675,9 @@ const AdminUsersManagement = () => {
                 <button
                   type="button"
                   className="btn btn-sm btn-primary text-primary-content"
-                  disabled={
-                    currentPage === totalPages || isFetching
-                  }
+                  disabled={currentPage === totalPages || isFetching}
                   onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(prev + 1, totalPages),
-                    )
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                 >
                   Next
@@ -749,9 +719,7 @@ const AdminUsersManagement = () => {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-primary">
-                      {selectedUser.name
-                        ?.charAt(0)
-                        .toUpperCase() || "U"}
+                      {selectedUser.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                   )}
                 </div>
@@ -768,9 +736,7 @@ const AdminUsersManagement = () => {
 
             <div className="mt-6 space-y-3 rounded-xl bg-base-200/60 p-4">
               <div className="flex justify-between gap-4">
-                <span className="text-sm text-base-content/60">
-                  Role
-                </span>
+                <span className="text-sm text-base-content/60">Role</span>
 
                 <span className="font-medium capitalize">
                   {selectedUser.role}
@@ -778,13 +744,9 @@ const AdminUsersManagement = () => {
               </div>
 
               <div className="flex justify-between gap-4">
-                <span className="text-sm text-base-content/60">
-                  Joined
-                </span>
+                <span className="text-sm text-base-content/60">Joined</span>
 
-                <span className="font-medium">
-                  {selectedUser.joinedDate}
-                </span>
+                <span className="font-medium">{selectedUser.joinedDate}</span>
               </div>
             </div>
 
@@ -816,23 +778,16 @@ const AdminUsersManagement = () => {
       {editingUser && (
         <dialog className="modal modal-open">
           <div className="modal-box max-w-lg">
-            <h3 className="font-playfair text-2xl font-semibold">
-              Edit User
-            </h3>
+            <h3 className="font-playfair text-2xl font-semibold">Edit User</h3>
 
             <p className="mt-1 text-sm text-base-content/60">
               Update the user's basic profile information.
             </p>
 
-            <form
-              onSubmit={handleEditSubmit}
-              className="mt-5 space-y-4"
-            >
+            <form onSubmit={handleEditSubmit} className="mt-5 space-y-4">
               {/* Name */}
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Name
-                </span>
+                <span className="label-text mb-1 font-medium">Name</span>
 
                 <input
                   type="text"
@@ -869,17 +824,14 @@ const AdminUsersManagement = () => {
 
               {/* Role */}
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Role
-                </span>
+                <span className="label-text mb-1 font-medium">Role</span>
 
                 <select
                   className="select select-bordered w-full"
                   value={editForm.role}
                   disabled={
                     currentUser?._id &&
-                    String(currentUser._id) ===
-                      String(editingUser._id)
+                    String(currentUser._id) === String(editingUser._id)
                   }
                   onChange={(event) =>
                     setEditForm((prev) => ({
@@ -893,8 +845,7 @@ const AdminUsersManagement = () => {
                 </select>
 
                 {currentUser?._id &&
-                  String(currentUser._id) ===
-                    String(editingUser._id) && (
+                  String(currentUser._id) === String(editingUser._id) && (
                     <span className="mt-1 text-xs text-warning">
                       You cannot change your own role.
                     </span>
@@ -957,19 +908,11 @@ const AdminUsersManagement = () => {
 
               <p className="mt-2 text-sm text-base-content/65">
                 Change{" "}
-                <strong>
-                  {roleChangeUser.name ||
-                    roleChangeUser.email}
-                </strong>{" "}
+                <strong>{roleChangeUser.name || roleChangeUser.email}</strong>{" "}
                 from{" "}
-                <strong className="capitalize">
-                  {roleChangeUser.role}
-                </strong>{" "}
-                to{" "}
+                <strong className="capitalize">{roleChangeUser.role}</strong> to{" "}
                 <strong>
-                  {roleChangeUser.role === "admin"
-                    ? "User"
-                    : "Admin"}
+                  {roleChangeUser.role === "admin" ? "User" : "Admin"}
                 </strong>
                 ?
               </p>
@@ -1028,10 +971,7 @@ const AdminUsersManagement = () => {
 
               <p className="mt-2 text-sm text-base-content/65">
                 Are you sure you want to delete{" "}
-                <strong>
-                  {deleteUser.name || deleteUser.email}
-                </strong>
-                ?
+                <strong>{deleteUser.name || deleteUser.email}</strong>?
               </p>
 
               <p className="mt-2 text-xs text-error/80">

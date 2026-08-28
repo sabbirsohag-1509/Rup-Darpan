@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:5000/videos";
+const API_URL = "https://rup-darpan-backend.vercel.app/videos";
 
 const MAX_FEATURED_VIDEOS = 8;
 
@@ -251,47 +251,46 @@ const AdminVideosManagement = () => {
   // FEATURED TOGGLE
   // =========================================================
 
-const handleFeaturedToggle = async (video) => {
-  const currentlyFeatured = Boolean(video.featured);
+  const handleFeaturedToggle = async (video) => {
+    const currentlyFeatured = Boolean(video.featured);
 
-  // Adding to featured
-  if (!currentlyFeatured && featuredCount >= MAX_FEATURED_VIDEOS) {
-    toast.error(
-      `You already have ${MAX_FEATURED_VIDEOS} featured videos. Remove one first.`,
-    );
+    // Adding to featured
+    if (!currentlyFeatured && featuredCount >= MAX_FEATURED_VIDEOS) {
+      toast.error(
+        `You already have ${MAX_FEATURED_VIDEOS} featured videos. Remove one first.`,
+      );
 
-    return;
-  }
+      return;
+    }
 
-  try {
-    await axios.patch(
-      `${API_URL}/${video._id}/featured`,
-      {
-        featured: !currentlyFeatured,
-      },
-      {
-        withCredentials: true,
-      },
-    );
+    try {
+      await axios.patch(
+        `${API_URL}/${video._id}/featured`,
+        {
+          featured: !currentlyFeatured,
+        },
+        {
+          withCredentials: true,
+        },
+      );
 
-    await queryClient.invalidateQueries({
-      queryKey: ["admin-videos"],
-    });
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-videos"],
+      });
 
-    toast.success(
-      currentlyFeatured
-        ? "Removed from Featured Videos."
-        : "Added to Featured Videos.",
-    );
-  } catch (error) {
-    console.error("Featured toggle error:", error);
+      toast.success(
+        currentlyFeatured
+          ? "Removed from Featured Videos."
+          : "Added to Featured Videos.",
+      );
+    } catch (error) {
+      console.error("Featured toggle error:", error);
 
-    toast.error(
-      error.response?.data?.message ||
-        "Failed to update featured status.",
-    );
-  }
-};
+      toast.error(
+        error.response?.data?.message || "Failed to update featured status.",
+      );
+    }
+  };
 
   // =========================================================
   // RENDER

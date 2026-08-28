@@ -13,13 +13,9 @@ import {
   GripVertical,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const API_URL = "http://localhost:5000/hero-images";
+const API_URL = "https://rup-darpan-backend.vercel.app/hero-images";
 
 const AdminHeroImageManagement = () => {
   const queryClient = useQueryClient();
@@ -73,9 +69,7 @@ const AdminHeroImageManagement = () => {
     },
 
     onSuccess: (data) => {
-      toast.success(
-        data?.message || "Hero image deleted successfully.",
-      );
+      toast.success(data?.message || "Hero image deleted successfully.");
 
       queryClient.invalidateQueries({
         queryKey: ["hero-images"],
@@ -88,8 +82,7 @@ const AdminHeroImageManagement = () => {
       console.error("Delete hero image error:", error);
 
       toast.error(
-        error?.response?.data?.message ||
-          "Failed to delete hero image.",
+        error?.response?.data?.message || "Failed to delete hero image.",
       );
     },
   });
@@ -100,18 +93,13 @@ const AdminHeroImageManagement = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ heroId, data }) => {
-      const response = await axios.put(
-        `${API_URL}/${heroId}`,
-        data,
-      );
+      const response = await axios.put(`${API_URL}/${heroId}`, data);
 
       return response.data;
     },
 
     onSuccess: (data) => {
-      toast.success(
-        data?.message || "Hero image updated successfully.",
-      );
+      toast.success(data?.message || "Hero image updated successfully.");
 
       queryClient.invalidateQueries({
         queryKey: ["hero-images"],
@@ -127,8 +115,7 @@ const AdminHeroImageManagement = () => {
       console.error("Update hero image error:", error);
 
       toast.error(
-        error?.response?.data?.message ||
-          "Failed to update hero image.",
+        error?.response?.data?.message || "Failed to update hero image.",
       );
     },
   });
@@ -199,8 +186,7 @@ const AdminHeroImageManagement = () => {
         formData.title.trim() ||
         "Rup Darpon Hero Image",
 
-      displayOrder:
-        Number(formData.displayOrder) || 1,
+      displayOrder: Number(formData.displayOrder) || 1,
 
       isActive: Boolean(formData.isActive),
     };
@@ -247,13 +233,9 @@ const AdminHeroImageManagement = () => {
 
       publicId: hero.publicId || "",
 
-      altText:
-        hero.altText ||
-        hero.title ||
-        "Rup Darpon Hero Image",
+      altText: hero.altText || hero.title || "Rup Darpon Hero Image",
 
-      displayOrder:
-        Number(hero.displayOrder) || 1,
+      displayOrder: Number(hero.displayOrder) || 1,
 
       isActive: !Boolean(hero.isActive),
     };
@@ -337,8 +319,7 @@ const AdminHeroImageManagement = () => {
               </h2>
 
               <p className="mt-1 text-sm text-base-content/70">
-                Add, edit, delete and manage your homepage hero
-                banner images.
+                Add, edit, delete and manage your homepage hero banner images.
               </p>
             </div>
           </div>
@@ -365,13 +346,11 @@ const AdminHeroImageManagement = () => {
             </div>
 
             <div>
-              <h3 className="font-semibold">
-                Hero Banner Images
-              </h3>
+              <h3 className="font-semibold">Hero Banner Images</h3>
 
               <p className="text-sm text-base-content/60">
-                Manage the images displayed in the Rup Darpon
-                homepage hero section.
+                Manage the images displayed in the Rup Darpon homepage hero
+                section.
               </p>
             </div>
           </div>
@@ -419,8 +398,7 @@ const AdminHeroImageManagement = () => {
             </h3>
 
             <p className="mt-2 text-sm text-base-content/60">
-              Add your first hero banner image to display it
-              on the homepage.
+              Add your first hero banner image to display it on the homepage.
             </p>
 
             <Link
@@ -444,16 +422,13 @@ const AdminHeroImageManagement = () => {
                   <th>Title</th>
                   <th>Order</th>
                   <th>Status</th>
-                  <th className="text-right">
-                    Actions
-                  </th>
+                  <th className="text-right">Actions</th>
                 </tr>
               </thead>
 
               <tbody>
                 {heroImages.map((hero) => {
-                  const isActive =
-                    hero.isActive !== false;
+                  const isActive = hero.isActive !== false;
 
                   const isDeleting =
                     deleteMutation.isPending &&
@@ -468,11 +443,7 @@ const AdminHeroImageManagement = () => {
                           <div className="h-16 w-28 overflow-hidden rounded-lg bg-base-200">
                             <img
                               src={hero.image}
-                              alt={
-                                hero.altText ||
-                                hero.title ||
-                                "Hero banner"
-                              }
+                              alt={hero.altText || hero.title || "Hero banner"}
                               loading="lazy"
                               className="h-full w-full object-cover"
                             />
@@ -485,13 +456,11 @@ const AdminHeroImageManagement = () => {
                       <td>
                         <div className="max-w-[240px]">
                           <p className="truncate font-medium">
-                            {hero.title ||
-                              "Untitled Hero Image"}
+                            {hero.title || "Untitled Hero Image"}
                           </p>
 
                           <p className="mt-1 max-w-[240px] truncate text-xs text-base-content/40">
-                            {hero.altText ||
-                              "No alt text"}
+                            {hero.altText || "No alt text"}
                           </p>
                         </div>
                       </td>
@@ -510,16 +479,10 @@ const AdminHeroImageManagement = () => {
                       <td>
                         <button
                           type="button"
-                          onClick={() =>
-                            handleActiveToggle(hero)
-                          }
-                          disabled={
-                            updateMutation.isPending
-                          }
+                          onClick={() => handleActiveToggle(hero)}
+                          disabled={updateMutation.isPending}
                           className={`btn btn-sm gap-1 ${
-                            isActive
-                              ? "btn-success"
-                              : "btn-outline"
+                            isActive ? "btn-success" : "btn-outline"
                           }`}
                         >
                           {isActive ? (
@@ -543,12 +506,8 @@ const AdminHeroImageManagement = () => {
                           <button
                             type="button"
                             className="btn btn-sm btn-outline"
-                            onClick={() =>
-                              openEditModal(hero)
-                            }
-                            disabled={
-                              updateMutation.isPending
-                            }
+                            onClick={() => openEditModal(hero)}
+                            disabled={updateMutation.isPending}
                           >
                             <Pencil className="h-4 w-4" />
                             Edit
@@ -557,12 +516,8 @@ const AdminHeroImageManagement = () => {
                           <button
                             type="button"
                             className="btn btn-sm btn-error btn-outline"
-                            onClick={() =>
-                              handleDelete(hero)
-                            }
-                            disabled={
-                              deleteMutation.isPending
-                            }
+                            onClick={() => handleDelete(hero)}
+                            disabled={deleteMutation.isPending}
                           >
                             {isDeleting ? (
                               <span className="loading loading-spinner loading-xs" />
@@ -570,9 +525,7 @@ const AdminHeroImageManagement = () => {
                               <Trash2 className="h-4 w-4" />
                             )}
 
-                            {isDeleting
-                              ? "Deleting..."
-                              : "Delete"}
+                            {isDeleting ? "Deleting..." : "Delete"}
                           </button>
                         </div>
                       </td>
@@ -609,9 +562,7 @@ const AdminHeroImageManagement = () => {
                 type="button"
                 className="btn btn-circle btn-ghost btn-sm"
                 onClick={closeEditModal}
-                disabled={
-                  updateMutation.isPending
-                }
+                disabled={updateMutation.isPending}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -619,10 +570,7 @@ const AdminHeroImageManagement = () => {
 
             {/* FORM */}
 
-            <form
-              onSubmit={handleUpdate}
-              className="mt-5 space-y-5"
-            >
+            <form onSubmit={handleUpdate} className="mt-5 space-y-5">
               {/* IMAGE PREVIEW */}
 
               <div className="overflow-hidden rounded-2xl border border-primary/10 bg-base-200">
@@ -642,9 +590,7 @@ const AdminHeroImageManagement = () => {
               {/* TITLE */}
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Hero Title
-                </span>
+                <span className="label-text mb-1 font-medium">Hero Title</span>
 
                 <input
                   type="text"
@@ -663,9 +609,7 @@ const AdminHeroImageManagement = () => {
               {/* ALT TEXT */}
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Alt Text
-                </span>
+                <span className="label-text mb-1 font-medium">Alt Text</span>
 
                 <input
                   type="text"
@@ -684,9 +628,7 @@ const AdminHeroImageManagement = () => {
               {/* IMAGE URL */}
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 font-medium">
-                  Image URL
-                </span>
+                <span className="label-text mb-1 font-medium">Image URL</span>
 
                 <input
                   type="url"
@@ -740,8 +682,7 @@ const AdminHeroImageManagement = () => {
                   onChange={(event) =>
                     setFormData((prev) => ({
                       ...prev,
-                      displayOrder:
-                        event.target.value,
+                      displayOrder: event.target.value,
                     }))
                   }
                 />
@@ -774,8 +715,7 @@ const AdminHeroImageManagement = () => {
                     onChange={(event) =>
                       setFormData((prev) => ({
                         ...prev,
-                        isActive:
-                          event.target.checked,
+                        isActive: event.target.checked,
                       }))
                     }
                   />
@@ -795,9 +735,7 @@ const AdminHeroImageManagement = () => {
                   type="button"
                   className="btn"
                   onClick={closeEditModal}
-                  disabled={
-                    updateMutation.isPending
-                  }
+                  disabled={updateMutation.isPending}
                 >
                   Cancel
                 </button>
@@ -805,9 +743,7 @@ const AdminHeroImageManagement = () => {
                 <button
                   type="submit"
                   className="btn btn-primary text-primary-content"
-                  disabled={
-                    updateMutation.isPending
-                  }
+                  disabled={updateMutation.isPending}
                 >
                   {updateMutation.isPending ? (
                     <>
@@ -879,11 +815,7 @@ const AdminHeroImageManagement = () => {
               <div className="mt-5 overflow-hidden rounded-xl border border-base-content/10 bg-base-200">
                 <img
                   src={deleteHero.image}
-                  alt={
-                    deleteHero.altText ||
-                    deleteHero.title ||
-                    "Hero image"
-                  }
+                  alt={deleteHero.altText || deleteHero.title || "Hero image"}
                   className="h-36 w-full object-cover"
                 />
               </div>
@@ -892,13 +824,11 @@ const AdminHeroImageManagement = () => {
 
               <div className="mt-4 rounded-xl border border-error/10 bg-error/5 p-4">
                 <p className="text-sm font-semibold">
-                  {deleteHero.title ||
-                    "Untitled Hero Image"}
+                  {deleteHero.title || "Untitled Hero Image"}
                 </p>
 
                 <p className="mt-1 line-clamp-2 text-xs text-base-content/50">
-                  {deleteHero.altText ||
-                    "No alt text available"}
+                  {deleteHero.altText || "No alt text available"}
                 </p>
               </div>
 
@@ -906,9 +836,8 @@ const AdminHeroImageManagement = () => {
 
               <div className="mt-4 rounded-xl bg-base-200/70 p-3">
                 <p className="text-xs leading-relaxed text-base-content/60">
-                  Are you sure you want to permanently
-                  remove this hero image from your
-                  homepage hero section?
+                  Are you sure you want to permanently remove this hero image
+                  from your homepage hero section?
                 </p>
               </div>
 
@@ -919,9 +848,7 @@ const AdminHeroImageManagement = () => {
                   type="button"
                   className="btn btn-ghost"
                   onClick={cancelDelete}
-                  disabled={
-                    deleteMutation.isPending
-                  }
+                  disabled={deleteMutation.isPending}
                 >
                   Cancel
                 </button>
@@ -930,9 +857,7 @@ const AdminHeroImageManagement = () => {
                   type="button"
                   className="btn btn-error text-error-content"
                   onClick={confirmDelete}
-                  disabled={
-                    deleteMutation.isPending
-                  }
+                  disabled={deleteMutation.isPending}
                 >
                   {deleteMutation.isPending ? (
                     <>

@@ -21,7 +21,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const AdminBookingManagement = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);

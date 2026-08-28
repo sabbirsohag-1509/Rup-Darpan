@@ -26,7 +26,7 @@ import StatCard from "../../components/dashboard/StatCard";
 import SectionHeader from "../../components/dashboard/SectionHeader";
 import BookingStatusBadge from "../../components/dashboard/BookingStatusBadge";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 // =====================================================
 // HELPERS
@@ -91,24 +91,10 @@ const RevenueChart = ({ data }) => {
             }}
           >
             <defs>
-              <linearGradient
-                id="revenueGradient"
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop
-                  offset="0%"
-                  stopColor="currentColor"
-                  stopOpacity={0.35}
-                />
+              <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="currentColor" stopOpacity={0.35} />
 
-                <stop
-                  offset="100%"
-                  stopColor="currentColor"
-                  stopOpacity={0}
-                />
+                <stop offset="100%" stopColor="currentColor" stopOpacity={0} />
               </linearGradient>
             </defs>
 
@@ -140,10 +126,7 @@ const RevenueChart = ({ data }) => {
                 stroke: "currentColor",
                 strokeOpacity: 0.15,
               }}
-              formatter={(value) => [
-                formatCurrency(value),
-                "Revenue",
-              ]}
+              formatter={(value) => [formatCurrency(value), "Revenue"]}
               labelFormatter={(label) => `${label}`}
               contentStyle={{
                 borderRadius: "12px",
@@ -220,10 +203,7 @@ const BookingChart = ({ data }) => {
                 fill: "currentColor",
                 fillOpacity: 0.05,
               }}
-              formatter={(value) => [
-                `${value} bookings`,
-                "Bookings",
-              ]}
+              formatter={(value) => [`${value} bookings`, "Bookings"]}
               labelFormatter={(label) => `${label}`}
               contentStyle={{
                 borderRadius: "12px",
@@ -297,8 +277,7 @@ const DashboardError = ({ message }) => {
       </h2>
 
       <p className="mt-2 text-sm text-base-content/70">
-        {message ||
-          "Something went wrong while loading dashboard data."}
+        {message || "Something went wrong while loading dashboard data."}
       </p>
     </div>
   );
@@ -356,12 +335,9 @@ const AdminDashboard = () => {
     queryKey: ["admin-dashboard-bookings"],
 
     queryFn: async () => {
-      const response = await axios.get(
-        `${API_URL}/admin/bookings`,
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await axios.get(`${API_URL}/admin/bookings`, {
+        withCredentials: true,
+      });
 
       return response.data;
     },
@@ -380,12 +356,9 @@ const AdminDashboard = () => {
     queryKey: ["admin-dashboard-reviews"],
 
     queryFn: async () => {
-      const response = await axios.get(
-        `${API_URL}/admin/reviews`,
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await axios.get(`${API_URL}/admin/reviews`, {
+        withCredentials: true,
+      });
 
       return response.data;
     },
@@ -417,11 +390,7 @@ const AdminDashboard = () => {
   // LOADING
   // ===================================================
 
-  if (
-    usersLoading ||
-    bookingsLoading ||
-    reviewsLoading
-  ) {
+  if (usersLoading || bookingsLoading || reviewsLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -429,11 +398,7 @@ const AdminDashboard = () => {
   // ERROR
   // ===================================================
 
-  if (
-    usersError ||
-    bookingsError ||
-    reviewsError
-  ) {
+  if (usersError || bookingsError || reviewsError) {
     const errorMessage =
       usersQueryError?.response?.data?.message ||
       bookingsQueryError?.response?.data?.message ||
@@ -447,14 +412,12 @@ const AdminDashboard = () => {
   // STATS
   // ===================================================
 
-  const totalUsers =
-    usersData?.total ?? users.length;
+  const totalUsers = usersData?.total ?? users.length;
 
   const totalBookings = bookings.length;
 
   const pendingBookings = bookings.filter(
-    (booking) =>
-      booking.status?.toLowerCase() === "pending",
+    (booking) => booking.status?.toLowerCase() === "pending",
   ).length;
 
   // ===================================================
@@ -463,19 +426,14 @@ const AdminDashboard = () => {
 
   const totalRevenue = bookings
     .filter((booking) => {
-      const status =
-        booking.status?.toLowerCase();
+      const status = booking.status?.toLowerCase();
 
       return (
-        status === "confirmed" ||
-        status === "completed" ||
-        status === "paid"
+        status === "confirmed" || status === "completed" || status === "paid"
       );
     })
     .reduce((total, booking) => {
-      return (
-        total + getBookingPrice(booking)
-      );
+      return total + getBookingPrice(booking);
     }, 0);
 
   // ===================================================
@@ -484,150 +442,99 @@ const AdminDashboard = () => {
 
   const currentDate = new Date();
 
-  const currentYear =
-    currentDate.getFullYear();
+  const currentYear = currentDate.getFullYear();
 
-  const currentMonth =
-    currentDate.getMonth();
+  const currentMonth = currentDate.getMonth();
 
   // ===================================================
   // THIS MONTH BOOKINGS
   // ===================================================
 
-  const thisMonthBookings = bookings.filter(
-    (booking) => {
-      if (!booking.createdAt) {
-        return false;
-      }
+  const thisMonthBookings = bookings.filter((booking) => {
+    if (!booking.createdAt) {
+      return false;
+    }
 
-      const date = new Date(
-        booking.createdAt,
-      );
+    const date = new Date(booking.createdAt);
 
-      return (
-        date.getFullYear() ===
-          currentYear &&
-        date.getMonth() ===
-          currentMonth
-      );
-    },
-  ).length;
+    return (
+      date.getFullYear() === currentYear && date.getMonth() === currentMonth
+    );
+  }).length;
 
   // ===================================================
   // BOOKING ANALYTICS
   // ===================================================
 
-  const bookingBars = Array.from(
-    { length: 6 },
-    (_, index) => {
-      const monthIndex =
-        currentMonth - (5 - index);
+  const bookingBars = Array.from({ length: 6 }, (_, index) => {
+    const monthIndex = currentMonth - (5 - index);
 
-      const date = new Date(
-        currentYear,
-        monthIndex,
-        1,
+    const date = new Date(currentYear, monthIndex, 1);
+
+    const month = date.toLocaleString("en-US", {
+      month: "short",
+    });
+
+    const value = bookings.filter((booking) => {
+      if (!booking.createdAt) {
+        return false;
+      }
+
+      const bookingDate = new Date(booking.createdAt);
+
+      return (
+        bookingDate.getFullYear() === date.getFullYear() &&
+        bookingDate.getMonth() === date.getMonth()
       );
+    }).length;
 
-      const month =
-        date.toLocaleString(
-          "en-US",
-          {
-            month: "short",
-          },
-        );
-
-      const value = bookings.filter(
-        (booking) => {
-          if (!booking.createdAt) {
-            return false;
-          }
-
-          const bookingDate =
-            new Date(
-              booking.createdAt,
-            );
-
-          return (
-            bookingDate.getFullYear() ===
-              date.getFullYear() &&
-            bookingDate.getMonth() ===
-              date.getMonth()
-          );
-        },
-      ).length;
-
-      return {
-        month,
-        value,
-      };
-    },
-  );
+    return {
+      month,
+      value,
+    };
+  });
 
   // ===================================================
   // REVENUE ANALYTICS
   // ===================================================
 
-  const revenueBars = Array.from(
-    { length: 6 },
-    (_, index) => {
-      const monthIndex =
-        currentMonth - (5 - index);
+  const revenueBars = Array.from({ length: 6 }, (_, index) => {
+    const monthIndex = currentMonth - (5 - index);
 
-      const date = new Date(
-        currentYear,
-        monthIndex,
-        1,
-      );
+    const date = new Date(currentYear, monthIndex, 1);
 
-      const month =
-        date.toLocaleString(
-          "en-US",
-          {
-            month: "short",
-          },
+    const month = date.toLocaleString("en-US", {
+      month: "short",
+    });
+
+    const value = bookings
+      .filter((booking) => {
+        if (!booking.createdAt) {
+          return false;
+        }
+
+        const bookingDate = new Date(booking.createdAt);
+
+        const status = booking.status?.toLowerCase();
+
+        const isRevenueBooking =
+          status === "confirmed" || status === "completed" || status === "paid";
+
+        return (
+          isRevenueBooking &&
+          bookingDate.getFullYear() === date.getFullYear() &&
+          bookingDate.getMonth() === date.getMonth()
         );
+      })
+      .reduce((total, booking) => {
+        return total + getBookingPrice(booking);
+      }, 0);
 
-      const value = bookings
-        .filter((booking) => {
-          if (!booking.createdAt) {
-            return false;
-          }
-
-          const bookingDate =
-            new Date(
-              booking.createdAt,
-            );
-
-          const status =
-            booking.status?.toLowerCase();
-
-          const isRevenueBooking =
-            status === "confirmed" ||
-            status === "completed" ||
-            status === "paid";
-
-          return (
-            isRevenueBooking &&
-            bookingDate.getFullYear() ===
-              date.getFullYear() &&
-            bookingDate.getMonth() ===
-              date.getMonth()
-          );
-        })
-        .reduce((total, booking) => {
-          return (
-            total +
-            getBookingPrice(booking)
-          );
-        }, 0);
-
-      return {
-        month,
-        value,
-      };
-    },
-  );
+    return {
+      month,
+      value,
+    };
+  });
 
   // ===================================================
   // RECENT BOOKINGS
@@ -635,10 +542,7 @@ const AdminDashboard = () => {
 
   const recentBookings = [...bookings]
     .sort((a, b) => {
-      return (
-        new Date(b.createdAt || 0) -
-        new Date(a.createdAt || 0)
-      );
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
     })
     .slice(0, 5);
 
@@ -648,10 +552,7 @@ const AdminDashboard = () => {
 
   const recentUsers = [...users]
     .sort((a, b) => {
-      return (
-        new Date(b.createdAt || 0) -
-        new Date(a.createdAt || 0)
-      );
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
     })
     .slice(0, 5);
 
@@ -659,42 +560,25 @@ const AdminDashboard = () => {
   // SORT ALL REVIEWS
   // ===================================================
 
-  const sortedReviews = [...reviews].sort(
-    (a, b) => {
-      return (
-        new Date(b.createdAt || 0) -
-        new Date(a.createdAt || 0)
-      );
-    },
-  );
+  const sortedReviews = [...reviews].sort((a, b) => {
+    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+  });
 
   // ===================================================
   // REVIEW PAGINATION
   // ===================================================
 
-  const totalReviewPages = Math.ceil(
-    sortedReviews.length /
-      REVIEWS_PER_PAGE,
-  );
+  const totalReviewPages = Math.ceil(sortedReviews.length / REVIEWS_PER_PAGE);
 
   const safeReviewPage =
-    totalReviewPages > 0
-      ? Math.min(
-          reviewPage,
-          totalReviewPages,
-        )
-      : 1;
+    totalReviewPages > 0 ? Math.min(reviewPage, totalReviewPages) : 1;
 
-  const reviewStartIndex =
-    (safeReviewPage - 1) *
-    REVIEWS_PER_PAGE;
+  const reviewStartIndex = (safeReviewPage - 1) * REVIEWS_PER_PAGE;
 
-  const paginatedReviews =
-    sortedReviews.slice(
-      reviewStartIndex,
-      reviewStartIndex +
-        REVIEWS_PER_PAGE,
-    );
+  const paginatedReviews = sortedReviews.slice(
+    reviewStartIndex,
+    reviewStartIndex + REVIEWS_PER_PAGE,
+  );
 
   // ===================================================
   // STAT CARDS
@@ -730,12 +614,9 @@ const AdminDashboard = () => {
     {
       label: "Total Revenue",
 
-      value: formatCurrency(
-        totalRevenue,
-      ),
+      value: formatCurrency(totalRevenue),
 
-      description:
-        "Revenue from confirmed/completed bookings",
+      description: "Revenue from confirmed/completed bookings",
 
       icon: DollarSign,
     },
@@ -780,10 +661,7 @@ const AdminDashboard = () => {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
-          <StatCard
-            key={stat.label}
-            {...stat}
-          />
+          <StatCard key={stat.label} {...stat} />
         ))}
       </section>
 
@@ -828,92 +706,69 @@ const AdminDashboard = () => {
               </thead>
 
               <tbody>
-                {recentBookings.map(
-                  (booking) => {
-                    const customerName =
-                      booking.name ||
-                      booking.userName ||
-                      booking.customerName ||
-                      booking.customer ||
-                      "Unknown Customer";
+                {recentBookings.map((booking) => {
+                  const customerName =
+                    booking.name ||
+                    booking.userName ||
+                    booking.customerName ||
+                    booking.customer ||
+                    "Unknown Customer";
 
-                    const packageName =
-                      booking.packageName ||
-                      booking.package ||
-                      "Unknown Package";
+                  const packageName =
+                    booking.packageName || booking.package || "Unknown Package";
 
-                    const paymentStatus =
-                      booking.paymentStatus ||
-                      booking.payment ||
-                      (booking.status?.toLowerCase() ===
-                      "paid"
-                        ? "Paid"
-                        : "Unpaid");
+                  const paymentStatus =
+                    booking.paymentStatus ||
+                    booking.payment ||
+                    (booking.status?.toLowerCase() === "paid"
+                      ? "Paid"
+                      : "Unpaid");
 
-                    return (
-                      <tr
-                        key={
-                          booking._id ||
-                          `${customerName}-${booking.createdAt}`
-                        }
-                      >
-                        <td className="font-semibold">
-                          {customerName}
-                        </td>
+                  return (
+                    <tr
+                      key={
+                        booking._id || `${customerName}-${booking.createdAt}`
+                      }
+                    >
+                      <td className="font-semibold">{customerName}</td>
 
-                        <td>
-                          {packageName}
-                        </td>
+                      <td>{packageName}</td>
 
-                        <td>
-                          {formatDate(
-                            booking.createdAt,
-                          )}
-                        </td>
+                      <td>{formatDate(booking.createdAt)}</td>
 
-                        <td>
-                          <BookingStatusBadge
-                            status={
-                              booking.status
-                                ? booking.status
-                                    .charAt(0)
-                                    .toUpperCase() +
-                                  booking.status.slice(
-                                    1,
-                                  )
-                                : "Pending"
-                            }
-                          />
-                        </td>
+                      <td>
+                        <BookingStatusBadge
+                          status={
+                            booking.status
+                              ? booking.status.charAt(0).toUpperCase() +
+                                booking.status.slice(1)
+                              : "Pending"
+                          }
+                        />
+                      </td>
 
-                        <td>
-                          <BookingStatusBadge
-                            status={
-                              typeof paymentStatus ===
-                              "string"
-                                ? paymentStatus
-                                    .charAt(0)
-                                    .toUpperCase() +
-                                  paymentStatus.slice(
-                                    1,
-                                  )
-                                : "Unpaid"
-                            }
-                          />
-                        </td>
+                      <td>
+                        <BookingStatusBadge
+                          status={
+                            typeof paymentStatus === "string"
+                              ? paymentStatus.charAt(0).toUpperCase() +
+                                paymentStatus.slice(1)
+                              : "Unpaid"
+                          }
+                        />
+                      </td>
 
-                        <td>
-                          <Link
-                            to="/admin/bookings"
-                            className="btn btn-ghost btn-xs hover:text-primary"
-                          >
-                            Manage
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  },
-                )}
+                      <td>
+                        <Link
+                          to="/admin/bookings"
+                          className="btn btn-ghost btn-xs hover:text-primary"
+                        >
+                          Manage
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -945,10 +800,7 @@ const AdminDashboard = () => {
             ) : (
               recentUsers.map((item) => (
                 <article
-                  key={
-                    item._id ||
-                    item.email
-                  }
+                  key={item._id || item.email}
                   className="flex items-center gap-3 rounded-xl border border-primary/10 p-3"
                 >
                   {/* Avatar */}
@@ -957,20 +809,12 @@ const AdminDashboard = () => {
                     <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary">
                       {item.profilePhoto ? (
                         <img
-                          src={
-                            item.profilePhoto
-                          }
-                          alt={
-                            item.name ||
-                            "User"
-                          }
+                          src={item.profilePhoto}
+                          alt={item.name || "User"}
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center font-semibold">
-                          {item.name
-                            ?.charAt(0)
-                            .toUpperCase() ||
-                            "U"}
+                          {item.name?.charAt(0).toUpperCase() || "U"}
                         </div>
                       )}
                     </div>
@@ -980,8 +824,7 @@ const AdminDashboard = () => {
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
-                      {item.name ||
-                        "Unknown User"}
+                      {item.name || "Unknown User"}
                     </p>
 
                     <p className="truncate text-xs text-base-content/70">
@@ -993,14 +836,11 @@ const AdminDashboard = () => {
 
                   <div className="text-right">
                     <p className="text-xs uppercase tracking-wide text-primary">
-                      {item.role ||
-                        "user"}
+                      {item.role || "user"}
                     </p>
 
                     <p className="text-xs text-base-content/65">
-                      {formatDate(
-                        item.createdAt,
-                      )}
+                      {formatDate(item.createdAt)}
                     </p>
                   </div>
                 </article>
@@ -1027,100 +867,77 @@ const AdminDashboard = () => {
                 No reviews found.
               </div>
             ) : (
-              paginatedReviews.map(
-                (item) => {
-                  const rating =
-                    Math.min(
-                      Math.max(
-                        Number(
-                          item.rating,
-                        ) || 0,
-                        0,
-                      ),
-                      5,
-                    );
+              paginatedReviews.map((item) => {
+                const rating = Math.min(
+                  Math.max(Number(item.rating) || 0, 0),
+                  5,
+                );
 
-                  const customerName =
-                    item.userName ||
-                    item.customerName ||
-                    item.customer ||
-                    "Unknown Customer";
+                const customerName =
+                  item.userName ||
+                  item.customerName ||
+                  item.customer ||
+                  "Unknown Customer";
 
-                  return (
-                    <article
-                      key={
-                        item._id ||
-                        `${customerName}-${item.createdAt}`
-                      }
-                      className="rounded-xl border border-primary/10 p-4"
-                    >
-                      {/* Customer + Date */}
+                return (
+                  <article
+                    key={item._id || `${customerName}-${item.createdAt}`}
+                    className="rounded-xl border border-primary/10 p-4"
+                  >
+                    {/* Customer + Date */}
 
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-sm font-semibold">
-                          {customerName}
-                        </p>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold">{customerName}</p>
 
-                        <p className="text-xs text-base-content/65">
-                          {formatDate(
-                            item.createdAt,
-                          )}
-                        </p>
-                      </div>
-
-                      {/* Rating */}
-
-                      <div className="mt-2 flex items-center gap-1">
-                        <div className="flex items-center">
-                          {[1, 2, 3, 4, 5].map(
-                            (star) => (
-                              <Star
-                                key={star}
-                                size={16}
-                                strokeWidth={1.8}
-                                className={
-                                  star <=
-                                  rating
-                                    ? "fill-primary text-primary"
-                                    : "text-base-content/20"
-                                }
-                              />
-                            ),
-                          )}
-                        </div>
-
-                        <span className="ml-1 text-xs font-medium text-base-content/65">
-                          {rating}/5
-                        </span>
-                      </div>
-
-                      {/* Review */}
-
-                      <p className="mt-2 text-sm text-base-content/75">
-                        {item.comment ||
-                          "No review text."}
+                      <p className="text-xs text-base-content/65">
+                        {formatDate(item.createdAt)}
                       </p>
+                    </div>
 
-                      {/* Status */}
+                    {/* Rating */}
 
-                      <div className="mt-3">
-                        <BookingStatusBadge
-                          status={
-                            item.status
-                              ? item.status
-                                  .charAt(0)
-                                  .toUpperCase() +
-                                item.status.slice(
-                                  1,
-                                )
-                              : "Pending"
-                          }
-                        />
+                    <div className="mt-2 flex items-center gap-1">
+                      <div className="flex items-center">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={16}
+                            strokeWidth={1.8}
+                            className={
+                              star <= rating
+                                ? "fill-primary text-primary"
+                                : "text-base-content/20"
+                            }
+                          />
+                        ))}
                       </div>
-                    </article>
-                  );
-                },
-              )
+
+                      <span className="ml-1 text-xs font-medium text-base-content/65">
+                        {rating}/5
+                      </span>
+                    </div>
+
+                    {/* Review */}
+
+                    <p className="mt-2 text-sm text-base-content/75">
+                      {item.comment || "No review text."}
+                    </p>
+
+                    {/* Status */}
+
+                    <div className="mt-3">
+                      <BookingStatusBadge
+                        status={
+                          item.status
+                            ? item.status.charAt(0).toUpperCase() +
+                              item.status.slice(1)
+                            : "Pending"
+                        }
+                      />
+                    </div>
+                  </article>
+                );
+              })
             )}
           </div>
 
@@ -1135,18 +952,8 @@ const AdminDashboard = () => {
               <button
                 type="button"
                 className="btn btn-sm btn-outline"
-                disabled={
-                  safeReviewPage === 1
-                }
-                onClick={() =>
-                  setReviewPage(
-                    (prev) =>
-                      Math.max(
-                        prev - 1,
-                        1,
-                      ),
-                  )
-                }
+                disabled={safeReviewPage === 1}
+                onClick={() => setReviewPage((prev) => Math.max(prev - 1, 1))}
               >
                 Previous
               </button>
@@ -1156,27 +963,18 @@ const AdminDashboard = () => {
               <div className="flex items-center gap-1">
                 {Array.from(
                   {
-                    length:
-                      totalReviewPages,
+                    length: totalReviewPages,
                   },
                   (_, index) => {
-                    const page =
-                      index + 1;
+                    const page = index + 1;
 
                     return (
                       <button
                         key={page}
                         type="button"
-                        onClick={() =>
-                          setReviewPage(
-                            page,
-                          )
-                        }
+                        onClick={() => setReviewPage(page)}
                         className={`btn btn-sm ${
-                          safeReviewPage ===
-                          page
-                            ? "btn-primary"
-                            : "btn-ghost"
+                          safeReviewPage === page ? "btn-primary" : "btn-ghost"
                         }`}
                       >
                         {page}
@@ -1191,18 +989,9 @@ const AdminDashboard = () => {
               <button
                 type="button"
                 className="btn btn-sm btn-outline"
-                disabled={
-                  safeReviewPage ===
-                  totalReviewPages
-                }
+                disabled={safeReviewPage === totalReviewPages}
                 onClick={() =>
-                  setReviewPage(
-                    (prev) =>
-                      Math.min(
-                        prev + 1,
-                        totalReviewPages,
-                      ),
-                  )
+                  setReviewPage((prev) => Math.min(prev + 1, totalReviewPages))
                 }
               >
                 Next

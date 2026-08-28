@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 // =========================================================
 // MAIN COMPONENT

@@ -18,7 +18,7 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useState } from "react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const MyReview = () => {
   const [selectedReview, setSelectedReview] = useState(null);
@@ -31,8 +31,8 @@ const MyReview = () => {
   const [editComment, setEditComment] = useState("");
 
   const [isUpdating, setIsUpdating] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const {
     data: reviews = [],
@@ -127,8 +127,8 @@ const MyReview = () => {
         },
       );
 
-        toast.success("Review Updated successfully!");
-        setShowSuccessModal(true);
+      toast.success("Review Updated successfully!");
+      setShowSuccessModal(true);
 
       setIsEditModalOpen(false);
       setSelectedReview(null);
@@ -310,9 +310,7 @@ const MyReview = () => {
 
             <div className="flex items-center gap-2">
               <div className="rounded-xl border border-primary/10 bg-base-200 px-4 py-2.5">
-                <p className="text-xs text-base-content/50">
-                  Total Reviews
-                </p>
+                <p className="text-xs text-base-content/50">Total Reviews</p>
 
                 <p className="text-lg font-bold text-primary">
                   {reviews.length}
@@ -346,8 +344,8 @@ const MyReview = () => {
             </h3>
 
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-base-content/60">
-              Your submitted reviews will appear here. Share your
-              experience after using our photography services.
+              Your submitted reviews will appear here. Share your experience
+              after using our photography services.
             </p>
           </section>
         ) : (
@@ -390,9 +388,7 @@ const MyReview = () => {
                           <CalendarDays className="h-3 w-3" />
 
                           {review.createdAt
-                            ? new Date(
-                                review.createdAt,
-                              ).toLocaleDateString()
+                            ? new Date(review.createdAt).toLocaleDateString()
                             : "N/A"}
                         </p>
                       </div>
@@ -551,9 +547,7 @@ const MyReview = () => {
 
                   <p className="text-xs text-base-content/50">
                     {selectedReview.createdAt
-                      ? new Date(
-                          selectedReview.createdAt,
-                        ).toLocaleDateString()
+                      ? new Date(selectedReview.createdAt).toLocaleDateString()
                       : "N/A"}
                   </p>
                 </div>
@@ -571,8 +565,7 @@ const MyReview = () => {
                     </p>
 
                     <p className="font-semibold">
-                      {selectedReview.packageName ||
-                        "Photography Package"}
+                      {selectedReview.packageName || "Photography Package"}
                     </p>
                   </div>
                 </div>
@@ -708,8 +701,7 @@ const MyReview = () => {
                       </p>
 
                       <p className="font-semibold">
-                        {selectedReview.packageName ||
-                          "Photography Package"}
+                        {selectedReview.packageName || "Photography Package"}
                       </p>
                     </div>
                   </div>
@@ -840,8 +832,8 @@ const MyReview = () => {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-base-content/60">
-                Are you sure you want to delete this review? This action
-                cannot be undone.
+                Are you sure you want to delete this review? This action cannot
+                be undone.
               </p>
             </div>
 
@@ -914,49 +906,49 @@ const MyReview = () => {
             }}
           />
         </dialog>
-          )}
-          <div> 
-               {showSuccessModal && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-primary/20 bg-base-100/95 p-7 text-center shadow-2xl backdrop-blur-md sm:p-8">
-            {/* Icon */}
-
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
-              <CheckCircle2 className="h-8 w-8 text-success" />
-            </div>
-
-            {/* Message */}
-
-            <h3 className="mt-5 font-playfair text-2xl font-semibold">
-              Review Submitted Successfully
-            </h3>
-
-            <p className="mt-3 text-sm leading-6 text-base-content/65">
-              Thank you for taking the time to share your experience with us!
-            </p>
-
-            <p className="mt-2 text-sm leading-6 text-base-content/65">
-              Your review has been submitted successfully. It will be published
-              shortly after being reviewed by the RupDarpon team.
-              <span className="mt-1 block text-xs opacity-80 sm:text-sm">
-                (আপনার রিভিউটি সফলভাবে জমা হয়েছে। রূপদর্পণ টিম যাচাই করার পর
-                খুব শীঘ্রই এটি প্রকাশ করা হবে।)
-              </span>
-            </p>
-
-            {/* OK */}
-
-            <button
-              type="button"
-              onClick={() => setShowSuccessModal(false)}
-              className="btn btn-primary mt-6 w-full rounded-full text-primary-content"
-            >
-              OK
-            </button>
-          </div>
-        </div>
       )}
+      <div>
+        {showSuccessModal && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-3xl border border-primary/20 bg-base-100/95 p-7 text-center shadow-2xl backdrop-blur-md sm:p-8">
+              {/* Icon */}
+
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+                <CheckCircle2 className="h-8 w-8 text-success" />
+              </div>
+
+              {/* Message */}
+
+              <h3 className="mt-5 font-playfair text-2xl font-semibold">
+                Review Submitted Successfully
+              </h3>
+
+              <p className="mt-3 text-sm leading-6 text-base-content/65">
+                Thank you for taking the time to share your experience with us!
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-base-content/65">
+                Your review has been submitted successfully. It will be
+                published shortly after being reviewed by the RupDarpon team.
+                <span className="mt-1 block text-xs opacity-80 sm:text-sm">
+                  (আপনার রিভিউটি সফলভাবে জমা হয়েছে। রূপদর্পণ টিম যাচাই করার পর
+                  খুব শীঘ্রই এটি প্রকাশ করা হবে।)
+                </span>
+              </p>
+
+              {/* OK */}
+
+              <button
+                type="button"
+                onClick={() => setShowSuccessModal(false)}
+                className="btn btn-primary mt-6 w-full rounded-full text-primary-content"
+              >
+                OK
+              </button>
+            </div>
           </div>
+        )}
+      </div>
     </>
   );
 };

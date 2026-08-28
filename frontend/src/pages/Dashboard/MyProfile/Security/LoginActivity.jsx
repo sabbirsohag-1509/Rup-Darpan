@@ -13,7 +13,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const LoginActivity = () => {
   const [showAll, setShowAll] = useState(false);
@@ -25,12 +25,9 @@ const LoginActivity = () => {
   } = useQuery({
     queryKey: ["login-activity"],
     queryFn: async () => {
-      const response = await axios.get(
-        `${API_URL}/users/login-activity`,
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await axios.get(`${API_URL}/users/login-activity`, {
+        withCredentials: true,
+      });
 
       return Array.isArray(response.data) ? response.data : [];
     },
@@ -60,9 +57,7 @@ const LoginActivity = () => {
   };
 
   // Initially show only 2 activities
-  const visibleActivities = showAll
-    ? activities
-    : activities.slice(0, 2);
+  const visibleActivities = showAll ? activities : activities.slice(0, 2);
 
   const hasMoreActivities = activities.length > 2;
 
@@ -219,12 +214,13 @@ const LoginActivity = () => {
 
                       <p className="mt-1 text-sm font-semibold">
                         {activity.loginAt
-                          ? new Date(
-                              activity.loginAt,
-                            ).toLocaleTimeString("en-BD", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })
+                          ? new Date(activity.loginAt).toLocaleTimeString(
+                              "en-BD",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )
                           : "Unknown"}
                       </p>
                     </div>

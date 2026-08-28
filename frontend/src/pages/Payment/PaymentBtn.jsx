@@ -1,7 +1,6 @@
-
 import { CreditCard } from "lucide-react";
 import axios from "axios";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
 const PaymentBtn = ({
   bookingId,
@@ -22,7 +21,7 @@ const PaymentBtn = ({
       });
 
       const response = await axios.post(
-        "http://localhost:5000/payment/init",
+        "https://rup-darpan-backend.vercel.app/payment/init",
         {
           amount: packagePrice,
           customerName,
@@ -44,14 +43,10 @@ const PaymentBtn = ({
       console.error("❌ Payment URL not found:", response.data);
 
       toast.error(
-        response.data?.message ||
-          "Failed to start payment. Please try again.",
+        response.data?.message || "Failed to start payment. Please try again.",
       );
     } catch (error) {
-      console.error(
-        "❌ SSLCommerz payment initialization error:",
-        error,
-      );
+      console.error("❌ SSLCommerz payment initialization error:", error);
 
       toast.error(
         error.response?.data?.message ||

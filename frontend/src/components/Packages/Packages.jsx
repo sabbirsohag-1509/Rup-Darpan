@@ -19,7 +19,7 @@ import OurPolicy from "../OurPolicy/OurPolicy";
 
 // Change this path according to your project structure
 
-const API_URL = "http://localhost:5000/packages";
+const API_URL = "https://rup-darpan-backend.vercel.app/packages";
 
 // =========================================
 // Utility: Short Description
@@ -119,7 +119,6 @@ const Packages = () => {
   if (isLoading) {
     return (
       <section className="px-4 pb-20 sm:pb-24">
-
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3].map((item) => (

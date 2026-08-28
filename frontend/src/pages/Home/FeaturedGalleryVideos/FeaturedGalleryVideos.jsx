@@ -2,14 +2,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { FaFacebookF } from "react-icons/fa";
-import {
-  Camera,
-  Play,
-  ArrowUpRight,
-} from "lucide-react";
+import { Camera, Play, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const FACEBOOK_PAGE_URL =
   "https://www.facebook.com/profile.php?id=61559974675020";
@@ -43,9 +39,7 @@ const FeaturedGalleryVideos = () => {
     queryKey: ["featured-videos"],
 
     queryFn: async () => {
-      const response = await axios.get(
-        `${API_URL}/featured-videos`
-      );
+      const response = await axios.get(`${API_URL}/featured-videos`);
 
       return response.data;
     },
@@ -63,7 +57,6 @@ const FeaturedGalleryVideos = () => {
     return (
       <section className="bg-base-100 py-16 sm:py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
-
           {/* Heading Skeleton */}
 
           <div className="mb-10 sm:mb-12 lg:mb-14">
@@ -111,7 +104,6 @@ const FeaturedGalleryVideos = () => {
     return (
       <section className="bg-base-100 py-16 sm:py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
-
           <div className="rounded-3xl border border-primary/10 bg-primary/5 px-6 py-10 text-center">
             <Camera className="mx-auto h-8 w-8 text-primary" />
 
@@ -125,7 +117,6 @@ const FeaturedGalleryVideos = () => {
           </div>
 
           <FacebookPageCTA />
-
         </div>
       </section>
     );
@@ -138,17 +129,14 @@ const FeaturedGalleryVideos = () => {
   return (
     <section className="bg-base-100 py-16 sm:py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
-
         {/* =====================================================
             HEADING
         ===================================================== */}
 
         <div className="mb-10 flex flex-col gap-6 sm:mb-12 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
-
           {/* Header Content */}
 
           <div className="max-w-2xl">
-
             {/* Decorative Line */}
 
             <div className="mb-4 flex items-center gap-2">
@@ -158,23 +146,18 @@ const FeaturedGalleryVideos = () => {
             {/* Heading */}
 
             <h2 className="font-playfair text-4xl font-semibold leading-[1.05] text-base-content sm:text-5xl lg:text-6xl">
-              Featured{" "}
-              <span className="italic text-primary">
-                Videos
-              </span>
+              Featured <span className="italic text-primary">Videos</span>
             </h2>
 
             {/* Description */}
 
             <p className="mt-5 max-w-xl text-sm leading-7 text-base-content/60 sm:text-base">
-              Relive some of our most memorable moments through
-              stories, celebrations, and beautiful wedding films.
+              Relive some of our most memorable moments through stories,
+              celebrations, and beautiful wedding films.
               <br />
-
               <span className="text-xs text-base-content/50 sm:text-sm">
-                আমাদের ক্যামেরায় বন্দি করা প্রিয় কিছু মুহূর্ত;
-                যেখানে প্রতিটি ভিডিও ধরে রাখে গল্প, আবেগ এবং
-                সুন্দর স্মৃতির জীবন্ত প্রতিচ্ছবি।
+                আমাদের ক্যামেরায় বন্দি করা প্রিয় কিছু মুহূর্ত; যেখানে প্রতিটি
+                ভিডিও ধরে রাখে গল্প, আবেগ এবং সুন্দর স্মৃতির জীবন্ত প্রতিচ্ছবি।
               </span>
             </p>
           </div>
@@ -188,14 +171,11 @@ const FeaturedGalleryVideos = () => {
               to="/gallery/videos"
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-primary-content sm:w-fit"
             >
-              <span>
-                View All Videos
-              </span>
+              <span>View All Videos</span>
 
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
           </div>
-
         </div>
 
         {/* =====================================================
@@ -204,10 +184,7 @@ const FeaturedGalleryVideos = () => {
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {videos.map((video) => (
-            <VideoCard
-              key={video._id}
-              video={video}
-            />
+            <VideoCard key={video._id} video={video} />
           ))}
         </div>
 
@@ -216,7 +193,6 @@ const FeaturedGalleryVideos = () => {
         ===================================================== */}
 
         <FacebookPageCTA />
-
       </div>
     </section>
   );
@@ -233,27 +209,20 @@ const VideoCard = ({ video }) => {
 
   const description = video.description?.trim() || "";
 
-  const isLongDescription =
-    description.length > DESCRIPTION_LIMIT;
+  const isLongDescription = description.length > DESCRIPTION_LIMIT;
 
   const displayedDescription =
     isExpanded || !isLongDescription
       ? description
-      : `${description
-          .slice(0, DESCRIPTION_LIMIT)
-          .trimEnd()}...`;
+      : `${description.slice(0, DESCRIPTION_LIMIT).trimEnd()}...`;
 
   return (
-    <article
-      className="group overflow-hidden rounded-3xl border border-primary/10 bg-base-100 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
-    >
-
+    <article className="group overflow-hidden rounded-3xl border border-primary/10 bg-base-100 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
       {/* =====================================================
           THUMBNAIL
       ===================================================== */}
 
       <div className="relative aspect-video overflow-hidden bg-base-200">
-
         {/* Thumbnail */}
 
         <img
@@ -279,12 +248,10 @@ const VideoCard = ({ video }) => {
           className="absolute inset-0 flex items-center justify-center"
         >
           <span className="flex h-16 w-16 items-center justify-center rounded-full border border-white/50 bg-white/85 text-primary shadow-2xl backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:bg-white sm:h-[72px] sm:w-[72px]">
-
             <Play
               className="ml-1 h-7 w-7 fill-current sm:h-8 sm:w-8"
               strokeWidth={1.5}
             />
-
           </span>
         </a>
 
@@ -311,7 +278,6 @@ const VideoCard = ({ video }) => {
         >
           <FacebookMark className="h-8 w-8 text-[16px]" />
         </a>
-
       </div>
 
       {/* =====================================================
@@ -319,7 +285,6 @@ const VideoCard = ({ video }) => {
       ===================================================== */}
 
       <div className="p-5 sm:p-6">
-
         {/* Title */}
 
         <h3 className="font-playfair text-xl font-semibold leading-tight text-base-content sm:text-2xl">
@@ -332,7 +297,6 @@ const VideoCard = ({ video }) => {
 
         {description && (
           <div className="mt-3">
-
             <p className="text-sm leading-6 text-base-content/60">
               {displayedDescription}
             </p>
@@ -342,15 +306,12 @@ const VideoCard = ({ video }) => {
             {isLongDescription && (
               <button
                 type="button"
-                onClick={() =>
-                  setIsExpanded((prev) => !prev)
-                }
+                onClick={() => setIsExpanded((prev) => !prev)}
                 className="mt-2 text-sm font-semibold text-primary transition-colors duration-300 hover:text-primary/70"
               >
                 {isExpanded ? "See less" : "See more"}
               </button>
             )}
-
           </div>
         )}
 
@@ -372,14 +333,11 @@ const VideoCard = ({ video }) => {
           >
             <FacebookMark className="h-7 w-7 text-[14px] transition-transform duration-300 group-hover/link:scale-110" />
 
-            <span>
-              Watch on Facebook
-            </span>
+            <span>Watch on Facebook</span>
 
             <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
           </a>
         )}
-
       </div>
     </article>
   );
@@ -392,15 +350,12 @@ const VideoCard = ({ video }) => {
 const FacebookPageCTA = () => {
   return (
     <div className="mt-14 overflow-hidden rounded-3xl border border-primary/10 bg-primary/5">
-
       <div className="relative px-6 py-8 text-center sm:px-10 sm:py-10">
-
         {/* Decorative Background */}
 
         <div className="pointer-events-none absolute -right-16 -top-16 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
 
         <div className="relative">
-
           {/* Facebook Icon */}
 
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0B66FB] text-white shadow-lg shadow-[#0B66FB]/20">
@@ -416,15 +371,15 @@ const FacebookPageCTA = () => {
           {/* English */}
 
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-base-content/60 sm:text-base">
-            See our latest photography, videos, events, and
-            behind-the-scenes updates on our Facebook page.
+            See our latest photography, videos, events, and behind-the-scenes
+            updates on our Facebook page.
           </p>
 
           {/* Bangla */}
 
           <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-base-content/60 sm:text-base">
-            আমাদের সর্বশেষ ছবি, ভিডিও, ইভেন্ট এবং নতুন
-            আপডেট দেখতে আমাদের Facebook Page-এ ঘুরে আসুন।
+            আমাদের সর্বশেষ ছবি, ভিডিও, ইভেন্ট এবং নতুন আপডেট দেখতে আমাদের
+            Facebook Page-এ ঘুরে আসুন।
           </p>
 
           {/* CTA */}
@@ -440,13 +395,10 @@ const FacebookPageCTA = () => {
               <FaFacebookF className="text-sm" />
             </span>
 
-            <span>
-              Visit Our Facebook Page
-            </span>
+            <span>Visit Our Facebook Page</span>
 
             <ArrowUpRight className="h-4 w-4" />
           </a>
-
         </div>
       </div>
     </div>

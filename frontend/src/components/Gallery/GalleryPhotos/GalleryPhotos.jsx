@@ -1,16 +1,6 @@
-import {
-  useMemo,
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 
-import {
-  useQuery,
-  useQueries,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 
 import axios from "axios";
 
@@ -37,7 +27,7 @@ import {
 
 import { Link } from "react-router";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rup-darpan-backend.vercel.app";
 
 const LIMIT = 9;
 
@@ -50,36 +40,24 @@ const LIKED_PHOTOS_KEY = "rupdarpon_liked_photos";
 
 const getVisitorId = () => {
   try {
-    const existingVisitorId =
-      localStorage.getItem(VISITOR_ID_KEY);
+    const existingVisitorId = localStorage.getItem(VISITOR_ID_KEY);
 
     if (existingVisitorId) {
       return existingVisitorId;
     }
 
     const newVisitorId =
-      typeof crypto !== "undefined" &&
-      typeof crypto.randomUUID === "function"
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
         ? crypto.randomUUID()
-        : `visitor-${Date.now()}-${Math.random()
-            .toString(36)
-            .slice(2, 12)}`;
+        : `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 
-    localStorage.setItem(
-      VISITOR_ID_KEY,
-      newVisitorId
-    );
+    localStorage.setItem(VISITOR_ID_KEY, newVisitorId);
 
     return newVisitorId;
   } catch (error) {
-    console.error(
-      "Failed to create visitor ID:",
-      error
-    );
+    console.error("Failed to create visitor ID:", error);
 
-    return `visitor-${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 12)}`;
+    return `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
   }
 };
 
@@ -89,8 +67,7 @@ const getVisitorId = () => {
 
 const getLikedPhotos = () => {
   try {
-    const stored =
-      localStorage.getItem(LIKED_PHOTOS_KEY);
+    const stored = localStorage.getItem(LIKED_PHOTOS_KEY);
 
     if (!stored) {
       return [];
@@ -100,10 +77,7 @@ const getLikedPhotos = () => {
 
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
-    console.error(
-      "Failed to read liked photos:",
-      error
-    );
+    console.error("Failed to read liked photos:", error);
 
     return [];
   }
@@ -115,15 +89,9 @@ const getLikedPhotos = () => {
 
 const saveLikedPhotos = (likedPhotos) => {
   try {
-    localStorage.setItem(
-      LIKED_PHOTOS_KEY,
-      JSON.stringify(likedPhotos)
-    );
+    localStorage.setItem(LIKED_PHOTOS_KEY, JSON.stringify(likedPhotos));
   } catch (error) {
-    console.error(
-      "Failed to save liked photos:",
-      error
-    );
+    console.error("Failed to save liked photos:", error);
   }
 };
 
@@ -141,24 +109,18 @@ const formatLikeCount = (count = 0) => {
   if (number < 1_000_000) {
     const value = number / 1000;
 
-    return `${value
-      .toFixed(value >= 10 ? 0 : 1)
-      .replace(/\.0$/, "")}K`;
+    return `${value.toFixed(value >= 10 ? 0 : 1).replace(/\.0$/, "")}K`;
   }
 
   if (number < 1_000_000_000) {
     const value = number / 1_000_000;
 
-    return `${value
-      .toFixed(value >= 10 ? 0 : 1)
-      .replace(/\.0$/, "")}M`;
+    return `${value.toFixed(value >= 10 ? 0 : 1).replace(/\.0$/, "")}M`;
   }
 
   const value = number / 1_000_000_000;
 
-  return `${value
-    .toFixed(value >= 10 ? 0 : 1)
-    .replace(/\.0$/, "")}B`;
+  return `${value.toFixed(value >= 10 ? 0 : 1).replace(/\.0$/, "")}B`;
 };
 
 // =========================================================
@@ -168,39 +130,31 @@ const formatLikeCount = (count = 0) => {
 const GalleryPhotos = () => {
   const queryClient = useQueryClient();
 
-  const [currentPage, setCurrentPage] =
-    useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [searchQuery, setSearchQuery] =
-    useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [selectedCategory, setSelectedCategory] =
-    useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const [selectedPhoto, setSelectedPhoto] =
-    useState(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   // =======================================================
   // VISITOR ID
   // =======================================================
 
-  const [visitorId] = useState(() =>
-    getVisitorId()
-  );
+  const [visitorId] = useState(() => getVisitorId());
 
   // =======================================================
   // LOCAL LIKES
   // =======================================================
 
-  const [likedPhotos, setLikedPhotos] =
-    useState(() => getLikedPhotos());
+  const [likedPhotos, setLikedPhotos] = useState(() => getLikedPhotos());
 
   // =======================================================
   // LIKE COUNTS
   // =======================================================
 
-  const [likeCounts, setLikeCounts] =
-    useState({});
+  const [likeCounts, setLikeCounts] = useState({});
 
   // =======================================================
   // LIKE REQUEST LOCK
@@ -215,9 +169,7 @@ const GalleryPhotos = () => {
   // fresh local like state
   // =======================================================
 
-  const syncedLikeStatusRef = useRef(
-    new Set()
-  );
+  const syncedLikeStatusRef = useRef(new Set());
 
   // =======================================================
   // FETCH PHOTOS
@@ -230,29 +182,22 @@ const GalleryPhotos = () => {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: [
-      "gallery-all-photos",
-      currentPage,
-    ],
+    queryKey: ["gallery-all-photos", currentPage],
 
     queryFn: async () => {
-      const response = await axios.get(
-        `${API_URL}/all-photos`,
-        {
-          params: {
-            page: currentPage,
-            limit: LIMIT,
-          },
-        }
-      );
+      const response = await axios.get(`${API_URL}/all-photos`, {
+        params: {
+          page: currentPage,
+          limit: LIMIT,
+        },
+      });
 
       return response.data;
     },
 
     staleTime: 1000 * 60 * 5,
 
-    placeholderData: (previousData) =>
-      previousData,
+    placeholderData: (previousData) => previousData,
 
     refetchOnWindowFocus: false,
   });
@@ -263,8 +208,7 @@ const GalleryPhotos = () => {
 
   const photos = photoData.photos || [];
 
-  const totalPages =
-    photoData.totalPages || 1;
+  const totalPages = photoData.totalPages || 1;
 
   // =======================================================
   // GET LIKE STATUS + COUNT
@@ -272,23 +216,17 @@ const GalleryPhotos = () => {
 
   const likeQueries = useQueries({
     queries: photos.map((photo) => ({
-      queryKey: [
-        "photo-like",
-        photo._id,
-        visitorId,
-      ],
+      queryKey: ["photo-like", photo._id, visitorId],
 
       queryFn: async () => {
         const response = await axios.get(
-          `${API_URL}/photos/${photo._id}/like/${visitorId}`
+          `${API_URL}/photos/${photo._id}/like/${visitorId}`,
         );
 
         return response.data;
       },
 
-      enabled:
-        Boolean(photo?._id) &&
-        Boolean(visitorId),
+      enabled: Boolean(photo?._id) && Boolean(visitorId),
 
       staleTime: 1000 * 60 * 2,
 
@@ -306,8 +244,7 @@ const GalleryPhotos = () => {
     const map = {};
 
     photos.forEach((photo, index) => {
-      const data =
-        likeQueries[index]?.data;
+      const data = likeQueries[index]?.data;
 
       if (data) {
         map[photo._id] = data;
@@ -338,8 +275,7 @@ const GalleryPhotos = () => {
         return;
       }
 
-      const queryData =
-        likeQueries[index]?.data;
+      const queryData = likeQueries[index]?.data;
 
       // ---------------------------------------------------
       // Initial count
@@ -347,31 +283,24 @@ const GalleryPhotos = () => {
 
       if (queryData) {
         setLikeCounts((previous) => {
-          if (
-            previous[photoId] ===
-            queryData.likes
-          ) {
+          if (previous[photoId] === queryData.likes) {
             return previous;
           }
 
           return {
             ...previous,
-            [photoId]:
-              queryData.likes ?? 0,
+            [photoId]: queryData.likes ?? 0,
           };
         });
       } else {
         setLikeCounts((previous) => {
-          if (
-            previous[photoId] !== undefined
-          ) {
+          if (previous[photoId] !== undefined) {
             return previous;
           }
 
           return {
             ...previous,
-            [photoId]:
-              photo.likes ?? 0,
+            [photoId]: photo.likes ?? 0,
           };
         });
       }
@@ -380,35 +309,19 @@ const GalleryPhotos = () => {
       // Sync liked status only once per photo
       // ---------------------------------------------------
 
-      if (
-        queryData &&
-        !syncedLikeStatusRef.current.has(
-          photoId
-        )
-      ) {
-        syncedLikeStatusRef.current.add(
-          photoId
-        );
+      if (queryData && !syncedLikeStatusRef.current.has(photoId)) {
+        syncedLikeStatusRef.current.add(photoId);
 
         setLikedPhotos((previous) => {
           let updated = previous;
 
           if (queryData.liked === true) {
-            if (
-              !previous.includes(photoId)
-            ) {
-              updated = [
-                ...previous,
-                photoId,
-              ];
+            if (!previous.includes(photoId)) {
+              updated = [...previous, photoId];
             }
           } else {
-            if (
-              previous.includes(photoId)
-            ) {
-              updated = previous.filter(
-                (id) => id !== photoId
-              );
+            if (previous.includes(photoId)) {
+              updated = previous.filter((id) => id !== photoId);
             }
           }
 
@@ -428,11 +341,7 @@ const GalleryPhotos = () => {
 
   const categories = useMemo(() => {
     const uniqueCategories = [
-      ...new Set(
-        photos
-          .map((photo) => photo.category)
-          .filter(Boolean)
-      ),
+      ...new Set(photos.map((photo) => photo.category).filter(Boolean)),
     ];
 
     return ["All", ...uniqueCategories];
@@ -443,8 +352,7 @@ const GalleryPhotos = () => {
   // =======================================================
 
   const filteredPhotos = useMemo(() => {
-    const query =
-      searchQuery.trim().toLowerCase();
+    const query = searchQuery.trim().toLowerCase();
 
     return photos.filter((photo) => {
       const searchableValues = [
@@ -453,35 +361,21 @@ const GalleryPhotos = () => {
         photo.photographer,
         photo.location,
         photo.description,
-        ...(Array.isArray(photo.tags)
-          ? photo.tags
-          : []),
+        ...(Array.isArray(photo.tags) ? photo.tags : []),
       ];
 
       const matchesSearch =
         !query ||
         searchableValues
           .filter(Boolean)
-          .some((value) =>
-            String(value)
-              .toLowerCase()
-              .includes(query)
-          );
+          .some((value) => String(value).toLowerCase().includes(query));
 
       const matchesCategory =
-        selectedCategory === "All" ||
-        photo.category === selectedCategory;
+        selectedCategory === "All" || photo.category === selectedCategory;
 
-      return (
-        matchesSearch &&
-        matchesCategory
-      );
+      return matchesSearch && matchesCategory;
     });
-  }, [
-    photos,
-    searchQuery,
-    selectedCategory,
-  ]);
+  }, [photos, searchQuery, selectedCategory]);
 
   // =======================================================
   // OPEN PHOTO
@@ -490,8 +384,7 @@ const GalleryPhotos = () => {
   const openPhoto = useCallback((photo) => {
     setSelectedPhoto(photo);
 
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
   }, []);
 
   // =======================================================
@@ -524,46 +417,34 @@ const GalleryPhotos = () => {
       // Prevent rapid duplicate requests
       // ---------------------------------------------------
 
-      if (
-        likingPhotosRef.current.has(
-          photoId
-        )
-      ) {
+      if (likingPhotosRef.current.has(photoId)) {
         return null;
       }
 
-      likingPhotosRef.current.add(
-        photoId
-      );
+      likingPhotosRef.current.add(photoId);
 
       // ---------------------------------------------------
       // Get current state
       // ---------------------------------------------------
 
-      const previousLiked =
-        likedPhotos.includes(photoId);
+      const previousLiked = likedPhotos.includes(photoId);
 
       const previousLikes =
         likeCounts[photoId] ??
         likeDataMap[photoId]?.likes ??
-        photos.find(
-          (photo) => photo._id === photoId
-        )?.likes ??
+        photos.find((photo) => photo._id === photoId)?.likes ??
         0;
 
       // ---------------------------------------------------
       // Optimistic state
       // ---------------------------------------------------
 
-      const optimisticLiked =
-        !previousLiked;
+      const optimisticLiked = !previousLiked;
 
-      const optimisticLikes =
-        Math.max(
-          0,
-          previousLikes +
-            (optimisticLiked ? 1 : -1)
-        );
+      const optimisticLikes = Math.max(
+        0,
+        previousLikes + (optimisticLiked ? 1 : -1),
+      );
 
       // ---------------------------------------------------
       // Update liked photos immediately
@@ -573,15 +454,11 @@ const GalleryPhotos = () => {
         let updated;
 
         if (optimisticLiked) {
-          updated = previous.includes(
-            photoId
-          )
+          updated = previous.includes(photoId)
             ? previous
             : [...previous, photoId];
         } else {
-          updated = previous.filter(
-            (id) => id !== photoId
-          );
+          updated = previous.filter((id) => id !== photoId);
         }
 
         saveLikedPhotos(updated);
@@ -602,17 +479,10 @@ const GalleryPhotos = () => {
       // Update React Query immediately
       // ---------------------------------------------------
 
-      queryClient.setQueryData(
-        [
-          "photo-like",
-          photoId,
-          visitorId,
-        ],
-        {
-          liked: optimisticLiked,
-          likes: optimisticLikes,
-        }
-      );
+      queryClient.setQueryData(["photo-like", photoId, visitorId], {
+        liked: optimisticLiked,
+        likes: optimisticLikes,
+      });
 
       try {
         // -------------------------------------------------
@@ -620,28 +490,18 @@ const GalleryPhotos = () => {
         // -------------------------------------------------
 
         await queryClient.cancelQueries({
-          queryKey: [
-            "photo-like",
-            photoId,
-            visitorId,
-          ],
+          queryKey: ["photo-like", photoId, visitorId],
         });
 
         // -------------------------------------------------
         // POST LIKE
         // -------------------------------------------------
 
-        const response = await axios.post(
-          `${API_URL}/photos/${photoId}/like`,
-          {
-            visitorId,
-          }
-        );
+        const response = await axios.post(`${API_URL}/photos/${photoId}/like`, {
+          visitorId,
+        });
 
-        const {
-          liked,
-          likes,
-        } = response.data;
+        const { liked, likes } = response.data;
 
         // -------------------------------------------------
         // Server confirmed count
@@ -649,8 +509,7 @@ const GalleryPhotos = () => {
 
         setLikeCounts((previous) => ({
           ...previous,
-          [photoId]:
-            Number(likes) || 0,
+          [photoId]: Number(likes) || 0,
         }));
 
         // -------------------------------------------------
@@ -661,15 +520,11 @@ const GalleryPhotos = () => {
           let updated;
 
           if (liked) {
-            updated = previous.includes(
-              photoId
-            )
+            updated = previous.includes(photoId)
               ? previous
               : [...previous, photoId];
           } else {
-            updated = previous.filter(
-              (id) => id !== photoId
-            );
+            updated = previous.filter((id) => id !== photoId);
           }
 
           saveLikedPhotos(updated);
@@ -681,35 +536,23 @@ const GalleryPhotos = () => {
         // Update React Query cache
         // -------------------------------------------------
 
-        queryClient.setQueryData(
-          [
-            "photo-like",
-            photoId,
-            visitorId,
-          ],
-          {
-            liked,
-            likes,
-          }
-        );
+        queryClient.setQueryData(["photo-like", photoId, visitorId], {
+          liked,
+          likes,
+        });
 
         // -------------------------------------------------
         // Mark as freshly synced
         // -------------------------------------------------
 
-        syncedLikeStatusRef.current.add(
-          photoId
-        );
+        syncedLikeStatusRef.current.add(photoId);
 
         return {
           liked,
           likes,
         };
       } catch (error) {
-        console.error(
-          "Like photo error:",
-          error
-        );
+        console.error("Like photo error:", error);
 
         // -------------------------------------------------
         // ROLLBACK LIKED STATE
@@ -719,15 +562,11 @@ const GalleryPhotos = () => {
           let updated;
 
           if (previousLiked) {
-            updated = previous.includes(
-              photoId
-            )
+            updated = previous.includes(photoId)
               ? previous
               : [...previous, photoId];
           } else {
-            updated = previous.filter(
-              (id) => id !== photoId
-            );
+            updated = previous.filter((id) => id !== photoId);
           }
 
           saveLikedPhotos(updated);
@@ -748,33 +587,17 @@ const GalleryPhotos = () => {
         // ROLLBACK QUERY CACHE
         // -------------------------------------------------
 
-        queryClient.setQueryData(
-          [
-            "photo-like",
-            photoId,
-            visitorId,
-          ],
-          {
-            liked: previousLiked,
-            likes: previousLikes,
-          }
-        );
+        queryClient.setQueryData(["photo-like", photoId, visitorId], {
+          liked: previousLiked,
+          likes: previousLikes,
+        });
 
         return null;
       } finally {
-        likingPhotosRef.current.delete(
-          photoId
-        );
+        likingPhotosRef.current.delete(photoId);
       }
     },
-    [
-      visitorId,
-      likedPhotos,
-      likeCounts,
-      likeDataMap,
-      photos,
-      queryClient,
-    ]
+    [visitorId, likedPhotos, likeCounts, likeDataMap, photos, queryClient],
   );
 
   // =======================================================
@@ -783,8 +606,7 @@ const GalleryPhotos = () => {
 
   const handlePhotoLike = useCallback(
     async (photoId) => {
-      const result =
-        await handleLike(photoId);
+      const result = await handleLike(photoId);
 
       if (!result) {
         return;
@@ -795,10 +617,7 @@ const GalleryPhotos = () => {
       // ---------------------------------------------------
 
       setSelectedPhoto((previous) => {
-        if (
-          !previous ||
-          previous._id !== photoId
-        ) {
+        if (!previous || previous._id !== photoId) {
           return previous;
         }
 
@@ -808,7 +627,7 @@ const GalleryPhotos = () => {
         };
       });
     },
-    [handleLike]
+    [handleLike],
   );
 
   // =======================================================
@@ -817,11 +636,7 @@ const GalleryPhotos = () => {
 
   const goToPage = useCallback(
     (page) => {
-      if (
-        page < 1 ||
-        page > totalPages ||
-        page === currentPage
-      ) {
+      if (page < 1 || page > totalPages || page === currentPage) {
         return;
       }
 
@@ -832,7 +647,7 @@ const GalleryPhotos = () => {
         behavior: "smooth",
       });
     },
-    [currentPage, totalPages]
+    [currentPage, totalPages],
   );
 
   // =======================================================
@@ -841,8 +656,7 @@ const GalleryPhotos = () => {
 
   useEffect(() => {
     return () => {
-      document.body.style.overflow =
-        "";
+      document.body.style.overflow = "";
     };
   }, []);
 
@@ -861,9 +675,7 @@ const GalleryPhotos = () => {
   return (
     <>
       <main className="min-h-screen bg-base-100">
-        <title>
-          Gallery Photos | Rup Darpon
-        </title>
+        <title>Gallery Photos | Rup Darpon</title>
 
         {/* =================================================
             HERO
@@ -883,24 +695,17 @@ const GalleryPhotos = () => {
               <div className="max-w-3xl">
                 <h1 className="font-playfair text-3xl font-semibold leading-tight text-base-content sm:text-4xl lg:text-5xl">
                   Stories captured{" "}
-                  <span className="italic text-primary">
-                    through our lens.
-                  </span>
+                  <span className="italic text-primary">through our lens.</span>
                 </h1>
 
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-base-content/60 sm:text-base">
-                  Explore our collection
-                  of photographs from
-                  weddings, celebrations,
-                  portraits, outdoor
-                  sessions, and beautiful
+                  Explore our collection of photographs from weddings,
+                  celebrations, portraits, outdoor sessions, and beautiful
                   moments.
                 </p>
 
                 <p className="mt-1 text-xs leading-6 text-base-content/50 sm:text-sm">
-                  আমাদের লেন্সে ধরা পড়া
-                  সুন্দর মুহূর্তগুলোর
-                  সম্পূর্ণ সংগ্রহ।
+                  আমাদের লেন্সে ধরা পড়া সুন্দর মুহূর্তগুলোর সম্পূর্ণ সংগ্রহ।
                 </p>
               </div>
 
@@ -923,9 +728,7 @@ const GalleryPhotos = () => {
                       </h2>
 
                       <p className="mt-1 text-xs leading-5 text-base-content/55">
-                        Browse photographs or
-                        watch our memorable
-                        films.
+                        Browse photographs or watch our memorable films.
                       </p>
                     </div>
                   </div>
@@ -971,9 +774,7 @@ const GalleryPhotos = () => {
                   placeholder="Search photos..."
                   value={searchQuery}
                   onChange={(event) => {
-                    setSearchQuery(
-                      event.target.value
-                    );
+                    setSearchQuery(event.target.value);
 
                     setCurrentPage(1);
                   }}
@@ -982,9 +783,7 @@ const GalleryPhotos = () => {
                 {searchQuery && (
                   <button
                     type="button"
-                    onClick={() =>
-                      setSearchQuery("")
-                    }
+                    onClick={() => setSearchQuery("")}
                     className="btn btn-circle btn-ghost btn-xs"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -995,29 +794,24 @@ const GalleryPhotos = () => {
               {/* CATEGORY */}
 
               <div className="flex gap-2 overflow-x-auto pb-1">
-                {categories.map(
-                  (category) => (
-                    <button
-                      key={category}
-                      type="button"
-                      onClick={() => {
-                        setSelectedCategory(
-                          category
-                        );
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory(category);
 
-                        setCurrentPage(1);
-                      }}
-                      className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition-all duration-300 ${
-                        selectedCategory ===
-                        category
-                          ? "bg-primary text-primary-content shadow-md"
-                          : "border border-base-300 bg-base-100 text-base-content/60 hover:border-primary/30 hover:text-primary"
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  )
-                )}
+                      setCurrentPage(1);
+                    }}
+                    className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition-all duration-300 ${
+                      selectedCategory === category
+                        ? "bg-primary text-primary-content shadow-md"
+                        : "border border-base-300 bg-base-100 text-base-content/60 hover:border-primary/30 hover:text-primary"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -1041,22 +835,15 @@ const GalleryPhotos = () => {
 
             <p className="text-sm text-base-content/50">
               {filteredPhotos.length} photo
-              {filteredPhotos.length !==
-              1
-                ? "s"
-                : ""}{" "}
-              on this page
+              {filteredPhotos.length !== 1 ? "s" : ""} on this page
             </p>
           </div>
 
           {/* ERROR */}
 
           {isError ? (
-            <GalleryError
-              onRetry={refetch}
-            />
-          ) : filteredPhotos.length ===
-            0 ? (
+            <GalleryError onRetry={refetch} />
+          ) : filteredPhotos.length === 0 ? (
             <GalleryEmpty />
           ) : (
             <>
@@ -1064,57 +851,39 @@ const GalleryPhotos = () => {
 
               <div
                 className={`columns-1 gap-5 sm:columns-2 lg:columns-3 ${
-                  isFetching
-                    ? "opacity-60"
-                    : ""
+                  isFetching ? "opacity-60" : ""
                 }`}
               >
-                {filteredPhotos.map(
-                  (photo) => {
-                    const serverLikeData =
-                      likeDataMap[
-                        photo._id
-                      ];
+                {filteredPhotos.map((photo) => {
+                  const serverLikeData = likeDataMap[photo._id];
 
-                    const isLiked =
-                      likedPhotos.includes(
-                        photo._id
-                      );
+                  const isLiked = likedPhotos.includes(photo._id);
 
-                    const likes =
-                      likeCounts[
-                        photo._id
-                      ] ??
-                      serverLikeData?.likes ??
-                      photo.likes ??
-                      0;
+                  const likes =
+                    likeCounts[photo._id] ??
+                    serverLikeData?.likes ??
+                    photo.likes ??
+                    0;
 
-                    return (
-                      <PhotoCard
-                        key={photo._id}
-                        photo={photo}
-                        onClick={() =>
-                          openPhoto(photo)
-                        }
-                        isLiked={isLiked}
-                        likes={likes}
-                      />
-                    );
-                  }
-                )}
+                  return (
+                    <PhotoCard
+                      key={photo._id}
+                      photo={photo}
+                      onClick={() => openPhoto(photo)}
+                      isLiked={isLiked}
+                      likes={likes}
+                    />
+                  );
+                })}
               </div>
 
               {/* PAGINATION */}
 
               {totalPages > 1 && (
                 <Pagination
-                  currentPage={
-                    currentPage
-                  }
+                  currentPage={currentPage}
                   totalPages={totalPages}
-                  onPageChange={
-                    goToPage
-                  }
+                  onPageChange={goToPage}
                   isFetching={isFetching}
                 />
               )}
@@ -1132,9 +901,7 @@ const GalleryPhotos = () => {
           photo={selectedPhoto}
           photos={filteredPhotos}
           onClose={closePhoto}
-          onSelectPhoto={
-            setSelectedPhoto
-          }
+          onSelectPhoto={setSelectedPhoto}
           onLike={handlePhotoLike}
           likedPhotos={likedPhotos}
           likeCounts={likeCounts}
@@ -1151,26 +918,13 @@ export default GalleryPhotos;
 // PHOTO CARD
 // =========================================================
 
-const PhotoCard = ({
-  photo,
-  onClick,
-  isLiked,
-  likes,
-}) => {
+const PhotoCard = ({ photo, onClick, isLiked, likes }) => {
   const imageUrl =
-    photo?.image ||
-    photo?.imageUrl ||
-    photo?.photoUrl ||
-    photo?.url ||
-    "";
+    photo?.image || photo?.imageUrl || photo?.photoUrl || photo?.url || "";
 
-  const title =
-    photo?.title ||
-    "Untitled Photograph";
+  const title = photo?.title || "Untitled Photograph";
 
-  const category =
-    photo?.category ||
-    "Photography";
+  const category = photo?.category || "Photography";
 
   return (
     <article
@@ -1194,9 +948,7 @@ const PhotoCard = ({
 
       {photo?.featured && (
         <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
-          <span className="text-primary">
-            ★
-          </span>
+          <span className="text-primary">★</span>
           Featured
         </div>
       )}
@@ -1216,15 +968,11 @@ const PhotoCard = ({
       >
         <Heart
           className={`h-3.5 w-3.5 cursor-pointer ${
-            isLiked
-              ? "fill-red-700 text-red-700"
-              : ""
+            isLiked ? "fill-red-700 text-red-700" : ""
           }`}
         />
 
-        <span>
-          {formatLikeCount(likes)}
-        </span>
+        <span>{formatLikeCount(likes)}</span>
       </div>
 
       <div className="absolute inset-x-0 bottom-0 translate-y-3 p-5 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 sm:p-6">
@@ -1276,18 +1024,16 @@ const PhotoDetailModal = ({
   // PAN POSITION
   // =======================================================
 
-  const [position, setPosition] =
-    useState({
-      x: 0,
-      y: 0,
-    });
+  const [position, setPosition] = useState({
+    x: 0,
+    y: 0,
+  });
 
   // =======================================================
   // LIKE LOADING
   // =======================================================
 
-  const [isLiking, setIsLiking] =
-    useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
   // =======================================================
   // DRAG STATE
@@ -1315,70 +1061,43 @@ const PhotoDetailModal = ({
   // =======================================================
 
   const imageUrl =
-    photo?.image ||
-    photo?.imageUrl ||
-    photo?.photoUrl ||
-    photo?.url ||
-    "";
+    photo?.image || photo?.imageUrl || photo?.photoUrl || photo?.url || "";
 
-  const title =
-    photo?.title ||
-    "Untitled Photograph";
+  const title = photo?.title || "Untitled Photograph";
 
-  const category =
-    photo?.category ||
-    "Photography";
+  const category = photo?.category || "Photography";
 
-  const tags = Array.isArray(photo?.tags)
-    ? photo.tags
-    : [];
+  const tags = Array.isArray(photo?.tags) ? photo.tags : [];
 
   // =======================================================
   // LIKE STATUS
   // =======================================================
 
-  const serverLikeData =
-    likeDataMap?.[photo?._id];
+  const serverLikeData = likeDataMap?.[photo?._id];
 
-  const isLiked =
-    likedPhotos.includes(photo?._id);
+  const isLiked = likedPhotos.includes(photo?._id);
 
   const likes =
-    likeCounts[photo?._id] ??
-    serverLikeData?.likes ??
-    photo?.likes ??
-    0;
+    likeCounts[photo?._id] ?? serverLikeData?.likes ?? photo?.likes ?? 0;
 
   // =======================================================
   // CURRENT INDEX
   // =======================================================
 
-  const currentIndex =
-    photos.findIndex(
-      (item) =>
-        item._id === photo?._id
-    );
+  const currentIndex = photos.findIndex((item) => item._id === photo?._id);
 
-  const hasPrevious =
-    currentIndex > 0;
+  const hasPrevious = currentIndex > 0;
 
-  const hasNext =
-    currentIndex !== -1 &&
-    currentIndex < photos.length - 1;
+  const hasNext = currentIndex !== -1 && currentIndex < photos.length - 1;
 
   // =======================================================
   // LIKE HANDLER
   // =======================================================
 
-  const handleLikeClick = async (
-    event
-  ) => {
+  const handleLikeClick = async (event) => {
     event.stopPropagation();
 
-    if (
-      isLiking ||
-      !photo?._id
-    ) {
+    if (isLiking || !photo?._id) {
       return;
     }
 
@@ -1408,36 +1127,25 @@ const PhotoDetailModal = ({
   // CHANGE ZOOM
   // =======================================================
 
-  const changeZoom = useCallback(
-    (newZoom) => {
-      const nextZoom = Math.min(
-        Math.max(newZoom, 0.5),
-        3
-      );
+  const changeZoom = useCallback((newZoom) => {
+    const nextZoom = Math.min(Math.max(newZoom, 0.5), 3);
 
-      setZoom(nextZoom);
+    setZoom(nextZoom);
 
-      if (nextZoom <= 1) {
-        setPosition({
-          x: 0,
-          y: 0,
-        });
-      }
-    },
-    []
-  );
+    if (nextZoom <= 1) {
+      setPosition({
+        x: 0,
+        y: 0,
+      });
+    }
+  }, []);
 
   // =======================================================
   // ZOOM IN
   // =======================================================
 
   const zoomIn = useCallback(() => {
-    setZoom((previous) =>
-      Math.min(
-        previous + 0.25,
-        10
-      )
-    );
+    setZoom((previous) => Math.min(previous + 0.25, 10));
   }, []);
 
   // =======================================================
@@ -1446,10 +1154,7 @@ const PhotoDetailModal = ({
 
   const zoomOut = useCallback(() => {
     setZoom((previous) => {
-      const next = Math.max(
-        previous - 0.25,
-        0.5
-      );
+      const next = Math.max(previous - 0.25, 0.5);
 
       if (next <= 1) {
         setPosition({
@@ -1471,15 +1176,8 @@ const PhotoDetailModal = ({
       return;
     }
 
-    onSelectPhoto(
-      photos[currentIndex - 1]
-    );
-  }, [
-    hasPrevious,
-    currentIndex,
-    photos,
-    onSelectPhoto,
-  ]);
+    onSelectPhoto(photos[currentIndex - 1]);
+  }, [hasPrevious, currentIndex, photos, onSelectPhoto]);
 
   // =======================================================
   // NEXT
@@ -1490,15 +1188,8 @@ const PhotoDetailModal = ({
       return;
     }
 
-    onSelectPhoto(
-      photos[currentIndex + 1]
-    );
-  }, [
-    hasNext,
-    currentIndex,
-    photos,
-    onSelectPhoto,
-  ]);
+    onSelectPhoto(photos[currentIndex + 1]);
+  }, [hasNext, currentIndex, photos, onSelectPhoto]);
 
   // =======================================================
   // RESET WHEN PHOTO CHANGES
@@ -1506,10 +1197,7 @@ const PhotoDetailModal = ({
 
   useEffect(() => {
     resetView();
-  }, [
-    photo?._id,
-    resetView,
-  ]);
+  }, [photo?._id, resetView]);
 
   // =======================================================
   // KEYBOARD
@@ -1529,10 +1217,7 @@ const PhotoDetailModal = ({
         showNext();
       }
 
-      if (
-        event.key === "+" ||
-        event.key === "="
-      ) {
+      if (event.key === "+" || event.key === "=") {
         zoomIn();
       }
 
@@ -1545,25 +1230,12 @@ const PhotoDetailModal = ({
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    onClose,
-    showPrevious,
-    showNext,
-    zoomIn,
-    zoomOut,
-    resetView,
-  ]);
+  }, [onClose, showPrevious, showNext, zoomIn, zoomOut, resetView]);
 
   // =======================================================
   // DISTANCE BETWEEN TWO FINGERS
@@ -1573,32 +1245,22 @@ const PhotoDetailModal = ({
     const first = touches[0];
     const second = touches[1];
 
-    const dx =
-      second.clientX -
-      first.clientX;
+    const dx = second.clientX - first.clientX;
 
-    const dy =
-      second.clientY -
-      first.clientY;
+    const dy = second.clientY - first.clientY;
 
-    return Math.sqrt(
-      dx * dx + dy * dy
-    );
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   // =======================================================
   // TOUCH START
   // =======================================================
 
-  const handleTouchStart = (
-    event
-  ) => {
-    const touches =
-      event.touches;
+  const handleTouchStart = (event) => {
+    const touches = event.touches;
 
     if (touches.length === 2) {
-      const distance =
-        getDistance(touches);
+      const distance = getDistance(touches);
 
       pinchState.current = {
         initialDistance: distance,
@@ -1608,20 +1270,15 @@ const PhotoDetailModal = ({
       return;
     }
 
-    if (
-      touches.length === 1 &&
-      zoom > 1
-    ) {
+    if (touches.length === 1 && zoom > 1) {
       const touch = touches[0];
 
       dragState.current = {
         isDragging: true,
         startX: touch.clientX,
         startY: touch.clientY,
-        startPositionX:
-          position.x,
-        startPositionY:
-          position.y,
+        startPositionX: position.x,
+        startPositionY: position.y,
       };
     }
   };
@@ -1630,38 +1287,23 @@ const PhotoDetailModal = ({
   // TOUCH MOVE
   // =======================================================
 
-  const handleTouchMove = (
-    event
-  ) => {
-    const touches =
-      event.touches;
+  const handleTouchMove = (event) => {
+    const touches = event.touches;
 
     if (touches.length === 2) {
       event.preventDefault();
 
-      const currentDistance =
-        getDistance(touches);
+      const currentDistance = getDistance(touches);
 
-      const {
-        initialDistance,
-        initialZoom,
-      } = pinchState.current;
+      const { initialDistance, initialZoom } = pinchState.current;
 
       if (!initialDistance) {
         return;
       }
 
-      const scale =
-        currentDistance /
-        initialDistance;
+      const scale = currentDistance / initialDistance;
 
-      const nextZoom = Math.min(
-        Math.max(
-          initialZoom * scale,
-          0.5
-        ),
-        3
-      );
+      const nextZoom = Math.min(Math.max(initialZoom * scale, 0.5), 3);
 
       setZoom(nextZoom);
 
@@ -1675,34 +1317,19 @@ const PhotoDetailModal = ({
       return;
     }
 
-    if (
-      touches.length === 1 &&
-      dragState.current
-        .isDragging &&
-      zoom > 1
-    ) {
+    if (touches.length === 1 && dragState.current.isDragging && zoom > 1) {
       event.preventDefault();
 
       const touch = touches[0];
 
-      const deltaX =
-        touch.clientX -
-        dragState.current.startX;
+      const deltaX = touch.clientX - dragState.current.startX;
 
-      const deltaY =
-        touch.clientY -
-        dragState.current.startY;
+      const deltaY = touch.clientY - dragState.current.startY;
 
       setPosition({
-        x:
-          dragState.current
-            .startPositionX +
-          deltaX,
+        x: dragState.current.startPositionX + deltaX,
 
-        y:
-          dragState.current
-            .startPositionY +
-          deltaY,
+        y: dragState.current.startPositionY + deltaY,
       });
     }
   };
@@ -1712,8 +1339,7 @@ const PhotoDetailModal = ({
   // =======================================================
 
   const handleTouchEnd = () => {
-    dragState.current.isDragging =
-      false;
+    dragState.current.isDragging = false;
 
     pinchState.current = {
       initialDistance: 0,
@@ -1725,9 +1351,7 @@ const PhotoDetailModal = ({
   // MOUSE DOWN
   // =======================================================
 
-  const handleMouseDown = (
-    event
-  ) => {
+  const handleMouseDown = (event) => {
     if (event.button !== 0) {
       return;
     }
@@ -1751,37 +1375,21 @@ const PhotoDetailModal = ({
   // MOUSE MOVE
   // =======================================================
 
-  const handleMouseMove = (
-    event
-  ) => {
-    if (
-      !dragState.current
-        .isDragging ||
-      zoom <= 1
-    ) {
+  const handleMouseMove = (event) => {
+    if (!dragState.current.isDragging || zoom <= 1) {
       return;
     }
 
     event.preventDefault();
 
-    const deltaX =
-      event.clientX -
-      dragState.current.startX;
+    const deltaX = event.clientX - dragState.current.startX;
 
-    const deltaY =
-      event.clientY -
-      dragState.current.startY;
+    const deltaY = event.clientY - dragState.current.startY;
 
     setPosition({
-      x:
-        dragState.current
-          .startPositionX +
-        deltaX,
+      x: dragState.current.startPositionX + deltaX,
 
-      y:
-        dragState.current
-          .startPositionY +
-        deltaY,
+      y: dragState.current.startPositionY + deltaY,
     });
   };
 
@@ -1790,8 +1398,7 @@ const PhotoDetailModal = ({
   // =======================================================
 
   const handleMouseUp = () => {
-    dragState.current.isDragging =
-      false;
+    dragState.current.isDragging = false;
   };
 
   // =======================================================
@@ -1824,19 +1431,13 @@ const PhotoDetailModal = ({
   // DATE
   // =======================================================
 
-  const formattedDate =
-    photo?.createdAt
-      ? new Date(
-          photo.createdAt
-        ).toLocaleDateString(
-          "en-US",
-          {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }
-        )
-      : null;
+  const formattedDate = photo?.createdAt
+    ? new Date(photo.createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
 
   // =======================================================
   // RENDER
@@ -1849,9 +1450,7 @@ const PhotoDetailModal = ({
     >
       <div
         className="relative flex h-full max-h-[100dvh] w-full max-w-[1500px] flex-col overflow-hidden bg-base-100 shadow-2xl sm:h-[96dvh] sm:rounded-2xl lg:h-[94vh] lg:flex-row lg:rounded-3xl"
-        onClick={(event) =>
-          event.stopPropagation()
-        }
+        onClick={(event) => event.stopPropagation()}
       >
         {/* =================================================
             CONTROL BAR
@@ -1869,10 +1468,7 @@ const PhotoDetailModal = ({
           </button>
 
           <span className="min-w-[42px] text-center text-[10px] font-semibold text-white sm:min-w-[50px] sm:text-xs">
-            {Math.round(
-              zoom * 100
-            )}
-            %
+            {Math.round(zoom * 100)}%
           </span>
 
           <button
@@ -1929,37 +1525,18 @@ const PhotoDetailModal = ({
         <div
           className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black"
           style={{
-            touchAction:
-              zoom > 1
-                ? "none"
-                : "pan-y",
+            touchAction: zoom > 1 ? "none" : "pan-y",
           }}
           onWheel={handleWheel}
-          onMouseDown={
-            handleMouseDown
-          }
-          onMouseMove={
-            handleMouseMove
-          }
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onMouseLeave={
-            handleMouseUp
-          }
-          onDoubleClick={
-            handleDoubleClick
-          }
-          onTouchStart={
-            handleTouchStart
-          }
-          onTouchMove={
-            handleTouchMove
-          }
-          onTouchEnd={
-            handleTouchEnd
-          }
-          onTouchCancel={
-            handleTouchEnd
-          }
+          onMouseLeave={handleMouseUp}
+          onDoubleClick={handleDoubleClick}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
         >
           {/* IMAGE */}
 
@@ -1970,21 +1547,15 @@ const PhotoDetailModal = ({
                 alt={title}
                 draggable={false}
                 className={`max-h-full max-w-full select-none object-contain ${
-                  zoom > 1
-                    ? "cursor-grab"
-                    : "cursor-zoom-in"
+                  zoom > 1 ? "cursor-grab" : "cursor-zoom-in"
                 }`}
                 style={{
                   transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${zoom})`,
-                  transformOrigin:
-                    "center center",
-                  transition:
-                    dragState.current
-                      .isDragging
-                      ? "none"
-                      : "transform 150ms ease-out",
-                  willChange:
-                    "transform",
+                  transformOrigin: "center center",
+                  transition: dragState.current.isDragging
+                    ? "none"
+                    : "transform 150ms ease-out",
+                  willChange: "transform",
                 }}
               />
             ) : (
@@ -1997,40 +1568,24 @@ const PhotoDetailModal = ({
           <div className="absolute bottom-3 left-1/2 z-40 -translate-x-1/2 sm:bottom-5">
             <button
               type="button"
-              onClick={
-                handleLikeClick
-              }
+              onClick={handleLikeClick}
               disabled={isLiking}
               className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-semibold shadow-xl backdrop-blur-md transition-all duration-300 sm:hidden ${
                 isLiked
                   ? "border-red-700 bg-red-900 text-white"
                   : "border-white/15 bg-black/65 text-white hover:bg-black/80"
               }`}
-              aria-label={
-                isLiked
-                  ? "Unlike photo"
-                  : "Like photo"
-              }
+              aria-label={isLiked ? "Unlike photo" : "Like photo"}
             >
               <Heart
                 className={`h-4 w-4 cursor-pointer ${
-                  isLiked
-                    ? "fill-red-700 text-red-700"
-                    : ""
+                  isLiked ? "fill-red-700 text-red-700" : ""
                 }`}
               />
 
-              <span>
-                {formatLikeCount(
-                  likes
-                )}
-              </span>
+              <span>{formatLikeCount(likes)}</span>
 
-              <span>
-                {isLiked
-                  ? "Liked"
-                  : "Like"}
-              </span>
+              <span>{isLiked ? "Liked" : "Like"}</span>
             </button>
           </div>
 
@@ -2043,19 +1598,16 @@ const PhotoDetailModal = ({
 
           {/* COUNTER */}
 
-          {photos.length > 0 &&
-            currentIndex !== -1 && (
-              <div className="absolute bottom-3 right-3 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-[10px] font-medium text-white/80 backdrop-blur-md sm:bottom-5 sm:right-5 sm:text-xs">
-                {currentIndex + 1} /{" "}
-                {photos.length}
-              </div>
-            )}
+          {photos.length > 0 && currentIndex !== -1 && (
+            <div className="absolute bottom-3 right-3 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-[10px] font-medium text-white/80 backdrop-blur-md sm:bottom-5 sm:right-5 sm:text-xs">
+              {currentIndex + 1} / {photos.length}
+            </div>
+          )}
 
           {/* DESKTOP HINT */}
 
           <div className="pointer-events-none absolute left-1/2 top-16 hidden -translate-x-1/2 rounded-full border border-white/10 bg-black/45 px-4 py-2 text-[10px] text-white/60 backdrop-blur-md sm:block">
-            Wheel to zoom • Drag to move
-            • Double click to zoom
+            Wheel to zoom • Drag to move • Double click to zoom
           </div>
 
           {/* MOBILE HINT */}
@@ -2115,21 +1667,15 @@ const PhotoDetailModal = ({
           <div className="space-y-4 py-5">
             {photo?.photographer && (
               <DetailRow
-                icon={
-                  <User className="h-4 w-4" />
-                }
+                icon={<User className="h-4 w-4" />}
                 label="Photographer"
-                value={
-                  photo.photographer
-                }
+                value={photo.photographer}
               />
             )}
 
             {photo?.location && (
               <DetailRow
-                icon={
-                  <MapPin className="h-4 w-4" />
-                }
+                icon={<MapPin className="h-4 w-4" />}
                 label="Location"
                 value={photo.location}
               />
@@ -2137,9 +1683,7 @@ const PhotoDetailModal = ({
 
             {formattedDate && (
               <DetailRow
-                icon={
-                  <CalendarDays className="h-4 w-4" />
-                }
+                icon={<CalendarDays className="h-4 w-4" />}
                 label="Captured"
                 value={formattedDate}
               />
@@ -2153,9 +1697,7 @@ const PhotoDetailModal = ({
           <div className="hidden border-y border-base-200 py-4 sm:block">
             <button
               type="button"
-              onClick={
-                handleLikeClick
-              }
+              onClick={handleLikeClick}
               disabled={isLiking}
               className={`flex w-full items-center justify-between rounded-2xl p-4 transition-all duration-300 ${
                 isLiked
@@ -2173,36 +1715,26 @@ const PhotoDetailModal = ({
                 >
                   <Heart
                     className={`h-5 w-5 cursor-pointer ${
-                      isLiked
-                        ? "fill-current"
-                        : ""
+                      isLiked ? "fill-current" : ""
                     }`}
                   />
                 </div>
 
                 <div className="text-left">
                   <p className="text-sm font-semibold">
-                    {isLiked
-                      ? "Liked"
-                      : "Like this photo"}
+                    {isLiked ? "Liked" : "Like this photo"}
                   </p>
 
-                  <p className="text-xs text-base-content/50">
-                    Show some love
-                  </p>
+                  <p className="text-xs text-base-content/50">Show some love</p>
                 </div>
               </div>
 
               <div className="text-right">
                 <p className="text-lg font-semibold">
-                  {formatLikeCount(
-                    likes
-                  )}
+                  {formatLikeCount(likes)}
                 </p>
 
-                <p className="text-xs text-base-content/50">
-                  Likes
-                </p>
+                <p className="text-xs text-base-content/50">Likes</p>
               </div>
             </button>
           </div>
@@ -2222,16 +1754,14 @@ const PhotoDetailModal = ({
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {tags.map(
-                  (tag, index) => (
-                    <span
-                      key={`${tag}-${index}`}
-                      className="rounded-full border border-base-300 bg-base-200/50 px-3 py-1.5 text-xs text-base-content/60"
-                    >
-                      #{tag}
-                    </span>
-                  )
-                )}
+                {tags.map((tag, index) => (
+                  <span
+                    key={`${tag}-${index}`}
+                    className="rounded-full border border-base-300 bg-base-200/50 px-3 py-1.5 text-xs text-base-content/60"
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
             </div>
           )}
@@ -2243,17 +1773,13 @@ const PhotoDetailModal = ({
           <div className="mt-6 grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={
-                showPrevious
-              }
+              onClick={showPrevious}
               disabled={!hasPrevious}
               className="btn btn-outline btn-sm rounded-full disabled:opacity-30 sm:btn-md"
             >
               <ArrowLeft className="h-4 w-4" />
 
-              <span className="hidden sm:inline">
-                Previous
-              </span>
+              <span className="hidden sm:inline">Previous</span>
             </button>
 
             <button
@@ -2262,9 +1788,7 @@ const PhotoDetailModal = ({
               disabled={!hasNext}
               className="btn btn-primary btn-sm rounded-full disabled:opacity-30 sm:btn-md"
             >
-              <span className="hidden sm:inline">
-                Next
-              </span>
+              <span className="hidden sm:inline">Next</span>
 
               <ArrowRight className="h-4 w-4" />
             </button>
@@ -2288,11 +1812,7 @@ const PhotoDetailModal = ({
 // DETAIL ROW
 // =========================================================
 
-const DetailRow = ({
-  icon,
-  label,
-  value,
-}) => {
+const DetailRow = ({ icon, label, value }) => {
   return (
     <div className="flex items-center gap-3">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -2316,29 +1836,14 @@ const DetailRow = ({
 // PAGINATION
 // =========================================================
 
-const Pagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  isFetching,
-}) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, isFetching }) => {
   const pages = [];
 
-  const start = Math.max(
-    1,
-    currentPage - 2
-  );
+  const start = Math.max(1, currentPage - 2);
 
-  const end = Math.min(
-    totalPages,
-    currentPage + 2
-  );
+  const end = Math.min(totalPages, currentPage + 2);
 
-  for (
-    let page = start;
-    page <= end;
-    page++
-  ) {
+  for (let page = start; page <= end; page++) {
     pages.push(page);
   }
 
@@ -2346,31 +1851,20 @@ const Pagination = ({
     <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
       <button
         type="button"
-        onClick={() =>
-          onPageChange(
-            currentPage - 1
-          )
-        }
-        disabled={
-          currentPage === 1 ||
-          isFetching
-        }
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1 || isFetching}
         className="btn btn-outline btn-sm rounded-full"
       >
         <ChevronLeft className="h-4 w-4" />
 
-        <span className="hidden sm:inline">
-          Previous
-        </span>
+        <span className="hidden sm:inline">Previous</span>
       </button>
 
       {pages.map((page) => (
         <button
           key={page}
           type="button"
-          onClick={() =>
-            onPageChange(page)
-          }
+          onClick={() => onPageChange(page)}
           disabled={isFetching}
           className={`h-9 min-w-9 rounded-full px-3 text-sm font-semibold transition-all ${
             currentPage === page
@@ -2384,20 +1878,11 @@ const Pagination = ({
 
       <button
         type="button"
-        onClick={() =>
-          onPageChange(
-            currentPage + 1
-          )
-        }
-        disabled={
-          currentPage === totalPages ||
-          isFetching
-        }
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages || isFetching}
         className="btn btn-outline btn-sm rounded-full"
       >
-        <span className="hidden sm:inline">
-          Next
-        </span>
+        <span className="hidden sm:inline">Next</span>
 
         <ChevronRight className="h-4 w-4" />
       </button>
@@ -2454,9 +1939,7 @@ const GalleryPhotosSkeleton = () => {
 // ERROR
 // =========================================================
 
-const GalleryError = ({
-  onRetry,
-}) => {
+const GalleryError = ({ onRetry }) => {
   return (
     <div className="rounded-3xl border border-error/10 bg-error/5 px-6 py-16 text-center">
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-error/10 text-error">
@@ -2468,9 +1951,7 @@ const GalleryError = ({
       </h3>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-base-content/60">
-        Something went wrong while
-        loading the gallery. Please
-        try again.
+        Something went wrong while loading the gallery. Please try again.
       </p>
 
       <button
@@ -2496,16 +1977,13 @@ const GalleryEmpty = () => {
       </div>
 
       <h3 className="mt-5 font-playfair text-2xl font-semibold">
-        No photos found / কোনো ছবি
-        পাওয়া যায়নি
+        No photos found / কোনো ছবি পাওয়া যায়নি
       </h3>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-base-content/60">
-        We couldn't find any photos
-        matching your search or selected
-        category. / আপনার অনুসন্ধান বা
-        নির্বাচিত ক্যাটাগরির সাথে মিলে এমন
-        কোনো ছবি আমরা খুঁজে পাইনি।
+        We couldn't find any photos matching your search or selected category. /
+        আপনার অনুসন্ধান বা নির্বাচিত ক্যাটাগরির সাথে মিলে এমন কোনো ছবি আমরা
+        খুঁজে পাইনি।
       </p>
     </div>
   );
