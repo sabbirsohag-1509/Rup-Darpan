@@ -568,6 +568,8 @@ const MyBookings = () => {
                         minimumAdvance={Math.ceil(
                           Number(booking.packagePrice || 0) * 0.3,
                         )}
+                        customerName={booking.userName}
+                        customerEmail={booking.userEmail}
                         isFailed={isFailed}
                       />
 
