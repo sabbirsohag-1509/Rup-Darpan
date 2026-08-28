@@ -20,6 +20,16 @@ const sslcz = new SSLCommerzPayment(
   process.env.SSLCOMMERZ_STORE_PASSWORD,
   process.env.SSLCOMMERZ_IS_LIVE === "true",
 );
+// TEMPORARY DEBUG
+console.log("🔐 SSL STORE ID:", process.env.SSLCOMMERZ_STORE_ID);
+console.log(
+  "🔐 SSL PASSWORD EXISTS:",
+  !!process.env.SSLCOMMERZ_STORE_PASSWORD
+);
+console.log(
+  "🔐 SSL IS LIVE:",
+  process.env.SSLCOMMERZ_IS_LIVE === "true"
+);
 
 // Middleware
 app.use(
@@ -3366,10 +3376,10 @@ async function run() {
 
     // SSLCommerz Instance
     const sslcz = new SSLCommerzPayment(
-      process.env.SSLCOMMERZ_STORE_ID,
-      process.env.SSLCOMMERZ_STORE_PASSWORD,
-      false, // sandbox = false?
-    );
+  process.env.SSLCOMMERZ_STORE_ID,
+  process.env.SSLCOMMERZ_STORE_PASSWORD,
+  process.env.SSLCOMMERZ_IS_LIVE === "true"
+);
 
     // ================= PAYMENT INIT ==========================
 
