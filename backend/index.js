@@ -113,7 +113,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     //db collection start
 
     const myDB = client.db("rup-darpon");
