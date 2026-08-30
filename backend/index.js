@@ -254,6 +254,9 @@ async function run() {
     };
     // =========================================================
     ////
+    app.get("/test-route", (req, res) => {
+  res.send("TEST ROUTE WORKING");
+});
     //////////////////////// USER's RELATED API ////////////////////////////////////////////
     // GET ALL USERS - ADMIN ONLY
     app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
