@@ -21,11 +21,7 @@ const RootLayout = () => {
       // CLICK TO TOP VISIBILITY
       // =================================================
 
-      if (currentScrollY > 200) {
-        setShowClickToTop(true);
-      } else {
-        setShowClickToTop(false);
-      }
+      setShowClickToTop(currentScrollY > 200);
 
       // =================================================
       // MOBILE NAVBAR SHOW / HIDE
@@ -74,7 +70,7 @@ const RootLayout = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-base-100 text-base-content">
+    <div className="flex min-h-screen flex-col bg-base-100 text-base-content">
       <SmoothScroll />
 
       <ScrollToTop />
@@ -107,61 +103,73 @@ const RootLayout = () => {
             CLICK TO TOP
         ================================================= */}
 
-        {showClickToTop && (
-          <div
-            className="
+        <div
+          className={`
+            pointer-events-none
+            absolute
+            left-0
+            right-0
+            top-full
+            z-40
+            flex
+            justify-center
+            transition-all
+            duration-500
+            ease-out
+            ${
+              showClickToTop
+                ? "translate-y-0 opacity-100"
+                : "-translate-y-4 opacity-0"
+            }
+          `}
+        >
+          <button
+            type="button"
+            onClick={handleClickToTop}
+            className={`
+              pointer-events-auto
+              group
+              mt-1.5
               flex
-              justify-center
-              border-t
-              border-primary/10
-              px-4
-              py-1.5
-            "
+              cursor-pointer
+              items-center
+              gap-1.5
+              rounded-full
+              bg-base-200
+              px-3
+              py-1
+              text-xs
+              font-medium
+              text-base-content/60
+              shadow-sm
+              transition-all
+              duration-200
+              hover:bg-primary/10
+              hover:text-primary
+              hover:shadow-md
+            `}
+            aria-label="Scroll to top"
           >
-            <button
-              type="button"
-              onClick={handleClickToTop}
+            <ArrowUp
               className="
-                group
-                flex
-                items-center
-                bg-base-200
-                gap-1.5
-                rounded-full
-                px-3
-                py-1
-                text-xs
-                font-medium
-                text-base-content/60
-                transition-all
+                h-3.5
+                w-3.5
+                transition-transform
                 duration-200
-                hover:bg-primary/10
-                hover:text-primary
-                cursor-pointer
+                group-hover:-translate-y-0.5
               "
-              aria-label="Scroll to top"
-            >
-              <ArrowUp
-                className="
-                  h-3.5
-                  w-3.5
-                  transition-transform
-                  duration-200
-                  group-hover:-translate-y-0.5
-                "
-              />
+            />
 
-              <span>Click to Top</span>
-            </button>
-          </div>
-        )}
+            <span>Click to Top</span>
+          </button>
+        </div>
       </header>
 
       {/* =================================================
           MAIN CONTENT
       ================================================= */}
 
-      <main className="flex-1 w-full">
+      <main className="w-full flex-1">
         <Outlet />
       </main>
 
