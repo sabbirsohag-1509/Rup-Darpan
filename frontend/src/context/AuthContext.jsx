@@ -9,7 +9,7 @@ const AuthProvider = ({ children }) => {
   // login
   const login = async (email, password) => {
     const response = await axios.post(
-      "https://rup-darpan-backend.vercel.app/login",
+      "http://localhost:5000/login",
       {
         email,
         password,
@@ -26,7 +26,7 @@ const AuthProvider = ({ children }) => {
   // logout
   const logout = async () => {
     await axios.post(
-      "https://rup-darpan-backend.vercel.app/logout",
+      "http://localhost:5000/logout",
       {},
       {
         withCredentials: true,
@@ -38,7 +38,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     axios
-      .get("https://rup-darpan-backend.vercel.app/me", {
+      .get("http://localhost:5000/me", {
         withCredentials: true,
       })
       .then((res) => {

@@ -19,7 +19,7 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
 import Loader from "../../components/shared/Loader";
 
-const API_URL = "https://rup-darpan-backend.vercel.app/users";
+const API_URL = "http://localhost:5000/users";
 const USERS_PER_PAGE = 10;
 
 const AdminUsersManagement = () => {

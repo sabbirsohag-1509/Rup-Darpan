@@ -5,7 +5,7 @@ import { FaFacebookF } from "react-icons/fa";
 import { Camera, Play, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router";
 
-const API_URL = "https://rup-darpan-backend.vercel.app";
+const API_URL = "http://localhost:5000";
 
 const FACEBOOK_PAGE_URL =
   "https://www.facebook.com/profile.php?id=61559974675020";

@@ -171,13 +171,9 @@ const AddPhoto = () => {
         createdAt: new Date(),
       };
 
-      const res = await axios.post(
-        "https://rup-darpan-backend.vercel.app/photos",
-        photoData,
-        {
-          withCredentials: true,
-        },
-      );
+      const res = await axios.post("http://localhost:5000/photos", photoData, {
+        withCredentials: true,
+      });
 
       if (res.data.insertedId) {
         toast.success("Photo added successfully!", {

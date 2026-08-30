@@ -42,9 +42,7 @@ const PackagesDetails = () => {
     queryKey: ["package", id],
 
     queryFn: async () => {
-      const response = await axios.get(
-        `https://rup-darpan-backend.vercel.app/packages/${id}`,
-      );
+      const response = await axios.get(`http://localhost:5000/packages/${id}`);
 
       return response.data;
     },

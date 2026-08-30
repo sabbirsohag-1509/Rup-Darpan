@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { ChevronDown } from "lucide-react";
 
-const API_URL = "https://rup-darpan-backend.vercel.app/hero-images";
+const API_URL = "http://localhost:5000/hero-images"; 
 
 const Hero = () => {
   // =========================================================

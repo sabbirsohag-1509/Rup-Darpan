@@ -19,7 +19,7 @@ import OurPolicy from "../OurPolicy/OurPolicy";
 
 // Change this path according to your project structure
 
-const API_URL = "https://rup-darpan-backend.vercel.app/packages";
+const API_URL = "http://localhost:5000/packages";
 
 // =========================================
 // Utility: Short Description

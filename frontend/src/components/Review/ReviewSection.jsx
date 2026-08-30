@@ -15,7 +15,7 @@ const ReviewSection = ({ packageId, packageName }) => {
 
     queryFn: async () => {
       const response = await axios.get(
-        `https://rup-darpan-backend.vercel.app/reviews/package/${packageId}`,
+        `http://localhost:5000/reviews/package/${packageId}`,
       );
 
       return response.data;

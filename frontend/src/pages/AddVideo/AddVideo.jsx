@@ -12,7 +12,7 @@ import {
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router";
 
-const API_URL = "https://rup-darpan-backend.vercel.app/videos";
+const API_URL = "http://localhost:5000/videos";
 
 const CLOUDINARY_UPLOAD_URL =
   "https://api.cloudinary.com/v1_1/dgshzmhyk/image/upload";

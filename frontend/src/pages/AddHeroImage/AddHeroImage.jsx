@@ -191,7 +191,7 @@ const AddHeroImage = () => {
       // -------------------------------------------------------
       // POST HERO IMAGE
       const response = await axios.post(
-        "https://rup-darpan-backend.vercel.app/hero-images",
+        "http://localhost:5000/hero-images",
         heroData,
         {
           withCredentials: true,

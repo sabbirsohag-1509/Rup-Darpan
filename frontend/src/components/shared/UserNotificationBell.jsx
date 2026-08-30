@@ -15,7 +15,7 @@ import {
   BadgeCheck,
 } from "lucide-react";
 
-const API_URL = "https://rup-darpan-backend.vercel.app";
+const API_URL = "http://localhost:5000";
 
 // ============================================================
 // NOTIFICATION SOUND

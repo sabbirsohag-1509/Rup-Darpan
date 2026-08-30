@@ -27,7 +27,7 @@ import QuickActionCard from "../../components/dashboard/QuickActionCard";
 // ======================================================
 
 const api = axios.create({
-  baseURL: "https://rup-darpan-backend.vercel.app",
+  baseURL: "http://localhost:5000",
   withCredentials: true,
 });
 
