@@ -1,3 +1,4 @@
+
 import { useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router";
 import DashboardSidebar from "../components/dashboard/DashboardSidebar";
@@ -6,90 +7,109 @@ import DashboardHeader from "../components/dashboard/DashboardHeader";
 const routeMeta = {
   "/dashboard": {
     title: "Dashboard",
-    description: "Overview of your photography experience.",
+    description: "Rup Darpon-এর সাথে আপনার অভিজ্ঞতার সংক্ষিপ্ত চিত্র",
   },
+
   "/dashboard/bookings": {
     title: "My Bookings",
-    description: "Track and manage your photography sessions.",
   },
+
   "/dashboard/reviews": {
-    title: "Reviews",
-    description: "Manage feedback and testimonials.",
+    title: "My Reviews",
   },
+
   "/dashboard/profile": {
-    title: "Profile",
-    description: "Manage your personal information.",
+    title: "My Profile",
   },
-  "/dashboard/settings": {
-    title: "Settings",
-    description: "Update your dashboard preferences.",
-  },
+
+
+  // ================= ADMIN =================
+
   "/admin/users": {
-    title: "Users",
-    description: "View and manage platform users.",
+    title: "Users Management",
   },
+
   "/admin/bookings": {
-    title: "Bookings",
-    description: "Monitor and manage all bookings.",
+    title: "Bookings Management",
   },
+
   "/admin/photos": {
-    title: "Photos",
-    description: "Manage your Image and gallery assets.",
+    title: "Photos & Galleries Management",
   },
-   "/admin/videos": {
-    title: "Videos",
-    description: "Manage your Video and gallery assets.",
+
+  "/admin/videos": {
+    title: "Videos & Galleries Management",
   },
-   "/admin/hero-images": {
-    title: "Hero Images",
-    description: "Manage your hero image assets.",
+
+  "/admin/hero-images": {
+    title: "Hero Images Management",
   },
+
   "/admin/packages": {
-    title: "Packages",
-    description: "Maintain photography package offerings.",
+    title: "Packages Management",
   },
+
   "/admin/reviews": {
-    title: "Reviews",
-    description: "Moderate and analyze customer feedback.",
+    title: "Reviews Management",
   },
+
   "/admin/payments": {
-    title: "Payments",
-    description: "Track payments and revenue activity.",
+    title: "Payments & Revenue Activity Tracking",
   },
-  "/admin/settings": {
-    title: "Admin Settings",
-    description: "Configure platform-level settings.",
-  },
+
 };
 
 const DashboardLayout = () => {
   const location = useLocation();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const headerMeta = useMemo(
-    () =>
+  // =========================================================
+  // CURRENT ROUTE META
+  // =========================================================
+
+  const headerMeta = useMemo(() => {
+    return (
       routeMeta[location.pathname] || {
         title: "Dashboard",
-        description: "Manage your Rup Darpon workspace.",
-      },
-    [location.pathname],
-  );
+        description: "Rup Darpon-এর সার্বিক কার্যক্রম ও ব্যবস্থাপনা",
+      }
+    );
+  }, [location.pathname]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-base-200/40 text-base-content">
-      <div className="shrink-0"> 
-        <DashboardHeader
-        title={headerMeta.title}
-        description={headerMeta.description}
-        onMenuClick={() => setSidebarOpen((prev) => !prev)}
-      />
-      </div>
+    <div className="flex h-screen overflow-hidden bg-base-200/40 text-base-content">
+      {/* =====================================================
+          LEFT SIDEBAR
+          NO CHANGE
+      ===================================================== */}
 
-      <div className="flex min-h-0 flex-1 overflow-hidden">
-        <DashboardSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
+      <DashboardSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {/* =====================================================
+          RIGHT SIDE
+          HEADER + CONTENT
+      ===================================================== */}
+
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* ===================================================
+            DASHBOARD HEADER
+        =================================================== */}
+
+        <div className="shrink-0">
+          <DashboardHeader
+            title={headerMeta.title}
+            description={headerMeta.description}
+            onMenuClick={() => setSidebarOpen((prev) => !prev)}
+          />
+        </div>
+
+        {/* ===================================================
+            MAIN CONTENT
+        =================================================== */}
 
         <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-4 lg:p-6">
           <Outlet />
