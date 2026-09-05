@@ -1,13 +1,19 @@
 # Rup Darpon - A Photography Website
 
 <p align="center">
-  A modern full-stack photography website developed for showcasing photography services, galleries, videos, packages, bookings, and customer reviews.
+
+A modern full-stack photography website developed for showcasing photography services, galleries, videos, packages, bookings, and customer reviews.
+
 </p>
 
 <p align="center">
-  <a href="LIVE-URL">🌐 Live Website</a>
-  &nbsp; • &nbsp;
-  <a href="https://github.com/sabbirsohag-1509/Rup-Darpan">💻 GitHub Repository</a>
+
+<a href="LIVE-URL">🌐 Live Website</a>
+
+  •  
+
+<a href="https://github.com/sabbirsohag-1509/Rup-Darpan">💻 GitHub Repository</a>
+
 </p>
 
 ---
@@ -29,6 +35,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 ### 🔗 Live Demo
 
 **Live URL:**
+
 `LIVE-URL`
 
 ---
@@ -38,6 +45,7 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 ### 🔗 Source Code
 
 **GitHub Repository:**
+
 `https://github.com/sabbirsohag-1509/Rup-Darpan`
 
 ---
@@ -125,6 +133,11 @@ I worked on this project as the **Full-Stack Developer**, responsible for develo
 * View package details
 * Submit booking requests
 * Submit reviews
+* User-specific notifications
+* Receive booking status notifications
+* Receive booking confirmation notifications
+* Payment option after booking confirmation
+* SSLCommerz payment integration
 * Responsive design
 
 ---
@@ -213,6 +226,11 @@ Visitors can submit photography booking requests through the website.
 * Booking information management
 * Booking status management
 * Admin booking management
+* Admin booking confirmation
+* User notification after booking confirmation
+* Payment option becomes available after admin confirmation
+* SSLCommerz payment integration
+* Secure online payment processing
 
 ---
 
@@ -229,6 +247,71 @@ Customers can submit reviews about their experience.
 
 ---
 
+# 🔔 Notification System
+
+The application includes separate notification functionality for **Admin** and **Users**.
+
+### 👤 User Notifications
+
+* User-specific notifications
+* Booking status notifications
+* Booking confirmation notifications
+* Payment availability notifications
+* Real-time notification display
+
+### 👨‍💼 Admin Notifications
+
+* Admin-specific notifications
+* New booking notifications
+* Booking request notifications
+* User activity notifications
+* Real-time notification display
+
+---
+
+# 💳 Online Payment
+
+After a user submits a booking request, the booking remains pending until the admin reviews and confirms the booking.
+
+Once the **Admin confirms the booking**, the user receives a notification and the **payment option becomes available**.
+
+The payment system is integrated with **SSLCommerz** for online payment processing.
+
+### Payment Flow
+
+```text
+User
+  │
+  ▼
+Submit Booking
+  │
+  ▼
+Booking Status: Pending
+  │
+  ▼
+Admin Receives Notification
+  │
+  ▼
+Admin Reviews Booking
+  │
+  ▼
+Admin Confirms Booking
+  │
+  ▼
+User Receives Notification
+  │
+  ▼
+Payment Option Available
+  │
+  ▼
+SSLCommerz Payment
+  │
+  ▼
+Payment Completed
+```
+
+---
+
 # 🔐 Authentication
 
 The application implements secure authentication and authorization.
@@ -239,18 +322,18 @@ Rup Darpon uses a custom backend authentication system built with Node.js, Expre
 
 ### Authentication Features
 
-- Custom email/password authentication
-- Google OAuth authentication
-- Password hashing
-- JWT-based authentication
-- HTTP-only cookies
-- Protected routes
-- Role-based authorization
-- Admin authorization
-- Forgot password
-- Password reset
-- Change password
-- Login activity tracking
+* Custom email/password authentication
+* Google OAuth authentication
+* Password hashing
+* JWT-based authentication
+* HTTP-only cookies
+* Protected routes
+* Role-based authorization
+* Admin authorization
+* Forgot password
+* Password reset
+* Change password
+* Login activity tracking
 
 ---
 
@@ -272,6 +355,10 @@ An administrative dashboard was developed to manage the website's content and us
 * Search
 * Pagination
 * Featured content management
+* Admin-specific notifications
+* New booking notifications
+* Booking confirmation management
+* Booking payment status management
 
 ---
 
@@ -358,6 +445,7 @@ Administrators can manage featured videos.
 * Cloudinary
 * Google OAuth
 * REST API
+* SSLCommerz
 * Git
 * GitHub
 
@@ -370,6 +458,7 @@ Administrators can manage featured videos.
 # 🔄 Application Architecture
 
 ```text
+
                  ┌────────────────────┐
                  │       User         │
                  └─────────┬──────────┘
@@ -391,6 +480,7 @@ Administrators can manage featured videos.
                  ┌────────────────────┐
                  │      MongoDB       │
                  └────────────────────┘
+
 ```
 
 ---
@@ -410,6 +500,7 @@ The backend uses MongoDB for storing application data.
 * `reviews`
 * `loginActivities`
 * `Likes and Reacts`
+* `notifications`
 
 ---
 
@@ -489,10 +580,9 @@ DELETE  /reviews/:id
 ```text
 POST    /likes
 GET     /likes
-
 ```
 
-
+---
 
 # 🔒 Environment Variables
 
@@ -502,8 +592,11 @@ Add the following to `.gitignore`:
 
 ```gitignore
 node_modules/
+
 .env
+
 .env.local
+
 dist/
 ```
 
@@ -515,6 +608,7 @@ Never expose:
 * Google OAuth secret
 * Email credentials
 * API keys that should remain private
+* SSLCommerz store credentials
 
 ---
 
@@ -548,6 +642,7 @@ The website focuses on providing a modern photography-oriented user experience.
 * Loading skeletons
 * Error states
 * Empty states
+* Milky Way / Multiverse-inspired particle background
 
 ---
 
@@ -658,6 +753,9 @@ While developing Rup Darpon, I worked with and gained practical experience in:
 * API integration
 * Git & GitHub
 * Frontend-backend integration
+* Notification system implementation
+* SSLCommerz payment integration
+* Booking and payment workflow
 
 ---
 
@@ -695,5 +793,32 @@ Thanks to the **Rup Darpon** team/client for the opportunity to work on this pro
 ---
 
 <p align="center">
-  Developed with ❤️ using the MERN Stack
+
+Developed with ❤️ using the MERN Stack
+
 </p>
+
+---
+
+# Rup Darpan — Future Features
+
+* [ ] Interactive Cosmic Hero
+* [ ] Before / After Photo Slider
+* [ ] Cinematic Gallery
+* [ ] AI-Powered Photo Search
+* [ ] Photography Location Map
+* [ ] Smart Booking Calendar
+* [ ] Package Comparison
+* [ ] Photo Like / Favorite System
+* [ ] Client Private Gallery
+* [ ] Client Photo Selection System
+* [ ] Featured Photography Stories / Case Studies
+* [ ] Cinematic Video Hero
+* [ ] Day / Night Theme
+* [ ] 3D Interactive Camera / Lens
+* [ ] Scroll-Based Storytelling
+* [ ] Photography Statistics
+* [ ] Real-Time Notification System
+* [ ] PWA / Installable Website
+* [ ] AI Photography Assistant
+* [ ] Photographer Dashboard Analytics
