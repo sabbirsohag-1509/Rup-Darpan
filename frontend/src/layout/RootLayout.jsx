@@ -6,6 +6,7 @@ import SmoothScroll from "../components/SmoothScroll";
 import SocialFloating from "../components/shared/SocialFloating";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
+import BubbleEffect from './../components/shared/BubbleEffect';
 
 const RootLayout = () => {
   const [showMobileNavbar, setShowMobileNavbar] = useState(true);
@@ -71,7 +72,7 @@ const RootLayout = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-base-100 text-base-content">
-      
+      <BubbleEffect />
       <SmoothScroll />
 
       <ScrollToTop />
