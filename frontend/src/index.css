@@ -108,3 +108,29 @@ html {
 body {
   overflow-x: hidden;
 }
+
+/* =====================================================
+   RUP DARPON - PROFILE AVATAR GLOW
+===================================================== */
+
+@keyframes rupDarponProfileGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px hsl(var(--p) / 0.35),
+      0 0 6px hsl(var(--p) / 0.35),
+      0 0 12px hsl(var(--p) / 0.2);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 2px hsl(var(--p) / 0.9),
+      0 0 10px hsl(var(--p) / 0.8),
+      0 0 24px hsl(var(--p) / 0.6),
+      0 0 38px hsl(var(--p) / 0.35);
+  }
+}
+
+.rup-darpon-profile-glow {
+  animation: rupDarponProfileGlow 1.8s ease-in-out infinite;
+}
