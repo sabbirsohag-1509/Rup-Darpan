@@ -111,70 +111,73 @@ const client = new MongoClient(uri, {
   },
 });
 
-async function run() {
-  try {
-    // await client.connect();
-    //db collection start
+const myDB = client.db("rup-darpon");
+const photoCollection = myDB.collection("photos");
+const userCollection = myDB.collection("users");
+const packagesCollection = myDB.collection("packages");
+const bookingCollection = myDB.collection("bookings");
+const reviewCollection = myDB.collection("reviews");
+const loginActivityCollection = myDB.collection("loginActivities");
+const videoCollection = myDB.collection("videos");
+const heroImagesCollection = myDB.collection("heroImages");
+const photoLikes = myDB.collection("photoLikes");
+const notificationsCollection = myDB.collection("notifications");
 
-    const myDB = client.db("rup-darpon");
-    const photoCollection = myDB.collection("photos");
-    const userCollection = myDB.collection("users");
-    const packagesCollection = myDB.collection("packages");
-    const bookingCollection = myDB.collection("bookings");
-    const reviewCollection = myDB.collection("reviews");
-    const loginActivityCollection = myDB.collection("loginActivities");
-    const videoCollection = myDB.collection("videos");
-    const heroImagesCollection = myDB.collection("heroImages");
-    const photoLikes = myDB.collection("photoLikes");
-    //likes indexes
+// Ensure MongoDB indexes asynchronously without blocking route registration
+async function initIndexes() {
+  try {
     await photoLikes.createIndex(
       { photoId: 1, visitorId: 1 },
       { unique: true },
     );
-    const notificationsCollection = myDB.collection("notifications");
-    //Helper function to create a notification
-    const createNotification = async ({
-      recipientId,
-      recipientRole,
-      type,
-      title,
-      message,
-      relatedId = null,
-    }) => {
-      try {
-        const notificationData = {
-          recipientId: recipientId.toString(),
-          recipientRole,
-          type,
-          title,
-          message,
-          relatedId: relatedId ? relatedId.toString() : null,
-          isRead: false,
-          createdAt: new Date(),
-        };
-
-        const result =
-          await notificationsCollection.insertOne(notificationData);
-
-        return {
-          _id: result.insertedId,
-          ...notificationData,
-        };
-      } catch (error) {
-        console.error("Create notification error:", error);
-        throw error;
-      }
-    };
-    // Notification indexes
     await notificationsCollection.createIndex({
       recipientId: 1,
       createdAt: -1,
     });
-
     await notificationsCollection.createIndex({
       recipientId: 1,
       isRead: 1,
     });
+    console.log("MongoDB indexes initialized successfully.");
+  } catch (error) {
+    console.error("MongoDB index initialization error:", error);
+  }
+}
+initIndexes();
+
+//Helper function to create a notification
+const createNotification = async ({
+  recipientId,
+  recipientRole,
+  type,
+  title,
+  message,
+  relatedId = null,
+}) => {
+  try {
+    const notificationData = {
+      recipientId: recipientId.toString(),
+      recipientRole,
+      type,
+      title,
+      message,
+      relatedId: relatedId ? relatedId.toString() : null,
+      isRead: false,
+      createdAt: new Date(),
+    };
+
+    const result =
+      await notificationsCollection.insertOne(notificationData);
+
+    return {
+      _id: result.insertedId,
+      ...notificationData,
+    };
+  } catch (error) {
+    console.error("Create notification error:", error);
+    throw error;
+  }
+};
 
     // Google Strategy
     passport.use(
@@ -3367,13 +3370,6 @@ async function run() {
 
     // ================= SSLCommerz PAYMENT RELATED API ==========================
 
-    // SSLCommerz Instance
-    const sslcz = new SSLCommerzPayment(
-      process.env.SSLCOMMERZ_STORE_ID,
-      process.env.SSLCOMMERZ_STORE_PASSWORD,
-      process.env.SSLCOMMERZ_IS_LIVE === "true",
-    );
-
     // ================= PAYMENT INIT ==========================
 
     app.post("/payment/init", verifyToken, async (req, res) => {
@@ -3738,11 +3734,8 @@ async function run() {
     // console.log(
     //   "Pinged your deployment. You successfully connected to MongoDB!",
     // );
-  } finally {
-    // await client.close();
-  }
-}
-run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
+
+module.exports = app;
