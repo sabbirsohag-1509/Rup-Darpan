@@ -27,7 +27,7 @@ import {
 
 import { Link } from "react-router";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rupdarpon-backend.vercel.app";
 
 const LIMIT = 9;
 

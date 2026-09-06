@@ -21,7 +21,7 @@ const PaymentBtn = ({
       });
 
       const response = await axios.post(
-        "http://localhost:5000/payment/init",
+        "https://rupdarpon-backend.vercel.app/payment/init",
         {
           amount: packagePrice,
           customerName,

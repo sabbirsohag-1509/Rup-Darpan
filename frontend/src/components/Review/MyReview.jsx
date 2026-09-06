@@ -18,7 +18,7 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useState } from "react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://rupdarpon-backend.vercel.app";
 
 const MyReview = () => {
   const [selectedReview, setSelectedReview] = useState(null);
