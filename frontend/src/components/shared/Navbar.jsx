@@ -438,8 +438,7 @@ const Navbar = () => {
               w-10
               overflow-hidden
               rounded-full
-              ring-2
-              ring-primary/30
+              rup-darpon-profile-glow
               ring-offset-2
               ring-offset-base-100
             "
@@ -928,7 +927,7 @@ const Navbar = () => {
                 bg-primary/10
                 text-primary
                 ring-1
-                ring-primary/30
+                rup-darpon-profile-glow
               "
             >
               <LogOut className="h-6 w-6" />
