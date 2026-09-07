@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import PaymentBtn from "../../../pages/Payment/PaymentBtn";
 
-const API_URL = "https://rupdarpon-backend.vercel.app/bookings";
+const API_URL = "https://rupdarpon-server.vercel.app/bookings";
 
 // ============================================================
 // PAYMENT STATUS STYLE

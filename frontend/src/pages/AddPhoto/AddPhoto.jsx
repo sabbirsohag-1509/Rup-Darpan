@@ -172,7 +172,7 @@ const AddPhoto = () => {
       };
 
       const res = await axios.post(
-        "https://rupdarpon-backend.vercel.app/photos",
+        "https://rupdarpon-server.vercel.app/photos",
         photoData,
         {
           withCredentials: true,

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 
-const API_URL = "https://rupdarpon-backend.vercel.app";
+const API_URL = "https://rupdarpon-server.vercel.app";
 
 // =========================================================
 // MAIN COMPONENT

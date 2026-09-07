@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { ChevronDown } from "lucide-react";
 
-const API_URL = "https://rupdarpon-backend.vercel.app/hero-images";
+const API_URL = "https://rupdarpon-server.vercel.app/hero-images";
 
 const Hero = () => {
   // =========================================================

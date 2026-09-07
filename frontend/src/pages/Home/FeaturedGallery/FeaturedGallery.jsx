@@ -4,7 +4,7 @@ import axios from "axios";
 import { ArrowUpRight, Camera } from "lucide-react";
 import { Link } from "react-router";
 
-const API_URL = "https://rupdarpon-backend.vercel.app/featured-photos";
+const API_URL = "https://rupdarpon-server.vercel.app/featured-photos";
 
 const FeaturedGallery = () => {
   const sectionRef = useRef(null);

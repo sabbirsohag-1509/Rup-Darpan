@@ -130,7 +130,7 @@ const Register = () => {
       const { confirmPassword, acceptTerms, ...userData } = data;
 
       const response = await axios.post(
-        "https://rupdarpon-backend.vercel.app/register",
+        "https://rupdarpon-server.vercel.app/register",
         userData,
       );
 
@@ -441,7 +441,7 @@ const Register = () => {
           type="button"
           onClick={() => {
             window.location.href =
-              "https://rupdarpon-backend.vercel.app/auth/google";
+              "https://rupdarpon-server.vercel.app/auth/google";
           }}
           className="btn btn-outline w-full border-primary/30 hover:border-primary hover:bg-primary/10"
         >

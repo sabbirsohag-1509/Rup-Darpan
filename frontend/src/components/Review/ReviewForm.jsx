@@ -38,7 +38,7 @@ const ReviewForm = ({ packageName, packageId }) => {
 
     try {
       const response = await axios.post(
-        "https://rupdarpon-backend.vercel.app/reviews",
+        "https://rupdarpon-server.vercel.app/reviews",
         reviewData,
         {
           withCredentials: true,

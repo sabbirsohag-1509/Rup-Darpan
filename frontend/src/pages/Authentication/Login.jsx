@@ -5,7 +5,7 @@ import { Eye, EyeOff, LogIn, Mail, X, KeyRound } from "lucide-react";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
 
-const API_URL = "https://rupdarpon-backend.vercel.app";
+const API_URL = "https://rupdarpon-server.vercel.app";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 

@@ -26,7 +26,7 @@ import StatCard from "../../components/dashboard/StatCard";
 import SectionHeader from "../../components/dashboard/SectionHeader";
 import BookingStatusBadge from "../../components/dashboard/BookingStatusBadge";
 
-const API_URL = "https://rupdarpon-backend.vercel.app";
+const API_URL = "https://rupdarpon-server.vercel.app";
 
 // =====================================================
 // HELPERS

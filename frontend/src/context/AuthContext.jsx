@@ -9,7 +9,7 @@ const AuthProvider = ({ children }) => {
   // login
   const login = async (email, password) => {
     const response = await axios.post(
-      "https://rupdarpon-backend.vercel.app/login",
+      "https://rupdarpon-server.vercel.app/login",
       {
         email,
         password,
@@ -26,7 +26,7 @@ const AuthProvider = ({ children }) => {
   // logout
   const logout = async () => {
     await axios.post(
-      "https://rupdarpon-backend.vercel.app/logout",
+      "https://rupdarpon-server.vercel.app/logout",
       {},
       {
         withCredentials: true,
@@ -38,7 +38,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     axios
-      .get("https://rupdarpon-backend.vercel.app/me", {
+      .get("https://rupdarpon-server.vercel.app/me", {
         withCredentials: true,
       })
       .then((res) => {

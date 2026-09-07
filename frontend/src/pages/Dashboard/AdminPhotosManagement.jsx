@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API_URL = "https://rupdarpon-backend.vercel.app/photos";
+const API_URL = "https://rupdarpon-server.vercel.app/photos";
 
 const MAX_FEATURED_PHOTOS = 8;
 

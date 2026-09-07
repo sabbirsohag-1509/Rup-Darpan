@@ -21,7 +21,7 @@ import toast from "react-hot-toast";
 import ChangePassword from "./Security/ChangePassword";
 import LoginActivity from "./Security/LoginActivity";
 
-const API_URL = "https://rupdarpon-backend.vercel.app";
+const API_URL = "https://rupdarpon-server.vercel.app";
 
 const AdminProfile = () => {
   const queryClient = useQueryClient();

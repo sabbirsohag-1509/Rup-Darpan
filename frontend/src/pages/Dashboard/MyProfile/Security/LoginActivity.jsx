@@ -13,7 +13,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const API_URL = "https://rupdarpon-backend.vercel.app";
+const API_URL = "https://rupdarpon-server.vercel.app";
 
 const LoginActivity = () => {
   const [showAll, setShowAll] = useState(false);

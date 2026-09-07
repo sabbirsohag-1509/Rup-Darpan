@@ -43,7 +43,7 @@ const PackagesDetails = () => {
 
     queryFn: async () => {
       const response = await axios.get(
-        `https://rupdarpon-backend.vercel.app/packages/${id}`,
+        `https://rupdarpon-server.vercel.app/packages/${id}`,
       );
 
       return response.data;

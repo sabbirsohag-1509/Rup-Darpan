@@ -27,17 +27,14 @@ const CLOUDINARY_UPLOAD_URL =
 const CLOUDINARY_UPLOAD_PRESET = "rup_darpon";
 
 const createPackage = async (packageData) => {
-  const response = await fetch(
-    "https://rupdarpon-backend.vercel.app/packages",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(packageData),
+  const response = await fetch("https://rupdarpon-server.vercel.app/packages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    credentials: "include",
+    body: JSON.stringify(packageData),
+  });
 
   if (!response.ok) {
     let errorMessage = "Failed to create package.";

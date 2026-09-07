@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API_URL = "https://rupdarpon-backend.vercel.app/videos";
+const API_URL = "https://rupdarpon-server.vercel.app/videos";
 
 const MAX_FEATURED_VIDEOS = 8;
 

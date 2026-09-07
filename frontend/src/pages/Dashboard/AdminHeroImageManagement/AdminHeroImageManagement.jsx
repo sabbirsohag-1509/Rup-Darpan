@@ -15,7 +15,7 @@ import {
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const API_URL = "https://rupdarpon-backend.vercel.app/hero-images";
+const API_URL = "https://rupdarpon-server.vercel.app/hero-images";
 
 const AdminHeroImageManagement = () => {
   const queryClient = useQueryClient();
