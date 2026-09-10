@@ -18,11 +18,12 @@ import toast from "react-hot-toast";
 
 import { AuthContext } from "../../context/AuthContext";
 import Loader from "../../components/shared/Loader";
+import { useApiConfig } from "../../hooks/apiConfig";
 
-const API_URL = "https://rupdarpon-server.vercel.app/users";
 const USERS_PER_PAGE = 10;
 
 const AdminUsersManagement = () => {
+  const { API_URL } = useApiConfig();
   const { user: currentUser } = useContext(AuthContext);
 
   const queryClient = useQueryClient();
@@ -79,7 +80,7 @@ const AdminUsersManagement = () => {
         search: searchQuery,
       });
 
-      const response = await fetch(`${API_URL}?${params.toString()}`, {
+      const response = await fetch(`${API_URL}/users?${params.toString()}`, {
         credentials: "include",
       });
 
@@ -123,7 +124,7 @@ const AdminUsersManagement = () => {
 
   const editUserMutation = useMutation({
     mutationFn: async ({ userId, userData }) => {
-      const response = await fetch(`${API_URL}/${userId}`, {
+      const response = await fetch(`${API_URL}/users/${userId}`, {
         method: "PATCH",
 
         headers: {
@@ -173,7 +174,7 @@ const AdminUsersManagement = () => {
 
   const roleMutation = useMutation({
     mutationFn: async ({ userId, role }) => {
-      const response = await fetch(`${API_URL}/${userId}/role`, {
+      const response = await fetch(`${API_URL}/users/${userId}/role`, {
         method: "PATCH",
 
         headers: {
@@ -219,7 +220,7 @@ const AdminUsersManagement = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (userId) => {
-      const response = await fetch(`${API_URL}/${userId}`, {
+      const response = await fetch(`${API_URL}/users/${userId}`, {
         method: "DELETE",
         credentials: "include",
       });

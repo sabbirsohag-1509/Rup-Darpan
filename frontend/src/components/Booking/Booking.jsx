@@ -19,10 +19,10 @@ import {
 import { AuthContext } from "../../context/AuthContext";
 import { useContext, useEffect } from "react";
 import toast from "react-hot-toast";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const Booking = () => {
+  const { API_URL } = useApiConfig();
   const [searchParams] = useSearchParams();
   const packageId = searchParams.get("package");
   const { user } = useContext(AuthContext);

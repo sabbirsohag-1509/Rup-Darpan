@@ -3,10 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ArrowUpRight, Camera } from "lucide-react";
 import { Link } from "react-router";
-
-const API_URL = "https://rupdarpon-server.vercel.app/featured-photos";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 const FeaturedGallery = () => {
+  const { API_URL } = useApiConfig();
   const sectionRef = useRef(null);
 
   // =========================================================
@@ -21,7 +21,7 @@ const FeaturedGallery = () => {
   } = useQuery({
     queryKey: ["featured-photos"],
     queryFn: async () => {
-      const response = await axios.get(API_URL);
+      const response = await axios.get(`${API_URL}/featured-photos`);
 
       return response.data?.photos || response.data || [];
     },

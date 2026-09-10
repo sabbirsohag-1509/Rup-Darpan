@@ -14,12 +14,12 @@ import {
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
-
-const API_URL = "https://rupdarpon-server.vercel.app/videos";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const MAX_FEATURED_VIDEOS = 8;
 
 const AdminVideosManagement = () => {
+  const { API_URL } = useApiConfig();
   const queryClient = useQueryClient();
 
   // =========================================================
@@ -55,7 +55,7 @@ const AdminVideosManagement = () => {
     queryKey: ["admin-videos", currentPage],
 
     queryFn: async () => {
-      const response = await axios.get(API_URL, {
+      const response = await axios.get(`${API_URL}/videos`, {
         params: {
           page: currentPage,
           limit: 6,
@@ -106,7 +106,7 @@ const AdminVideosManagement = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (videoId) => {
-      const response = await axios.delete(`${API_URL}/${videoId}`, {
+      const response = await axios.delete(`${API_URL}/videos/${videoId}`, {
         withCredentials: true,
       });
 
@@ -212,7 +212,7 @@ const AdminVideosManagement = () => {
 
     try {
       await axios.put(
-        `${API_URL}/${editingVideo._id}`,
+        `${API_URL}/videos/${editingVideo._id}`,
         {
           title: formData.title.trim(),
 
@@ -265,7 +265,7 @@ const AdminVideosManagement = () => {
 
     try {
       await axios.patch(
-        `${API_URL}/${video._id}/featured`,
+        `${API_URL}/videos/${video._id}/featured`,
         {
           featured: !currentlyFeatured,
         },

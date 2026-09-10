@@ -18,8 +18,7 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import PaymentBtn from "../../../pages/Payment/PaymentBtn";
-
-const API_URL = "https://rupdarpon-server.vercel.app/bookings";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 // ============================================================
 // PAYMENT STATUS STYLE
@@ -105,6 +104,7 @@ const getStatusStyle = (status) => {
 // ============================================================
 
 const MyBookings = () => {
+  const { API_URL } = useApiConfig();
   const {
     data: bookings = [],
     isLoading,
@@ -113,7 +113,7 @@ const MyBookings = () => {
   } = useQuery({
     queryKey: ["myBookings"],
     queryFn: async () => {
-      const response = await axios.get(API_URL, {
+      const response = await axios.get(`${API_URL}/bookings`, {
         withCredentials: true,
       });
 

@@ -12,12 +12,12 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
-
-const API_URL = "https://rupdarpon-server.vercel.app/photos";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const MAX_FEATURED_PHOTOS = 8;
 
 const AdminPhotosManagement = () => {
+  const { API_URL } = useApiConfig();
   // =========================================================
   // STATE
   // =========================================================
@@ -57,7 +57,7 @@ const AdminPhotosManagement = () => {
   // =========================================================
 
   const fetchPhotos = async (page = 1) => {
-    const response = await axios.get(API_URL, {
+    const response = await axios.get(`${API_URL}/photos`, {
       params: {
         page,
         limit: 6,
@@ -122,7 +122,7 @@ const AdminPhotosManagement = () => {
     setDeletingId(photoId);
 
     try {
-      await axios.delete(`${API_URL}/${photoId}`, {
+      await axios.delete(`${API_URL}/photos/${photoId}`, {
         withCredentials: true,
       });
 
@@ -238,7 +238,7 @@ const AdminPhotosManagement = () => {
 
     try {
       await axios.put(
-        `${API_URL}/${editingPhoto._id}`,
+        `${API_URL}/photos/${editingPhoto._id}`,
         {
           title: formData.title.trim(),
           image: formData.image.trim(),
@@ -280,7 +280,7 @@ const AdminPhotosManagement = () => {
     if (currentlyFeatured) {
       try {
         await axios.put(
-          `${API_URL}/${photo._id}`,
+          `${API_URL}/photos/${photo._id}`,
           {
             title: photo.title || "",
             image: photo.image || "",
@@ -323,7 +323,7 @@ const AdminPhotosManagement = () => {
     // ADD TO FEATURED
     try {
       await axios.put(
-        `${API_URL}/${photo._id}`,
+        `${API_URL}/photos/${photo._id}`,
         {
           title: photo.title || "",
           image: photo.image || "",

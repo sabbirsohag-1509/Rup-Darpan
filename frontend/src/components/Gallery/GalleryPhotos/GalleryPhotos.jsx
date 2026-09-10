@@ -26,8 +26,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 const LIMIT = 9;
 
@@ -128,6 +127,7 @@ const formatLikeCount = (count = 0) => {
 // =========================================================
 
 const GalleryPhotos = () => {
+  const { API_URL } = useApiConfig();
   const queryClient = useQueryClient();
 
   const [currentPage, setCurrentPage] = useState(1);

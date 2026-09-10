@@ -1,15 +1,17 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
+import { useApiConfig } from "../hooks/apiConfig";
 
 export const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
+  const { API_URL } = useApiConfig();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   // login
   const login = async (email, password) => {
     const response = await axios.post(
-      "https://rupdarpon-server.vercel.app/login",
+      `${API_URL}/login`,
       {
         email,
         password,
@@ -26,7 +28,7 @@ const AuthProvider = ({ children }) => {
   // logout
   const logout = async () => {
     await axios.post(
-      "https://rupdarpon-server.vercel.app/logout",
+      `${API_URL}/logout`,
       {},
       {
         withCredentials: true,
@@ -38,7 +40,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     axios
-      .get("https://rupdarpon-server.vercel.app/me", {
+      .get(`${API_URL}/me`, {
         withCredentials: true,
       })
       .then((res) => {

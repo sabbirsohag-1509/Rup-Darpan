@@ -25,8 +25,7 @@ import {
 import StatCard from "../../components/dashboard/StatCard";
 import SectionHeader from "../../components/dashboard/SectionHeader";
 import BookingStatusBadge from "../../components/dashboard/BookingStatusBadge";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 // =====================================================
 // HELPERS
@@ -288,6 +287,7 @@ const DashboardError = ({ message }) => {
 // =====================================================
 
 const AdminDashboard = () => {
+  const { API_URL } = useApiConfig();
   // ===================================================
   // REVIEW FRONTEND PAGINATION
   // ===================================================

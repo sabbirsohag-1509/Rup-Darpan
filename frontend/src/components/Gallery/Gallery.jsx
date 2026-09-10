@@ -8,14 +8,14 @@ import {
   Video,
 } from "lucide-react";
 import { Link } from "react-router";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 // =========================================================
 // MAIN COMPONENT
 // =========================================================
 
 const Gallery = () => {
+  const { API_URL } = useApiConfig();
   // =======================================================
   // FETCH PHOTOS
   // =======================================================

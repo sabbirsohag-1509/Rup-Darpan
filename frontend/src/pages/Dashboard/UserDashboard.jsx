@@ -12,6 +12,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
+import { useEffect } from "react";
 import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,13 +22,14 @@ import SectionHeader from "../../components/dashboard/SectionHeader";
 import BookingStatusBadge from "../../components/dashboard/BookingStatusBadge";
 import EmptyState from "../../components/dashboard/EmptyState";
 import QuickActionCard from "../../components/dashboard/QuickActionCard";
+import { useApiConfig, API_URL as DEFAULT_API_URL } from "../../hooks/apiConfig";
 
 // ======================================================
 // AXIOS
 // ======================================================
 
 const api = axios.create({
-  baseURL: "https://rupdarpon-server.vercel.app",
+  baseURL: DEFAULT_API_URL,
   withCredentials: true,
 });
 
@@ -155,6 +157,13 @@ const getStatus = (booking) => {
 // ======================================================
 
 const UserDashboard = () => {
+  const { API_URL } = useApiConfig();
+
+  useEffect(() => {
+    if (API_URL) {
+      api.defaults.baseURL = String(API_URL);
+    }
+  }, [API_URL]);
   // ====================================================
   // CURRENT USER
   // ====================================================
