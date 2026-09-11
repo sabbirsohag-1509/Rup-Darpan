@@ -1,824 +1,373 @@
-# Rup Darpon - A Photography Website
-
-<p align="center">
-
-A modern full-stack photography website developed for showcasing photography services, galleries, videos, packages, bookings, and customer reviews.
-
-</p>
-
-<p align="center">
-
-<a href="LIVE-URL">🌐 Live Website</a>
-
-  •  
-
-<a href="https://github.com/sabbirsohag-1509/Rup-Darpan">💻 GitHub Repository</a>
-
-</p>
-
----
-
-## 📌 About The Project
-
-**Rup Darpon** is a full-stack photography website developed to provide a professional online presence for a photography service.
-
-The website allows visitors to explore photography works, browse categorized galleries, watch featured videos, view photography packages, submit booking requests, and leave reviews.
-
-The project also includes an **Admin Dashboard** for managing website content such as photos, videos, hero images, packages, users, bookings, and reviews.
-
-I worked on this project as the **Full-Stack Developer**, responsible for developing the frontend, backend, API integration, authentication, database integration, and administrative functionality.
-
----
-
-## 🌐 Live Website
-
-### 🔗 Live Demo
-
-**Live URL:**
-
-`LIVE-URL`
-
----
-
-## 💻 GitHub Repository
-
-### 🔗 Source Code
-
-**GitHub Repository:**
-
-`https://github.com/sabbirsohag-1509/Rup-Darpan`
-
----
-
-# 🖼️ Screenshots
-
-## 🏠 Homepage
-
-<!-- Add homepage screenshot here -->
-
-![Rup Darpon Homepage](LIVE-URL)
-
----
-
-## 📸 Photography Gallery
-
-<!-- Add gallery screenshot here -->
-
-![Photography Gallery](LIVE-URL)
-
----
-
-## 🎥 Featured Videos
-
-<!-- Add featured videos screenshot here -->
-
-![Featured Videos](LIVE-URL)
-
----
-
-## 📦 Photography Packages
-
-<!-- Add packages screenshot here -->
-
-![Photography Packages](LIVE-URL)
-
----
-
-## 📅 Booking
-
-<!-- Add booking screenshot here -->
-
-![Booking System](LIVE-URL)
-
----
-
-## ⭐ Customer Reviews
-
-<!-- Add reviews screenshot here -->
-
-![Customer Reviews](LIVE-URL)
-
----
-
-## 🛠️ Admin Dashboard
-
-<!-- Add admin dashboard screenshot here -->
-
-![Admin Dashboard](LIVE-URL)
-
----
-
-# ✨ Main Features
-
-## 👤 User Features
-
-* User registration and login
-* Email/password authentication
-* Google authentication
-* JWT-based authentication
-* Protected routes
-* User profile management
-* Change password
-* Forgot password
-* Password reset
-* Login activity tracking
-* Browse photography gallery
-* Search photos
-* Filter photos by category
-* View detailed photo information
-* View featured photos
-* Watch featured videos
-* Explore photography services
-* View photography packages
-* View package details
-* Submit booking requests
-* Submit reviews
-* User-specific notifications
-* Receive booking status notifications
-* Receive booking confirmation notifications
-* Payment option after booking confirmation
-* SSLCommerz payment integration
-* Responsive design
-
----
-
-# 📸 Photography Gallery
-
-The gallery provides an interactive way for visitors to explore photography work.
-
-### Gallery Features
-
-* Category filtering
-* Search functionality
-* Pagination
-* Responsive grid/masonry layout
-* Featured photo labels
-* Photo detail modal
-* Previous/next navigation
-* Keyboard navigation
-* Zoom controls
-* Mouse-wheel zoom
-* Photo metadata
-* Photo statistics
-* Tags
-* Loading skeleton
-* Error state
-* Empty state
-
----
-
-# 🎥 Featured Videos
-
-The website includes a dedicated section for showcasing featured photography videos.
-
-### Features
-
-* Featured videos
-* Facebook video support
-* Video management
-* Featured video limit
-* Search
-* Pagination
-* Responsive video section
-
----
-
-# 🖼️ Dynamic Hero Section
-
-The homepage hero section is dynamically managed from the backend.
-
-### Features
-
-* Add hero images
-* Edit hero images
-* Delete hero images
-* Activate/deactivate hero images
-* Search hero images
-* Sort hero images
-* Maximum hero image limit
-
----
-
-# 📦 Photography Packages
-
-Visitors can explore available photography packages and their details.
-
-### Features
-
-* Package listing
-* Package details
-* Pricing information
-* Package descriptions
-* Responsive package cards
-* Admin package management
-
----
-
-# 📅 Booking System
-
-Visitors can submit photography booking requests through the website.
-
-### Features
-
-* Package selection
-* Booking form
-* Booking request submission
-* Booking information management
-* Booking status management
-* Admin booking management
-* Admin booking confirmation
-* User notification after booking confirmation
-* Payment option becomes available after admin confirmation
-* SSLCommerz payment integration
-* Secure online payment processing
-
----
-
-# ⭐ Review System
-
-Customers can submit reviews about their experience.
-
-### Features
-
-* Submit reviews
-* Display reviews
-* Review management
-* Admin review management
-
----
-
-# 🔔 Notification System
-
-The application includes separate notification functionality for **Admin** and **Users**.
-
-### 👤 User Notifications
-
-* User-specific notifications
-* Booking status notifications
-* Booking confirmation notifications
-* Payment availability notifications
-* Real-time notification display
-
-### 👨‍💼 Admin Notifications
-
-* Admin-specific notifications
-* New booking notifications
-* Booking request notifications
-* User activity notifications
-* Real-time notification display
-
----
-
-# 💳 Online Payment
-
-After a user submits a booking request, the booking remains pending until the admin reviews and confirms the booking.
-
-Once the **Admin confirms the booking**, the user receives a notification and the **payment option becomes available**.
-
-The payment system is integrated with **SSLCommerz** for online payment processing.
-
-### Payment Flow
-
-```text
-User
-  │
-  ▼
-Submit Booking
-  │
-  ▼
-Booking Status: Pending
-  │
-  ▼
-Admin Receives Notification
-  │
-  ▼
-Admin Reviews Booking
-  │
-  ▼
-Admin Confirms Booking
-  │
-  ▼
-User Receives Notification
-  │
-  ▼
-Payment Option Available
-  │
-  ▼
-SSLCommerz Payment
-  │
-  ▼
-Payment Completed
-```
-
----
-
-# 🔐 Authentication
-
-The application implements secure authentication and authorization.
-
-## 🔐 Authentication & Authorization
-
-Rup Darpon uses a custom backend authentication system built with Node.js, Express.js, MongoDB, JWT, and Passport.js.
-
-### Authentication Features
-
-* Custom email/password authentication
-* Google OAuth authentication
-* Password hashing
-* JWT-based authentication
-* HTTP-only cookies
-* Protected routes
-* Role-based authorization
-* Admin authorization
-* Forgot password
-* Password reset
-* Change password
-* Login activity tracking
-
----
-
-# 👨‍💼 Admin Dashboard
-
-An administrative dashboard was developed to manage the website's content and users.
+# Rup Darpon
+
+A full-stack photography service platform for showcasing photography work, managing packages, accepting bookings, collecting reviews, and processing payments.
+
+## Live Application
+
+- Frontend: https://rup-darpon.netlify.app
+- Backend API: https://rupdarpon-server.vercel.app
+- API health check: https://rupdarpon-server.vercel.app/
+
+## Features
+
+### Public and User Features
+
+- Browse photography galleries, videos, hero images, and packages
+- Filter and search gallery content
+- View package details and package reviews
+- Register and log in with email/password
+- Sign in with Google OAuth
+- Manage profile information and profile photo
+- Submit, edit, and delete reviews
+- Submit photography booking requests
+- Track booking status and payment status
+- Receive booking and account notifications
+- Pay through SSLCommerz after booking confirmation
 
 ### Admin Features
 
-* Dashboard
-* User management
-* Photo management
-* Video management
-* Hero image management
-* Package management
-* Booking management
-* Review management
-* User role management
-* Search
-* Pagination
-* Featured content management
-* Admin-specific notifications
-* New booking notifications
-* Booking confirmation management
-* Booking payment status management
-
----
-
-# 👥 User Management
-
-Administrators can manage registered users.
-
-### Features
-
-* View users
-* Search users
-* Update user information
-* Change user roles
-* Delete users
-* View login activity
-
----
-
-# 📸 Photo Management
-
-Administrators can manage photography content.
-
-### Features
-
-* Add photos
-* Edit photos
-* Delete photos
-* Mark photos as featured
-* Search photos
-* Category management
-* Pagination
-
----
-
-# 🎥 Video Management
-
-Administrators can manage featured videos.
-
-### Features
-
-* Add videos
-* Edit videos
-* Delete videos
-* Mark videos as featured
-* Search videos
-* Featured video limit
-
----
-
-# 🧰 Technologies Used
-
-## Frontend
-
-* React.js
-* JavaScript
-* Vite
-* React Router
-* React Query
-* Axios
-* Tailwind CSS
-* DaisyUI
-* Custom Authentication
-* React Hook Form
-
----
-
-## Backend
-
-* Node.js
-* Express.js
-* MongoDB
-* JWT
-* Passport.js
-* Nodemailer
-* UAParser
-* CORS
-
----
-
-## Other Technologies & Services
-
-* Custom Authentication
-* MongoDB Atlas
-* Cloudinary
-* Google OAuth
-* REST API
-* SSLCommerz
-* Git
-* GitHub
-
----
-
-> The structure above is an overview and may vary depending on the final project structure.
-
----
-
-# 🔄 Application Architecture
-
-```text
-
-                 ┌────────────────────┐
-                 │       User         │
-                 └─────────┬──────────┘
-                           │
-                           ▼
-                 ┌────────────────────┐
-                 │  React Frontend    │
-                 │      + Vite        │
-                 └─────────┬──────────┘
-                           │
-                       REST API
-                           │
-                           ▼
-                 ┌────────────────────┐
-                 │ Express + Node.js  │
-                 └─────────┬──────────┘
-                           │
-                           ▼
-                 ┌────────────────────┐
-                 │      MongoDB       │
-                 └────────────────────┘
-
-```
-
----
-
-# 🗄️ Database Collections
-
-The backend uses MongoDB for storing application data.
-
-### Collections
-
-* `users`
-* `photos`
-* `videos`
-* `heroImages`
-* `packages`
-* `bookings`
-* `reviews`
-* `loginActivities`
-* `Likes and Reacts`
-* `notifications`
-
----
-
-# 🔌 API Endpoints
-
-## Users
-
-```text
-GET     /users
-GET     /users/me
-PATCH   /users/me
-PATCH   /users/:id
-PATCH   /users/:id/role
-DELETE  /users/:id
-```
-
-## Photos
-
-```text
-POST    /photos
-GET     /photos
-GET     /featured-photos
-GET     /all-photos
-PUT     /photos/:id
-DELETE  /photos/:id
-```
-
-## Videos
-
-```text
-POST    /videos
-GET     /videos
-PATCH   /videos/:id/featured
-PUT     /videos/:id
-DELETE  /videos/:id
-```
-
-## Hero Images
-
-```text
-POST    /hero-images
-GET     /hero-images
-PUT     /hero-images/:id
-DELETE  /hero-images/:id
-```
-
-## Packages
-
-```text
-POST    /packages
-GET     /packages
-GET     /packages/:id
-PUT     /packages/:id
-DELETE  /packages/:id
-```
-
-## Bookings
-
-```text
-POST    /bookings
-GET     /bookings
-PATCH   /bookings/:id
-DELETE  /bookings/:id
-```
-
-## Reviews
-
-```text
-POST    /reviews
-GET     /reviews
-PATCH   /reviews/:id
-DELETE  /reviews/:id
-```
-
-## Likes and Reacts
-
-```text
-POST    /likes
-GET     /likes
-```
-
----
-
-# 🔒 Environment Variables
-
-Sensitive credentials should not be committed to GitHub.
-
-Add the following to `.gitignore`:
-
-```gitignore
-node_modules/
-
-.env
-
-.env.local
-
-dist/
-```
-
-Never expose:
-
-* MongoDB credentials
-* JWT secret
-* Custom authentication private credentials
-* Google OAuth secret
-* Email credentials
-* API keys that should remain private
-* SSLCommerz store credentials
-
----
-
-# 📱 Responsive Design
-
-The website is designed to provide a responsive experience across:
-
-* 💻 Desktop
-* 💻 Laptop
-* 📱 Tablet
-* 📱 Mobile
-
-The interface uses responsive Tailwind CSS utilities and adaptive layouts.
-
----
-
-# 🎨 UI & Design
-
-The website focuses on providing a modern photography-oriented user experience.
-
-### Design Highlights
-
-* Modern typography
-* Photography-focused layouts
-* Dark visual theme
-* Responsive navigation
-* Interactive gallery
-* Smooth UI interactions
-* Image-focused sections
-* Responsive cards
-* Loading skeletons
-* Error states
-* Empty states
-* Milky Way / Multiverse-inspired particle background
-
----
-
-# ⚡ Performance
-
-Several techniques are used to improve the application's performance:
-
-* React Query caching
-* API pagination
-* Limited data fetching
-* Responsive layouts
-* Loading skeletons
-* Conditional rendering
-* Image optimization support
-* Cloudinary integration
-* Efficient API requests
-
----
-
-# 🛡️ Security
-
-The application includes:
-
-* JWT authentication
-* HTTP-only cookies
-* Protected routes
-* Role-based authorization
-* Admin authorization
-* Environment variables
-* CORS configuration
-* Password reset functionality
-* Authentication validation
-
----
-
-# 🧪 Error & Loading States
-
-The frontend provides user-friendly states for:
-
-* Loading
-* API errors
-* Empty data
-* Invalid input
-* Authentication errors
-* Unauthorized access
-* Failed API requests
-
----
-
-# 🚀 Deployment
-
-The project can be deployed using platforms such as:
+- Dashboard with platform statistics
+- User and role management
+- Photo, video, hero image, and package management
+- Booking review, confirmation, cancellation, and deletion
+- Review approval, rejection, featuring, and deletion
+- Notification management
+- Pagination, search, loading states, and error states
+
+## Technology Stack
 
 ### Frontend
 
-* Netlify
+- React 19
+- Vite
+- React Router
+- TanStack React Query
+- Axios
+- React Hook Form
+- Tailwind CSS and DaisyUI
+- Lucide React
+- Framer Motion
 
 ### Backend
 
-* Vercel or,
-* Railway
+- Node.js
+- Express 5
+- MongoDB Atlas
+- JWT authentication with HTTP-only cookies
+- Passport.js and Google OAuth
+- bcrypt password hashing
+- Nodemailer
+- SSLCommerz
+- CORS
 
-### Database
+### Deployment and Services
 
-* MongoDB Atlas
+- Netlify for the frontend
+- Vercel for the backend API
+- MongoDB Atlas for the database
+- Cloudinary for profile image uploads
+- Google Cloud OAuth credentials
 
----
+## Project Structure
 
-# 🔮 Future Improvements
+```text
+Rup-Darpan/
+├── backend/
+│   ├── index.js
+│   ├── vercel.json
+│   └── src/
+│       ├── config/
+│       ├── controllers/
+│       ├── middlewares/
+│       ├── models/
+│       ├── routes/
+│       └── utils/
+├── frontend/
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── context/
+│       ├── hooks/
+│       ├── layout/
+│       ├── pages/
+│       └── router/
+└── README.md
+```
 
-Possible future improvements include:
+## Requirements
 
-* Online payment integration
-* Advanced booking calendar
-* Real-time booking notifications
-* Email notifications
-* SMS notifications
-* Advanced analytics
-* Customer dashboard
-* Wishlist/favorite photos
-* SEO optimization
-* Progressive Web App support
+- Node.js 20 or newer
+- npm
+- MongoDB Atlas database
+- Google OAuth credentials for Google login
+- SSLCommerz credentials for payments
+- Cloudinary upload preset for profile images
 
----
+## Local Setup
 
-# 🧠 Development Experience
+Clone the repository and install dependencies in both applications:
 
-While developing Rup Darpon, I worked with and gained practical experience in:
+```bash
+git clone https://github.com/sabbirsohag-1509/Rup-Darpan.git
+cd Rup-Darpan
 
-* Full-stack MERN development
-* React component architecture
-* REST API development
-* MongoDB database design
-* Authentication & authorization
-* Custom authentication
-* Google OAuth
-* JWT-based authentication
-* React Query
-* Axios
-* React Router
-* Tailwind CSS
-* DaisyUI
-* CRUD operations
-* Pagination
-* Search & filtering
-* Admin dashboard development
-* Role-based access control
-* API integration
-* Git & GitHub
-* Frontend-backend integration
-* Notification system implementation
-* SSLCommerz payment integration
-* Booking and payment workflow
+cd backend
+npm install
 
----
+cd ../frontend
+npm install
+```
 
-# 👨‍💻 Developer
+### Backend Environment Variables
+
+Create `backend/.env`:
+
+```env
+PORT=5000
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+SERVER_URL=http://localhost:5000
+
+DB_USER=your-mongodb-user
+DB_PASS=your-mongodb-password
+JWT_SECRET=your-long-random-jwt-secret
+
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
+
+EMAIL_USER=your-email-address
+EMAIL_PASS=your-email-app-password
+
+SSLCOMMERZ_STORE_ID=your-store-id
+SSLCOMMERZ_STORE_PASSWORD=your-store-password
+SSLCOMMERZ_IS_LIVE=false
+```
+
+Never commit `backend/.env` or expose its values publicly.
+
+### Frontend Environment Variables
+
+Create `frontend/.env`:
+
+```env
+VITE_API_URL=https://rupdarpon-server.vercel.app
+```
+
+For local backend development, use:
+
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+The frontend reads the API URL from `src/hooks/apiConfig.js`.
+
+## Running Locally
+
+Start the backend:
+
+```bash
+cd backend
+npm run dev
+```
+
+Start the frontend in a second terminal:
+
+```bash
+cd frontend
+npm run dev
+```
+
+The frontend normally runs at `http://localhost:5173`.
+
+## Production Deployment
+
+### Backend on Vercel
+
+Set the Vercel project Root Directory to `backend`, add all backend environment variables under the Production environment, then deploy:
+
+```bash
+cd backend
+vercel --prod
+```
+
+Required production values include:
+
+```env
+CLIENT_URL=https://rup-darpon.netlify.app
+SERVER_URL=https://rupdarpon-server.vercel.app
+GOOGLE_CALLBACK_URL=https://rupdarpon-server.vercel.app/auth/google/callback
+```
+
+MongoDB Atlas must allow connections from Vercel. Configure the Atlas Network Access rules appropriately for the deployment environment.
+
+### Frontend on Netlify
+
+Use these Netlify build settings:
+
+- Base directory: `frontend`
+- Build command: `npm run build`
+- Publish directory: `dist` when the base directory is `frontend`
+- Environment variable: `VITE_API_URL=https://rupdarpon-server.vercel.app`
+
+The included `frontend/public/_redirects` file supports client-side routing on Netlify.
+
+## Google OAuth Configuration
+
+For production Google login, configure the same OAuth client used by the backend.
+
+Authorized JavaScript origin:
+
+```text
+https://rup-darpon.netlify.app
+```
+
+Authorized redirect URI:
+
+```text
+https://rupdarpon-server.vercel.app/auth/google/callback
+```
+
+The redirect URI must match exactly, including protocol, spelling, path, and trailing slash behavior. Keep `GOOGLE_CLIENT_SECRET` only in backend/Vercel environment variables.
+
+## API Overview
+
+All API paths are relative to `https://rupdarpon-server.vercel.app`.
+
+### Authentication
+
+```text
+POST  /register
+POST  /login
+POST  /logout
+GET   /me
+GET   /auth/google
+GET   /auth/google/callback
+POST  /users/forgot-password
+PATCH /users/reset-password/:token
+PATCH /users/change-password
+```
+
+### Content
+
+```text
+GET    /all-photos
+GET    /featured-photos
+POST   /photos
+GET    /photos
+PUT    /photos/:id
+DELETE /photos/:id
+
+GET    /all-videos
+GET    /featured-videos
+POST   /videos
+GET    /videos
+PUT    /videos/:id
+DELETE /videos/:id
+
+GET    /hero-images
+POST   /hero-images
+PUT    /hero-images/:id
+DELETE /hero-images/:id
+
+GET    /packages
+GET    /packages/:id
+POST   /packages
+PUT    /packages/:id
+DELETE /packages/:id
+```
+
+### Bookings and Reviews
+
+```text
+POST   /bookings
+GET    /bookings
+GET    /admin/bookings
+PATCH  /admin/bookings/:id/confirm
+PATCH  /admin/bookings/:id/cancel
+DELETE /admin/bookings/:id
+
+GET    /reviews/package/:packageId
+POST   /reviews
+GET    /reviews/my
+PATCH  /reviews/:id
+DELETE /reviews/:id
+GET    /admin/reviews
+PATCH  /admin/reviews/:id/approve
+PATCH  /admin/reviews/:id/reject
+PATCH  /admin/reviews/:id/feature
+DELETE /admin/reviews/:id
+```
+
+### Notifications and Payments
+
+```text
+POST   /notifications
+GET    /notifications
+GET    /notifications/unread-count
+PATCH  /notifications/:id/read
+PATCH  /notifications/read-all
+DELETE /notifications/:id
+
+POST   /payment/init
+POST   /payment/success
+POST   /payment/fail
+POST   /payment/cancel
+POST   /payment/ipn
+```
+
+Protected endpoints require the authentication cookie. Admin endpoints additionally require an admin role.
+
+## Database Collections
+
+- `users`
+- `photos`
+- `photoLikes`
+- `videos`
+- `heroImages`
+- `packages`
+- `bookings`
+- `reviews`
+- `notifications`
+- `loginActivities`
+
+## Available Scripts
+
+### Frontend
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
+
+### Backend
+
+```bash
+npm start
+npm run dev
+```
+
+## Security Notes
+
+- Do not commit `.env`, `.env.local`, or production credentials.
+- Do not expose `GOOGLE_CLIENT_SECRET`, database credentials, JWT secrets, email passwords, or SSLCommerz passwords.
+- Rotate any secret that has been accidentally shared.
+- Use separate credentials for local development and production where possible.
+- Keep MongoDB Atlas Network Access and Database Access configured for the deployed backend.
+
+## Developer
 
 ### Sabbir Hossain Sohag
 
-**Full-Stack MERN Developer**
+- GitHub: https://github.com/sabbirsohag-1509/Rup-Darpan
+- LinkedIn: https://www.linkedin.com/in/sabbirhossainsohag
+- Portfolio: https://portfolio-sabbir-sohag-f956ef.netlify.app
+- Email: sabbirhossainsohag5@gmail.com
 
-I worked on the **development of the Rup Darpon website**, including the frontend, backend, API integration, authentication, database integration, and admin dashboard functionality.
+## Project Ownership
 
-### Connect With Me
+Rup Darpon is a photography website developed for its respective owner/client. The website content, photography work, branding, images, videos, and business information belong to their respective owner/client.
 
-* **GitHub:** `https://github.com/sabbirsohag-1509`
-* **LinkedIn:** `https://www.linkedin.com/in/sabbirhossainsohag`
-* **Portfolio:** `https://portfolio-sabbir-sohag-f956ef.netlify.app`
-* **Email:** `sabbirhossainsohag5@gmail.com`
-
----
-
-# 📄 Project Ownership
-
-**Rup Darpon** is a photography website developed for its respective owner/client.
-
-The website content, photography work, branding, images, videos, and business information belong to their respective owner/client.
-
-I contributed to the project as the **Full-Stack Developer** responsible for the technical development and implementation.
-
----
-
-# ⭐ Acknowledgement
-
-Thanks to the **Rup Darpon** team/client for the opportunity to work on this project.
-
----
-
-<p align="center">
-
-Developed with ❤️ using the MERN Stack
-
-</p>
-
----
-
-# Rup Darpan — Future Features
-
-* [ ] Interactive Cosmic Hero
-* [ ] Before / After Photo Slider
-* [ ] Cinematic Gallery
-* [ ] AI-Powered Photo Search
-* [ ] Photography Location Map
-* [ ] Smart Booking Calendar
-* [ ] Package Comparison
-* [ ] Photo Like / Favorite System
-* [ ] Client Private Gallery
-* [ ] Client Photo Selection System
-* [ ] Featured Photography Stories / Case Studies
-* [ ] Cinematic Video Hero
-* [ ] Day / Night Theme
-* [ ] 3D Interactive Camera / Lens
-* [ ] Scroll-Based Storytelling
-* [ ] Photography Statistics
-* [ ] Real-Time Notification System
-* [ ] PWA / Installable Website
-* [ ] AI Photography Assistant
-* [ ] Photographer Dashboard Analytics
+The developer contributed the technical implementation, including the frontend, backend, API integration, authentication, database integration, payment workflow, and admin dashboard.
