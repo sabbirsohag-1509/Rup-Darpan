@@ -12,10 +12,10 @@ import {
   Package,
 } from "lucide-react";
 import toast from "react-hot-toast";
-
-const API_URL = "https://rupdarpon-server.vercel.app/packages";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const AdminPackageManagement = () => {
+  const { API_URL } = useApiConfig();
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +44,7 @@ const AdminPackageManagement = () => {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get(API_URL, {
+      const response = await axios.get(`${API_URL}/packages`, {
         withCredentials: true,
       });
 
@@ -94,7 +94,7 @@ const AdminPackageManagement = () => {
     setDeletingId(packageId);
 
     try {
-      await axios.delete(`${API_URL}/${packageId}`, {
+      await axios.delete(`${API_URL}/packages/${packageId}`, {
         withCredentials: true,
       });
 
@@ -173,7 +173,7 @@ const AdminPackageManagement = () => {
         updatedAt: new Date(),
       };
 
-      await axios.put(`${API_URL}/${editingPackage._id}`, updatedPackage, {
+      await axios.put(`${API_URL}/packages/${editingPackage._id}`, updatedPackage, {
         withCredentials: true,
       });
 

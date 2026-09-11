@@ -16,10 +16,10 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const AdminReviewManagement = () => {
+  const { API_URL } = useApiConfig();
   const [selectedReview, setSelectedReview] = useState(null);
   const [deleteReviewId, setDeleteReviewId] = useState(null);
 

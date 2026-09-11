@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 import { FaFacebookF } from "react-icons/fa";
 import { Link } from "react-router";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 const LIMIT = 6;
 
@@ -24,6 +23,7 @@ const LIMIT = 6;
 // =========================================================
 
 const GalleryVideos = () => {
+  const { API_URL } = useApiConfig();
   // =======================================================
   // STATE
   // =======================================================

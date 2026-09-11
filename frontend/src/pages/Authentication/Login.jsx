@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, LogIn, Mail, X, KeyRound } from "lucide-react";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
 const Login = () => {
+  const { API_URL } = useApiConfig();
   const [showPassword, setShowPassword] = useState(false);
 
   // Forgot Password Modal

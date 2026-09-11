@@ -16,10 +16,7 @@ import {
 } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import OurPolicy from "../OurPolicy/OurPolicy";
-
-// Change this path according to your project structure
-
-const API_URL = "https://rupdarpon-server.vercel.app/packages";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 // =========================================
 // Utility: Short Description
@@ -42,6 +39,7 @@ const getShortDescription = (description, wordLimit = 50) => {
 // =========================================
 
 const Packages = () => {
+  const { API_URL } = useApiConfig();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -59,7 +57,7 @@ const Packages = () => {
     queryKey: ["packages"],
 
     queryFn: async () => {
-      const response = await axios.get(API_URL);
+      const response = await axios.get(`${API_URL}/packages`);
 
       return response.data;
     },

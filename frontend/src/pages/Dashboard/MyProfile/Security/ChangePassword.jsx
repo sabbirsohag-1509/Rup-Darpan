@@ -11,8 +11,7 @@ import {
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../../../hooks/apiConfig";
 
 const uppercaseRegex = /[A-Z]/;
 const lowercaseRegex = /[a-z]/;
@@ -80,6 +79,7 @@ const getPasswordStrength = (checks) => {
 };
 
 const ChangePassword = () => {
+  const { API_URL } = useApiConfig();
   const [isOpen, setIsOpen] = useState(false);
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);

@@ -20,10 +20,10 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const AdminBookingManagement = () => {
+  const { API_URL } = useApiConfig();
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [deleteBookingId, setDeleteBookingId] = useState(null);
 

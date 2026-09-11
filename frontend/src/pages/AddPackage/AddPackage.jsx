@@ -20,14 +20,15 @@ import {
   X,
 } from "lucide-react";
 import Loader from "../../components/shared/Loader";
+import { useApiConfig, API_URL as DEFAULT_API_URL } from "../../hooks/apiConfig";
 
 const CLOUDINARY_UPLOAD_URL =
   "https://api.cloudinary.com/v1_1/dgshzmhyk/image/upload";
 
 const CLOUDINARY_UPLOAD_PRESET = "rup_darpon";
 
-const createPackage = async (packageData) => {
-  const response = await fetch("https://rupdarpon-server.vercel.app/packages", {
+const createPackage = async (packageData, apiUrl = DEFAULT_API_URL) => {
+  const response = await fetch(`${apiUrl}/packages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -53,6 +54,7 @@ const createPackage = async (packageData) => {
 };
 
 const AddPackage = () => {
+  const { API_URL } = useApiConfig();
   const navigate = useNavigate();
 
   const [features, setFeatures] = useState([
@@ -104,7 +106,7 @@ const AddPackage = () => {
   // --------------------------------------------------
 
   const { mutate: submitPackage, isPending } = useMutation({
-    mutationFn: createPackage,
+    mutationFn: (data) => createPackage(data, API_URL),
 
     onSuccess: () => {
       toast.success("Package added successfully!", {

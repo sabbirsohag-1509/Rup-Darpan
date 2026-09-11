@@ -53,10 +53,10 @@ const BookingCTA = () => {
         {/* Action Button */}
         <div>
           <Link
-            to="/pricing"
+            to="/packages"
             className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-primary-content sm:w-fit"
           >
-            <Link to="/packages">View Pricing Packages</Link>
+            <span>View Pricing Packages</span>
             <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
         </div>

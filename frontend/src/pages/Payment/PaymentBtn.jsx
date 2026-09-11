@@ -1,6 +1,7 @@
 import { CreditCard } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const PaymentBtn = ({
   bookingId,
@@ -10,6 +11,8 @@ const PaymentBtn = ({
   customerEmail,
   isFailed = false,
 }) => {
+  const { API_URL } = useApiConfig();
+
   const handlePayment = async () => {
     try {
       console.log("💳 Starting SSLCommerz payment...", {
@@ -21,7 +24,7 @@ const PaymentBtn = ({
       });
 
       const response = await axios.post(
-        "https://rupdarpon-server.vercel.app/payment/init",
+        `${API_URL}/payment/init`,
         {
           amount: packagePrice,
           customerName,

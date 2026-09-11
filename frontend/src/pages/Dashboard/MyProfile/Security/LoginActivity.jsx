@@ -12,10 +12,10 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../../../hooks/apiConfig";
 
 const LoginActivity = () => {
+  const { API_URL } = useApiConfig();
   const [showAll, setShowAll] = useState(false);
 
   const {

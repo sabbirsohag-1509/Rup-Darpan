@@ -14,8 +14,10 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const AddHeroImage = () => {
+  const { API_URL } = useApiConfig();
   const navigate = useNavigate();
 
   const [previewImage, setPreviewImage] = useState("");
@@ -191,7 +193,7 @@ const AddHeroImage = () => {
       // -------------------------------------------------------
       // POST HERO IMAGE
       const response = await axios.post(
-        "https://rupdarpon-server.vercel.app/hero-images",
+        `${API_URL}/hero-images`,
         heroData,
         {
           withCredentials: true,

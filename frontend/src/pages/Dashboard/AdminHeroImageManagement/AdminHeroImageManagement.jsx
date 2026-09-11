@@ -14,10 +14,10 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-const API_URL = "https://rupdarpon-server.vercel.app/hero-images";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 const AdminHeroImageManagement = () => {
+  const { API_URL } = useApiConfig();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -51,9 +51,8 @@ const AdminHeroImageManagement = () => {
     queryKey: ["hero-images"],
 
     queryFn: async () => {
-      const response = await axios.get(API_URL);
-
-      return response.data?.data || [];
+      const response = await axios.get(`${API_URL}/hero-images`);
+      return response.data || [];
     },
   });
 
@@ -63,7 +62,7 @@ const AdminHeroImageManagement = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (heroId) => {
-      const response = await axios.delete(`${API_URL}/${heroId}`);
+      const response = await axios.delete(`${API_URL}/hero-images/${heroId}`);
 
       return response.data;
     },
@@ -93,7 +92,7 @@ const AdminHeroImageManagement = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ heroId, data }) => {
-      const response = await axios.put(`${API_URL}/${heroId}`, data);
+      const response = await axios.put(`${API_URL}/hero-images/${heroId}`, data);
 
       return response.data;
     },

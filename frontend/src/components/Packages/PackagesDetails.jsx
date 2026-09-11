@@ -21,8 +21,10 @@ import {
 
 import { AuthContext } from "../../context/AuthContext";
 import ReviewSection from "../Review/ReviewSection";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const PackagesDetails = () => {
+  const { API_URL } = useApiConfig();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -43,7 +45,7 @@ const PackagesDetails = () => {
 
     queryFn: async () => {
       const response = await axios.get(
-        `https://rupdarpon-server.vercel.app/packages/${id}`,
+        `${API_URL}/packages/${id}`,
       );
 
       return response.data;

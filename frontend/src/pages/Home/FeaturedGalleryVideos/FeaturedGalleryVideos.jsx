@@ -4,8 +4,7 @@ import axios from "axios";
 import { FaFacebookF } from "react-icons/fa";
 import { Camera, Play, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 const FACEBOOK_PAGE_URL =
   "https://www.facebook.com/profile.php?id=61559974675020";
@@ -31,6 +30,7 @@ const FacebookMark = ({ className = "" }) => {
 // =========================================================
 
 const FeaturedGalleryVideos = () => {
+  const { API_URL } = useApiConfig();
   const {
     data: videoData = {},
     isLoading,

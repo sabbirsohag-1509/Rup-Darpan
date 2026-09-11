@@ -19,6 +19,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const CATEGORIES = [
   "Wedding",
@@ -32,6 +33,7 @@ const CATEGORIES = [
 ];
 
 const AddPhoto = () => {
+  const { API_URL } = useApiConfig();
   const [tags, setTags] = useState(["Bride", "Outdoor", "Sunset"]);
   const [tagInput, setTagInput] = useState("");
   const [previewImage, setPreviewImage] = useState("");
@@ -172,7 +174,7 @@ const AddPhoto = () => {
       };
 
       const res = await axios.post(
-        "https://rupdarpon-server.vercel.app/photos",
+        `${API_URL}/photos`,
         photoData,
         {
           withCredentials: true,

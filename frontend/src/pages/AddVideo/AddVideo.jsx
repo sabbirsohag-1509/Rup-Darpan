@@ -11,8 +11,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router";
-
-const API_URL = "https://rupdarpon-server.vercel.app/videos";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const CLOUDINARY_UPLOAD_URL =
   "https://api.cloudinary.com/v1_1/dgshzmhyk/image/upload";
@@ -22,6 +21,7 @@ const CLOUDINARY_UPLOAD_PRESET = "rup_darpon";
 const MAX_FEATURED_VIDEOS = 8;
 
 const AddVideo = () => {
+  const { API_URL } = useApiConfig();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -210,7 +210,7 @@ const AddVideo = () => {
 
       console.log("Sending video payload:", payload);
 
-      const response = await axios.post(API_URL, payload, {
+      const response = await axios.post(`${API_URL}/videos`, payload, {
         withCredentials: true,
       });
 

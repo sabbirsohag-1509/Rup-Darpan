@@ -11,8 +11,7 @@ import {
   Trash2,
   UserPlus,
 } from "lucide-react";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig, API_URL as DEFAULT_API_URL } from "../../hooks/apiConfig";
 
 // ============================================================
 // NOTIFICATION SOUND
@@ -77,16 +76,16 @@ const formatTimeAgo = (date) => {
 // API FUNCTIONS
 // ============================================================
 
-const fetchNotifications = async () => {
-  const response = await axios.get(`${API_URL}/notifications`, {
+const fetchNotifications = async (apiUrl = DEFAULT_API_URL) => {
+  const response = await axios.get(`${apiUrl}/notifications`, {
     withCredentials: true,
   });
 
   return response.data.notifications || [];
 };
 
-const fetchUnreadCount = async () => {
-  const response = await axios.get(`${API_URL}/notifications/unread-count`, {
+const fetchUnreadCount = async (apiUrl = DEFAULT_API_URL) => {
+  const response = await axios.get(`${apiUrl}/notifications/unread-count`, {
     withCredentials: true,
   });
 
@@ -126,6 +125,7 @@ const NotificationSkeleton = () => {
 // ============================================================
 
 const NotificationBell = () => {
+  const { API_URL } = useApiConfig();
   const [open, setOpen] = useState(false);
 
   const dropdownRef = useRef(null);
@@ -192,7 +192,7 @@ const NotificationBell = () => {
     isError: notificationsError,
   } = useQuery({
     queryKey: ["notifications"],
-    queryFn: fetchNotifications,
+    queryFn: () => fetchNotifications(API_URL),
     enabled: open,
     staleTime: 30 * 1000,
   });
@@ -203,7 +203,7 @@ const NotificationBell = () => {
 
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ["notifications", "unread-count"],
-    queryFn: fetchUnreadCount,
+    queryFn: () => fetchUnreadCount(API_URL),
     staleTime: 30 * 1000,
 
     // Check for new notifications every 10 seconds

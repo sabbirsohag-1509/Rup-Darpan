@@ -16,10 +16,10 @@ import {
 import toast from "react-hot-toast";
 import ChangePassword from "./Security/ChangePassword";
 import LoginActivity from "./Security/LoginActivity";
-
-const API_URL = "https://rupdarpon-server.vercel.app";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 const UserProfile = () => {
+  const { API_URL } = useApiConfig();
   const queryClient = useQueryClient();
 
   const [isEditOpen, setIsEditOpen] = useState(false);

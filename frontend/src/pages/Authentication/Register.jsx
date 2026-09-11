@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Check, Eye, EyeOff, UploadCloud, User, UserPlus } from "lucide-react";
 import toast from "react-hot-toast";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 const uppercaseRegex = /[A-Z]/;
@@ -57,6 +58,7 @@ const getPasswordStrength = (checks) => {
 };
 
 const Register = () => {
+  const { API_URL } = useApiConfig();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
@@ -130,7 +132,7 @@ const Register = () => {
       const { confirmPassword, acceptTerms, ...userData } = data;
 
       const response = await axios.post(
-        "https://rupdarpon-server.vercel.app/register",
+        `${API_URL}/register`,
         userData,
       );
 
@@ -440,8 +442,7 @@ const Register = () => {
         <button
           type="button"
           onClick={() => {
-            window.location.href =
-              "https://rupdarpon-server.vercel.app/auth/google";
+            window.location.href = `${API_URL}/auth/google`;
           }}
           className="btn btn-outline w-full border-primary/30 hover:border-primary hover:bg-primary/10"
         >

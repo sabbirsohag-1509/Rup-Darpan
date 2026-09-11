@@ -4,8 +4,10 @@ import { CheckCircle2, MessageSquareText, Send, Star } from "lucide-react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import { AuthContext } from "./../../context/AuthContext";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const ReviewForm = ({ packageName, packageId }) => {
+  const { API_URL } = useApiConfig();
   const { user } = useContext(AuthContext);
 
   const [rating, setRating] = useState(0);
@@ -38,7 +40,7 @@ const ReviewForm = ({ packageName, packageId }) => {
 
     try {
       const response = await axios.post(
-        "https://rupdarpon-server.vercel.app/reviews",
+        `${API_URL}/reviews`,
         reviewData,
         {
           withCredentials: true,

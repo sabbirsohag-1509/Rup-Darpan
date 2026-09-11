@@ -4,10 +4,10 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { ChevronDown } from "lucide-react";
-
-const API_URL = "https://rupdarpon-server.vercel.app/hero-images";
+import { useApiConfig } from "../../../hooks/apiConfig";
 
 const Hero = () => {
+  const { API_URL } = useApiConfig();
   // =========================================================
   // STATE
   // =========================================================
@@ -30,9 +30,9 @@ const Hero = () => {
     queryKey: ["hero-images"],
 
     queryFn: async () => {
-      const response = await axios.get(API_URL);
+      const response = await axios.get(`${API_URL}/hero-images`);
 
-      return response.data?.data || [];
+      return response.data || [];
     },
 
     staleTime: 5 * 60 * 1000,

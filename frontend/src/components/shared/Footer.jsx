@@ -252,15 +252,10 @@ const Footer = () => {
                   Facebook
                 </p>
 
-                <Link
-                  to={FACEBOOK_PAGE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 flex items-center gap-1 text-sm text-base-content/65 transition-colors group-hover:text-primary"
-                >
+                <span className="mt-1 flex items-center gap-1 text-sm text-base-content/65 transition-colors group-hover:text-primary">
                   Our Facebook Page
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
+                </span>
               </div>
             </a>
           </div>

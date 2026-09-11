@@ -2,8 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { CalendarDays, MessageSquareText, Star, UserRound } from "lucide-react";
 import ReviewForm from "./ReviewForm";
+import { useApiConfig } from "../../hooks/apiConfig";
 
 const ReviewSection = ({ packageId, packageName }) => {
+  const { API_URL } = useApiConfig();
   // =====================================================
   // FETCH PACKAGE REVIEWS
   const {
@@ -15,7 +17,7 @@ const ReviewSection = ({ packageId, packageName }) => {
 
     queryFn: async () => {
       const response = await axios.get(
-        `https://rupdarpon-server.vercel.app/reviews/package/${packageId}`,
+        `${API_URL}/reviews/package/${packageId}`,
       );
 
       return response.data;
