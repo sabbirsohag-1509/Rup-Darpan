@@ -1,4 +1,9 @@
-import { bookingCollection, userCollection, ObjectId, isValidObjectId } from "../config/db.js";
+import {
+  bookingCollection,
+  userCollection,
+  ObjectId,
+  isValidObjectId,
+} from "../config/db.js";
 import { createNotification } from "../utils/notification.helper.js";
 
 /**
@@ -29,6 +34,7 @@ export const createBooking = async (req, res) => {
       userId: req.user.userId,
       userName: user.name,
       userEmail: user.email,
+      userPhoto: user.profilePhoto || null,
       status: "pending",
       paymentStatus: "unpaid",
       createdAt: new Date(),
@@ -57,7 +63,10 @@ export const createBooking = async (req, res) => {
         ),
       );
     } catch (adminNotifErr) {
-      console.error("⚠️ Non-fatal admin notification error:", adminNotifErr.message);
+      console.error(
+        "⚠️ Non-fatal admin notification error:",
+        adminNotifErr.message,
+      );
     }
 
     // Notify booking creator safely
@@ -72,7 +81,10 @@ export const createBooking = async (req, res) => {
         relatedId: result.insertedId,
       });
     } catch (userNotifErr) {
-      console.error("⚠️ Non-fatal user notification error:", userNotifErr.message);
+      console.error(
+        "⚠️ Non-fatal user notification error:",
+        userNotifErr.message,
+      );
     }
 
     return res.status(201).send({
