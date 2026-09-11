@@ -428,9 +428,17 @@ const AdminBookingManagement = () => {
 
                           <div className="min-w-0">
                             <div className="flex items-center gap-3">
-                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                                <User className="h-4 w-4 text-primary" />
-                              </div>
+                              {booking.userPhoto ? (
+                                <img
+                                  src={booking.userPhoto}
+                                  alt={booking.userName || "User"}
+                                  className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-primary/10"
+                                />
+                              ) : (
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                                  <User className="h-4 w-4 text-primary" />
+                                </div>
+                              )}
 
                               <div className="min-w-0">
                                 <p className="truncate text-sm font-semibold">

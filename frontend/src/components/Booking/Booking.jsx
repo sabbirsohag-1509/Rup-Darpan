@@ -47,7 +47,7 @@ const Booking = () => {
     handleSubmit,
     setValue,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const onSubmit = async (data) => {
@@ -60,6 +60,7 @@ const Booking = () => {
 
       userName: data.userName,
       userEmail: data.userEmail,
+      userPhoto: user?.profilePhoto || null,
       phone: data.phone,
       eventDate: data.eventDate,
       eventTime: data.eventTime,
@@ -562,10 +563,15 @@ const Booking = () => {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="btn btn-primary w-full text-primary-content"
               >
-                <Send className="h-4 w-4" />
-                Confirm Booking
+                {isSubmitting ? (
+                  <span className="loading loading-spinner loading-sm" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                {isSubmitting ? "Submitting..." : "Confirm Booking"}
               </button>
 
               <p className="mt-3 text-center text-xs text-base-content/45">
