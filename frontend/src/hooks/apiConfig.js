@@ -6,8 +6,10 @@
  * 2. Or update the fallback URL below directly.
  */
 
-// export const API_URL = import.meta.env.VITE_API_URL_LIVE || "https://rupdarpon-server.vercel.app";
-export const API_URL = import.meta.env.VITE_API_URL_LIVE || "https://rup-darpan.vercel.app";
+export const API_URL =
+  import.meta.env.VITE_API_URL_LIVE ||
+  import.meta.env.VITE_API_URL ||
+  "https://rupdarpon-server.vercel.app";
 // export const API_URL = import.meta.env.VITE_API_URL_LOCAL || "http://localhost:5000";
 
 export const API_BASE_URL = API_URL;
