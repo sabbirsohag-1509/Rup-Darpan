@@ -4,7 +4,9 @@ dotenv.config();
 
 const env = {
   PORT: process.env.PORT || 5000,
-  NODE_ENV: process.env.NODE_ENV || "development",
+  NODE_ENV:
+    process.env.NODE_ENV ||
+    (process.env.VERCEL === "1" ? "production" : "development"),
   CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
   SERVER_URL: process.env.SERVER_URL || "http://localhost:5000",
   JWT_SECRET: process.env.JWT_SECRET || "default_jwt_secret_change_me",
