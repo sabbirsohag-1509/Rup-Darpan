@@ -18,6 +18,9 @@ export const photoCollection = db.collection("photos");
 export const userCollection = db.collection("users");
 export const packagesCollection = db.collection("packages");
 export const bookingCollection = db.collection("bookings");
+export const paymentTransactionsCollection = db.collection(
+  "paymentTransactions",
+);
 export const reviewCollection = db.collection("reviews");
 export const loginActivityCollection = db.collection("loginActivities");
 export const videoCollection = db.collection("videos");
@@ -53,6 +56,14 @@ export const initIndexes = async () => {
     await notificationsCollection.createIndex({
       recipientId: 1,
       isRead: 1,
+    });
+    await paymentTransactionsCollection.createIndex(
+      { transactionId: 1 },
+      { unique: true },
+    );
+    await paymentTransactionsCollection.createIndex({
+      bookingId: 1,
+      createdAt: -1,
     });
     console.log("✅ MongoDB indexes initialized successfully.");
   } catch (error) {

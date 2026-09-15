@@ -1,6 +1,12 @@
 import sslcz from "../config/sslcommerz.js";
 import env from "../config/env.js";
 import { bookingCollection, ObjectId, isValidObjectId } from "../config/db.js";
+import {
+  createPaymentTransaction,
+  findPaymentTransactionById,
+  findPaymentTransactionsByBookingId,
+  updatePaymentTransaction,
+} from "../models/paymentTransaction.model.js";
 
 /**
  * Initialize SSLCommerz Payment session (User)
@@ -12,7 +18,8 @@ export const initPayment = async (req, res) => {
     if (!amount || !customerName || !customerEmail || !bookingId) {
       return res.status(400).send({
         success: false,
-        message: "Amount, customer name, customer email and booking ID are required.",
+        message:
+          "Amount, customer name, customer email and booking ID are required.",
       });
     }
 
@@ -42,19 +49,36 @@ export const initPayment = async (req, res) => {
       });
     }
 
-    if (booking.paymentStatus === "paid") {
+    const packageAmount = Number(booking.packagePrice);
+    const paymentTransactions =
+      await findPaymentTransactionsByBookingId(bookingId);
+    const paidAmount = paymentTransactions
+      .filter((transaction) => transaction.status === "paid")
+      .reduce(
+        (total, transaction) => total + Number(transaction.amount || 0),
+        0,
+      );
+    const remainingAmount = Math.max(packageAmount - paidAmount, 0);
+    const paymentAmount = Number(amount);
+
+    if (!Number.isFinite(paymentAmount) || paymentAmount < 1) {
+      return res.status(400).send({
+        success: false,
+        message: "Payment amount must be at least 1 BDT.",
+      });
+    }
+
+    if (remainingAmount <= 0) {
       return res.status(400).send({
         success: false,
         message: "This booking has already been paid.",
       });
     }
 
-    const paymentAmount = Number(booking.packagePrice);
-
-    if (Number(amount) !== paymentAmount) {
+    if (paymentAmount > remainingAmount) {
       return res.status(400).send({
         success: false,
-        message: "Payment amount does not match booking amount.",
+        message: `Payment cannot exceed the remaining amount of ${remainingAmount} BDT.`,
       });
     }
 
@@ -97,7 +121,10 @@ export const initPayment = async (req, res) => {
       value_b: req.user.userId,
     };
 
-    console.log("💳 Initializing SSLCommerz Payment for tran_id:", transactionId);
+    console.log(
+      "💳 Initializing SSLCommerz Payment for tran_id:",
+      transactionId,
+    );
 
     const apiResponse = await sslcz.init(data);
 
@@ -113,6 +140,17 @@ export const initPayment = async (req, res) => {
       { _id: new ObjectId(bookingId) },
       { $set: { transactionId, updatedAt: new Date() } },
     );
+
+    await createPaymentTransaction({
+      bookingId: new ObjectId(bookingId),
+      userId: req.user.userId,
+      transactionId,
+      amount: paymentAmount,
+      currency: "BDT",
+      paymentMethod: "sslcommerz",
+      gateway: "sslcommerz",
+      status: "initiated",
+    });
 
     return res.send({
       success: true,
@@ -157,6 +195,11 @@ export const paymentSuccess = async (req, res) => {
 export const paymentFail = async (req, res) => {
   try {
     const { tran_id } = req.body;
+
+    if (tran_id) {
+      await updatePaymentTransaction(tran_id, "failed");
+    }
+
     return res.redirect(
       `${env.CLIENT_URL}/payment/fail${tran_id ? `?tran_id=${encodeURIComponent(tran_id)}` : ""}`,
     );
@@ -172,6 +215,11 @@ export const paymentFail = async (req, res) => {
 export const paymentCancel = async (req, res) => {
   try {
     const { tran_id } = req.body;
+
+    if (tran_id) {
+      await updatePaymentTransaction(tran_id, "cancelled");
+    }
+
     return res.redirect(
       `${env.CLIENT_URL}/payment/cancel${tran_id ? `?tran_id=${encodeURIComponent(tran_id)}` : ""}`,
     );
@@ -232,7 +280,9 @@ export const paymentIPN = async (req, res) => {
       });
     }
 
-    if (booking.paymentStatus === "paid") {
+    const existingTransaction = await findPaymentTransactionById(tran_id);
+
+    if (existingTransaction?.status === "paid") {
       return res.status(200).send({
         success: true,
         message: "Payment already processed.",
@@ -242,10 +292,14 @@ export const paymentIPN = async (req, res) => {
     const paidAmount = Number(validationResponse.amount);
     const bookingAmount = Number(booking.packagePrice);
 
-    if (paidAmount !== bookingAmount) {
+    if (
+      !existingTransaction ||
+      paidAmount !== Number(existingTransaction.amount) ||
+      paidAmount < 1
+    ) {
       return res.status(400).send({
         success: false,
-        message: "Payment amount does not match booking amount.",
+        message: "Payment amount does not match the initialized transaction.",
       });
     }
 
@@ -263,11 +317,42 @@ export const paymentIPN = async (req, res) => {
       },
       {
         $set: {
-          paymentStatus: "paid",
+          paymentStatus: "partial",
           paymentMethod: "sslcommerz",
           transactionId: tran_id,
           paymentAmount: paidAmount,
+          paidAmount,
           paidAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    await updatePaymentTransaction(tran_id, "paid", {
+      amount: paidAmount,
+      currency: validationResponse.currency || "BDT",
+      validationId: val_id,
+      gatewayStatus: validationResponse.status,
+      paidAt: new Date(),
+    });
+
+    const paidTransactions =
+      await findPaymentTransactionsByBookingId(bookingId);
+    const totalPaid = paidTransactions
+      .filter((transaction) => transaction.status === "paid")
+      .reduce(
+        (total, transaction) => total + Number(transaction.amount || 0),
+        0,
+      );
+    const finalPaymentStatus = totalPaid >= bookingAmount ? "paid" : "partial";
+
+    await bookingCollection.updateOne(
+      { _id: new ObjectId(bookingId) },
+      {
+        $set: {
+          paymentStatus: finalPaymentStatus,
+          paymentAmount: totalPaid,
+          paidAmount: totalPaid,
           updatedAt: new Date(),
         },
       },
@@ -295,10 +380,63 @@ export const paymentIPN = async (req, res) => {
   }
 };
 
+export const getPaymentHistory = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    if (!isValidObjectId(bookingId)) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid booking ID.",
+      });
+    }
+
+    const booking = await bookingCollection.findOne({
+      _id: new ObjectId(bookingId),
+    });
+
+    if (!booking) {
+      return res.status(404).send({
+        success: false,
+        message: "Booking not found.",
+      });
+    }
+
+    if (booking.userId !== req.user.userId) {
+      return res.status(403).send({
+        success: false,
+        message: "You are not authorized to view this payment history.",
+      });
+    }
+
+    const transactions = await findPaymentTransactionsByBookingId(bookingId);
+
+    return res.send({
+      success: true,
+      bookingId,
+      packageAmount: Number(booking.packagePrice || 0),
+      totalPaid: transactions
+        .filter((transaction) => transaction.status === "paid")
+        .reduce(
+          (total, transaction) => total + Number(transaction.amount || 0),
+          0,
+        ),
+      transactions,
+    });
+  } catch (error) {
+    console.error("❌ Failed to fetch payment history:", error);
+    return res.status(500).send({
+      success: false,
+      message: "Failed to fetch payment history.",
+    });
+  }
+};
+
 export default {
   initPayment,
   paymentSuccess,
   paymentFail,
   paymentCancel,
   paymentIPN,
+  getPaymentHistory,
 };
