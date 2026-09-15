@@ -47,6 +47,9 @@ import AdminHeroImageManagement from "../pages/Dashboard/AdminHeroImageManagemen
 import ErrorPage from "../components/ErrorPage/ErrorPage";
 import AdminPaymentManagement from "../pages/Dashboard/AdminPaymentManagement";
 import OurPolicy from "../components/OurPolicy/OurPolicy";
+import PaymentSuccess from "../pages/Payment/PaymentSuccess";
+import PaymentFail from "../pages/Payment/PaymentFail";
+import PaymentCancel from "../pages/Payment/PaymentCancel";
 
 export const router = createBrowserRouter([
   // =====================================================
@@ -106,8 +109,20 @@ export const router = createBrowserRouter([
       },
       {
         path: "policy",
-        element: <OurPolicy></OurPolicy>
-      }
+        element: <OurPolicy></OurPolicy>,
+      },
+      {
+        path: "payment/success",
+        element: <PaymentSuccess />,
+      },
+      {
+        path: "payment/fail",
+        element: <PaymentFail />,
+      },
+      {
+        path: "payment/cancel",
+        element: <PaymentCancel />,
+      },
     ],
   },
 
@@ -279,8 +294,8 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AdminPaymentManagement />,
-          }
-        ]
+          },
+        ],
       },
       {
         path: "admin-profile",
