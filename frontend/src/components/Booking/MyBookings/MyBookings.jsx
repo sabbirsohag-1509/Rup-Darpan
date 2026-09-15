@@ -117,7 +117,24 @@ const MyBookings = () => {
         withCredentials: true,
       });
 
-      return response.data;
+      const bookingList = Array.isArray(response.data) ? response.data : [];
+      return Promise.all(
+        bookingList.map(async (booking) => {
+          try {
+            const historyResponse = await axios.get(
+              `${API_URL}/payment/history/${booking._id}`,
+              { withCredentials: true },
+            );
+
+            return {
+              ...booking,
+              paymentHistory: historyResponse.data,
+            };
+          } catch {
+            return booking;
+          }
+        }),
+      );
     },
   });
 
@@ -564,10 +581,10 @@ const MyBookings = () => {
                     <div className="mt-3">
                       <PaymentBtn
                         bookingId={booking._id}
-                        packagePrice={Number(booking.packagePrice || 0)}
                         minimumAdvance={Math.ceil(
                           Number(booking.packagePrice || 0) * 0.3,
                         )}
+                        remainingAmount={remainingAmount}
                         customerName={booking.userName}
                         customerEmail={booking.userEmail}
                         isFailed={isFailed}

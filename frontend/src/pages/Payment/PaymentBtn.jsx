@@ -2,22 +2,25 @@ import { CreditCard } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useApiConfig } from "../../hooks/apiConfig";
+import { useState } from "react";
 
 const PaymentBtn = ({
   bookingId,
-  packagePrice,
   minimumAdvance,
+  remainingAmount,
   customerName,
   customerEmail,
   isFailed = false,
 }) => {
   const { API_URL } = useApiConfig();
+  const [amount, setAmount] = useState(
+    String(Math.min(minimumAdvance, remainingAmount)),
+  );
 
   const handlePayment = async () => {
     try {
       console.log("💳 Starting SSLCommerz payment...", {
         bookingId,
-        packagePrice,
         minimumAdvance,
         customerName,
         customerEmail,
@@ -26,7 +29,7 @@ const PaymentBtn = ({
       const response = await axios.post(
         `${API_URL}/payment/init`,
         {
-          amount: packagePrice,
+          amount: Number(amount),
           customerName,
           customerEmail,
           bookingId,
@@ -60,6 +63,18 @@ const PaymentBtn = ({
 
   return (
     <div>
+      <label className="mb-2 block text-xs font-medium text-base-content/60">
+        Payment amount (BDT)
+      </label>
+      <input
+        type="number"
+        min="1"
+        max={remainingAmount}
+        step="1"
+        value={amount}
+        onChange={(event) => setAmount(event.target.value)}
+        className="input input-bordered mb-3 w-full"
+      />
       <button
         type="button"
         className="btn btn-primary w-full"
