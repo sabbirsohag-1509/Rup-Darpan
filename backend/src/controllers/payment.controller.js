@@ -15,11 +15,33 @@ export const initPayment = async (req, res) => {
   try {
     const { amount, customerName, customerEmail, bookingId } = req.body;
 
-    if (!amount || !customerName || !customerEmail || !bookingId) {
+    if (!amount || !bookingId) {
       return res.status(400).send({
         success: false,
-        message:
-          "Amount, customer name, customer email and booking ID are required.",
+        message: "Amount and booking ID are required.",
+      });
+    }
+
+    if (
+      !env.SSLCOMMERZ_STORE_ID ||
+      !env.SSLCOMMERZ_STORE_PASSWORD ||
+      !env.CLIENT_URL ||
+      !env.SERVER_URL
+    ) {
+      return res.status(503).send({
+        success: false,
+        message: "Payment gateway is not configured.",
+      });
+    }
+
+    if (
+      env.SSLCOMMERZ_IS_LIVE &&
+      (!env.CLIENT_URL.startsWith("https://") ||
+        !env.SERVER_URL.startsWith("https://"))
+    ) {
+      return res.status(503).send({
+        success: false,
+        message: "Live payments require HTTPS client and server URLs.",
       });
     }
 
@@ -50,6 +72,12 @@ export const initPayment = async (req, res) => {
     }
 
     const packageAmount = Number(booking.packagePrice);
+    if (!Number.isFinite(packageAmount) || packageAmount <= 0) {
+      return res.status(400).send({
+        success: false,
+        message: "This booking has an invalid package amount.",
+      });
+    }
     const paymentTransactions =
       await findPaymentTransactionsByBookingId(bookingId);
     const paidAmount = paymentTransactions
@@ -100,8 +128,8 @@ export const initPayment = async (req, res) => {
       product_category: "Photography",
       product_profile: "general",
 
-      cus_name: customerName,
-      cus_email: customerEmail,
+      cus_name: booking.userName || customerName || "Customer",
+      cus_email: booking.userEmail || customerEmail,
       cus_add1: booking.eventLocation || "Bangladesh",
       cus_city: "Dinajpur",
       cus_state: "Dinajpur",
@@ -126,22 +154,7 @@ export const initPayment = async (req, res) => {
       transactionId,
     );
 
-    const apiResponse = await sslcz.init(data);
-
-    if (!apiResponse?.GatewayPageURL) {
-      return res.status(500).send({
-        success: false,
-        message: "Failed to initialize SSLCommerz payment.",
-      });
-    }
-
-    // Save transaction ID on booking
-    await bookingCollection.updateOne(
-      { _id: new ObjectId(bookingId) },
-      { $set: { transactionId, updatedAt: new Date() } },
-    );
-
-    await createPaymentTransaction({
+    const transaction = await createPaymentTransaction({
       bookingId: new ObjectId(bookingId),
       userId: req.user.userId,
       transactionId,
@@ -151,6 +164,32 @@ export const initPayment = async (req, res) => {
       gateway: "sslcommerz",
       status: "initiated",
     });
+
+    let apiResponse;
+    try {
+      apiResponse = await sslcz.init(data);
+    } catch (gatewayError) {
+      await updatePaymentTransaction(transactionId, "failed", {
+        failureReason: "Gateway initialization failed",
+      });
+      throw gatewayError;
+    }
+
+    if (!apiResponse?.GatewayPageURL) {
+      await updatePaymentTransaction(transactionId, "failed", {
+        failureReason: "Gateway did not return a payment URL",
+      });
+      return res.status(500).send({
+        success: false,
+        message: "Failed to initialize SSLCommerz payment.",
+      });
+    }
+
+    // Keep only the latest transaction as a booking summary; history lives in its own collection.
+    await bookingCollection.updateOne(
+      { _id: new ObjectId(bookingId) },
+      { $set: { lastTransactionId: transactionId, updatedAt: new Date() } },
+    );
 
     return res.send({
       success: true,
@@ -303,10 +342,28 @@ export const paymentIPN = async (req, res) => {
       });
     }
 
-    if (booking.transactionId && booking.transactionId !== tran_id) {
+    if (
+      String(existingTransaction.bookingId) !== String(booking._id) ||
+      String(existingTransaction.userId) !== String(booking.userId)
+    ) {
       return res.status(400).send({
         success: false,
-        message: "Transaction ID does not match booking.",
+        message: "Transaction ownership could not be verified.",
+      });
+    }
+
+    const transactionUpdate = await updatePaymentTransaction(tran_id, "paid", {
+      amount: paidAmount,
+      currency: validationResponse.currency || "BDT",
+      validationId: val_id,
+      gatewayStatus: validationResponse.status,
+      paidAt: new Date(),
+    });
+
+    if (transactionUpdate.modifiedCount === 0) {
+      return res.status(200).send({
+        success: true,
+        message: "Payment already processed.",
       });
     }
 
@@ -314,27 +371,37 @@ export const paymentIPN = async (req, res) => {
       {
         _id: new ObjectId(bookingId),
         paymentStatus: { $ne: "paid" },
+        $expr: {
+          $lte: [
+            {
+              $add: [{ $ifNull: ["$paidAmount", 0] }, paidAmount],
+            },
+            { $toDouble: "$packagePrice" },
+          ],
+        },
       },
       {
         $set: {
           paymentStatus: "partial",
           paymentMethod: "sslcommerz",
-          transactionId: tran_id,
+          updatedAt: new Date(),
+        },
+        $inc: {
           paymentAmount: paidAmount,
           paidAmount,
-          paidAt: new Date(),
-          updatedAt: new Date(),
         },
       },
     );
 
-    await updatePaymentTransaction(tran_id, "paid", {
-      amount: paidAmount,
-      currency: validationResponse.currency || "BDT",
-      validationId: val_id,
-      gatewayStatus: validationResponse.status,
-      paidAt: new Date(),
-    });
+    if (updateResult.modifiedCount === 0) {
+      await updatePaymentTransaction(tran_id, "rejected", {
+        failureReason: "Payment would exceed the booking amount",
+      });
+      return res.status(400).send({
+        success: false,
+        message: "Payment would exceed the remaining booking amount.",
+      });
+    }
 
     const paidTransactions =
       await findPaymentTransactionsByBookingId(bookingId);
@@ -432,6 +499,46 @@ export const getPaymentHistory = async (req, res) => {
   }
 };
 
+export const getPaymentStatus = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const transaction = await findPaymentTransactionById(transactionId);
+
+    if (!transaction) {
+      return res.status(404).send({
+        success: false,
+        message: "Payment transaction not found.",
+      });
+    }
+
+    if (String(transaction.userId) !== String(req.user.userId)) {
+      return res.status(403).send({
+        success: false,
+        message: "You are not authorized to view this payment.",
+      });
+    }
+
+    return res.send({
+      success: true,
+      transaction: {
+        transactionId: transaction.transactionId,
+        bookingId: transaction.bookingId,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: transaction.status,
+        paidAt: transaction.paidAt || null,
+        failureReason: transaction.failureReason || null,
+      },
+    });
+  } catch (error) {
+    console.error("❌ Failed to fetch payment status:", error);
+    return res.status(500).send({
+      success: false,
+      message: "Failed to fetch payment status.",
+    });
+  }
+};
+
 export default {
   initPayment,
   paymentSuccess,
@@ -439,4 +546,5 @@ export default {
   paymentCancel,
   paymentIPN,
   getPaymentHistory,
+  getPaymentStatus,
 };
