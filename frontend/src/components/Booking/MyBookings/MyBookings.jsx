@@ -37,6 +37,14 @@ const getPaymentStyle = (paymentStatus, bookingStatus) => {
     };
   }
 
+  if (payment === "partial") {
+    return {
+      label: "Partially Paid",
+      icon: CreditCard,
+      className: "border-info/20 bg-info/10 text-info",
+    };
+  }
+
   // Payment failed
   if (payment === "failed") {
     return {
@@ -165,7 +173,7 @@ const MyBookings = () => {
           {[1, 2, 3, 4].map((item) => (
             <div
               key={item}
-              className="h-[700px] animate-pulse rounded-2xl bg-base-200"
+              className="h-175 animate-pulse rounded-2xl bg-base-200"
             />
           ))}
         </div>
@@ -357,8 +365,12 @@ const MyBookings = () => {
             // ==================================================
 
             const paidAmount = Number(
-              booking.paidAmount ?? (isPaid ? minimumAdvance : 0),
+              booking.paymentHistory?.totalPaid ??
+                booking.paidAmount ??
+                (isPaid ? minimumAdvance : 0),
             );
+
+            const transactions = booking.paymentHistory?.transactions || [];
 
             // ==================================================
             // REMAINING AMOUNT
@@ -461,12 +473,14 @@ const MyBookings = () => {
 
                         <p className="mt-0.5 text-sm font-medium">
                           {isPaid
-                            ? "Your 30% advance payment has been received"
-                            : isFailed
-                              ? "Your previous payment attempt was unsuccessful"
-                              : isConfirmed
-                                ? "30% advance payment is required"
-                                : "Payment available after booking confirmation"}
+                            ? "Your payment has been completed"
+                            : paymentStatus === "partial"
+                              ? "Your partial payment has been received"
+                              : isFailed
+                                ? "Your previous payment attempt was unsuccessful"
+                                : isConfirmed
+                                  ? "30% advance payment is required"
+                                  : "Payment available after booking confirmation"}
                         </p>
                       </div>
                     </div>
@@ -644,7 +658,7 @@ const MyBookings = () => {
                             </span>
                           </div>
 
-                          <span className="max-w-[160px] truncate text-xs font-medium">
+                          <span className="max-w-40 truncate text-xs font-medium">
                             {booking.transactionId}
                           </span>
                         </div>
@@ -684,6 +698,39 @@ const MyBookings = () => {
                           </span>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {transactions.length > 0 && (
+                    <div className="mt-4 border-t border-base-content/10 pt-4">
+                      <div className="mb-2 flex items-center gap-2">
+                        <ReceiptText className="h-4 w-4 text-primary" />
+                        <p className="text-xs font-semibold text-base-content/60">
+                          Payment History
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        {transactions.map((transaction) => (
+                          <div
+                            key={transaction.transactionId}
+                            className="flex items-center justify-between gap-3 rounded-lg bg-base-100 px-3 py-2"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-xs font-medium capitalize">
+                                {transaction.status}
+                              </p>
+                              <p className="truncate text-[10px] text-base-content/45">
+                                {transaction.transactionId}
+                              </p>
+                            </div>
+                            <span className="shrink-0 text-xs font-bold">
+                              ৳
+                              {Number(transaction.amount || 0).toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
